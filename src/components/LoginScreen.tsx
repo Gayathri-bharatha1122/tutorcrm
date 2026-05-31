@@ -15,6 +15,8 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import { Role, Screen } from '../types';
+import { useLanguage } from '../LanguageContext';
+import { LanguageSelector } from './LanguageSelector';
 
 interface LoginScreenProps {
   onLoginSuccess: (role: Role) => void;
@@ -23,6 +25,7 @@ interface LoginScreenProps {
 }
 
 export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavigate, initialRole = 'student' }) => {
+  const { t } = useLanguage();
   const [selectedRole, setSelectedRole] = useState<Role>(initialRole);
   
   // Dynamic customization variables based on chosen role
@@ -90,7 +93,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavi
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
-      setErrorStatus('Please provide both administrative username/email and access key.');
+      setErrorStatus(t('Please provide both administrative username/email and access key.'));
       return;
     }
 
@@ -110,16 +113,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavi
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center px-4 relative overflow-hidden font-sans">
-      
-      {/* Floating Back Button */}
-      <button
-        onClick={() => onNavigate('landing')}
-        className="absolute top-4 left-4 sm:top-6 sm:left-6 px-4 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white rounded-xl text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer shadow-md z-50 group"
-      >
-        <ArrowLeft className="h-4 w-4 group-hover:-translate-x-0.5 transition-transform" />
-        Back to Home
-      </button>
+    <div className="min-h-[calc(100vh-64px)] bg-slate-950 flex flex-col items-center justify-center px-4 relative overflow-hidden font-sans">
       
       {/* Decorative Glow elements */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-slate-900/40 opacity-70 blur-[100px] pointer-events-none" />
@@ -144,14 +138,14 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavi
         {/* Dynamic header colored based on current selected role */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-indigo-400 tracking-wider uppercase">Secure Portal Authorization</span>
+            <span className="text-xs font-semibold text-indigo-400 tracking-wider uppercase">{t('Secure Portal Authorization')}</span>
             <div className={`px-2 py-0.5 rounded-md text-[10px] font-bold text-white ${roleConfig[selectedRole].tagColor} flex items-center gap-1`}>
               {roleConfig[selectedRole].icon}
               {selectedRole.toUpperCase()}
             </div>
           </div>
-          <h2 className="text-xl font-bold text-white mb-1">{roleConfig[selectedRole].title}</h2>
-          <p className="text-slate-400 text-xs leading-relaxed">{roleConfig[selectedRole].desc}</p>
+          <h2 className="text-xl font-bold text-white mb-1">{t(roleConfig[selectedRole].title)}</h2>
+          <p className="text-slate-400 text-xs leading-relaxed">{t(roleConfig[selectedRole].desc)}</p>
         </div>
 
         {/* Role Select Buttons */}
@@ -178,7 +172,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavi
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <div className="mb-1.5">
-              <label className="block text-[11px] font-medium text-slate-400 uppercase">Login Identifier</label>
+              <label className="block text-[11px] font-medium text-slate-400 uppercase">{t('Login Identifier')}</label>
             </div>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
@@ -200,7 +194,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavi
 
           <div>
             <div className="mb-1.5">
-              <label className="block text-[11px] font-medium text-slate-400 uppercase">Access Token Key</label>
+              <label className="block text-[11px] font-medium text-slate-400 uppercase">{t('Access Token Key')}</label>
             </div>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
@@ -262,14 +256,14 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavi
               onClick={() => onNavigate('landing')}
               className="flex-1 py-3 bg-slate-950 border border-slate-800 hover:bg-slate-850 text-slate-300 font-semibold text-sm rounded-xl cursor-pointer transition-all flex items-center justify-center gap-1.5"
             >
-              <ArrowLeft className="h-4 w-4" /> Back
+              <ArrowLeft className="h-4 w-4" /> {t('Back')}
             </button>
             <button
               type="submit"
               className="flex-[2] py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-xl cursor-pointer shadow-lg shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 group"
               id="loginSubmitBtn"
             >
-              Access Portal
+              {t('Access Portal')}
               <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
             </button>
           </div>
@@ -277,13 +271,13 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavi
 
         {/* Dynamic Stepper switch backer */}
         <div className="mt-6 pt-5 border-t border-slate-800 text-center text-xs text-slate-500 font-medium">
-          <span>New to our campus? </span>
+          <span>{t('New to our campus?')} </span>
           <button 
             type="button"
             onClick={() => onNavigate('register')}
             className="text-indigo-400 hover:underline hover:text-indigo-300 transition-colors font-bold cursor-pointer"
           >
-            Run Registration Stepper
+            {t('Run Registration Stepper')}
           </button>
         </div>
       </motion.div>

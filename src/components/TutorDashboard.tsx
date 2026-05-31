@@ -17,6 +17,8 @@ import {
   X
 } from 'lucide-react';
 import { Student, Teacher } from '../types';
+import { useLanguage } from '../LanguageContext';
+import { LanguageSelector } from './LanguageSelector';
 
 interface TutorDashboardProps {
   students: Student[];
@@ -31,6 +33,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
   tutorName,
   onLogout
 }) => {
+  const { t } = useLanguage();
   const [markedAttendance, setMarkedAttendance] = useState<Record<string, 'Present' | 'Absent' | 'Excused'>>({
     ST001: 'Present',
     ST002: 'Present',
@@ -89,7 +92,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
             </div>
             <div>
               <span className="font-sans font-bold text-base text-white tracking-tight">EduManage Tutor</span>
-              <span className="text-[10px] block text-slate-500 font-semibold uppercase">Academic Command</span>
+              <span className="text-[10px] block text-slate-500 font-semibold uppercase">{t('Academic Command')}</span>
             </div>
           </div>
 
@@ -99,11 +102,12 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
                 <span className="text-xs font-bold text-slate-200 block">{tutorName}</span>
                 <span className="text-[10px] text-teal-400 font-bold uppercase font-mono">Senior Instructor Faculty</span>
               </div>
+              <LanguageSelector />
               <button 
                 onClick={onLogout}
                 className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs text-slate-200 font-semibold rounded-lg transition overflow-hidden cursor-pointer"
               >
-                Sign Out
+                {t('Sign Out')}
               </button>
             </div>
           </div>
@@ -137,7 +141,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
         <div className="bg-slate-900 border border-slate-800 p-6 rounded-3xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-1">
             <span className="text-xs font-bold text-teal-400 uppercase tracking-widest block">Senior Instructor Control</span>
-            <h2 className="text-2xl font-bold text-white">Daily Command Space – {tutorName}</h2>
+            <h2 className="text-2xl font-bold text-white">{t('Daily Command Space')} – {tutorName}</h2>
             <p className="text-slate-400 text-xs">Manage active pupil attendances, input assignment metrics, and dispatch calendar coordinates.</p>
           </div>
 
@@ -146,7 +150,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
               onClick={() => setShowScheduleModal(true)}
               className="px-4 py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 transition-all shadow-lg shadow-teal-600/15 cursor-pointer"
             >
-              <Plus className="h-4 w-4" /> Schedule seminar session
+              <Plus className="h-4 w-4" /> {t('Schedule seminar session')}
             </button>
           </div>
         </div>
@@ -159,7 +163,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
             <div className="space-y-4">
               <div className="border-b border-slate-850 pb-4 flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-bold text-white">Mark Today's Classroom Attendance Roll</h3>
+                  <h3 className="text-sm font-bold text-white">{t('Mark Today\'s Classroom Attendance Roll')}</h3>
                   <span className="text-[10px] text-slate-500">Record classroom absences instantly for automatic parent sync</span>
                 </div>
                 <span className="text-[10px] font-bold text-teal-400 bg-teal-500/10 px-2.5 py-1 rounded">Daily Standard Journal</span>
@@ -210,7 +214,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
           {/* Assignment grader panel - Right */}
           <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-6">
             <div className="mb-4">
-              <h3 className="text-xs font-bold text-white uppercase tracking-widest text-teal-400 mb-1">Evaluate Assignment Draft</h3>
+              <h3 className="text-xs font-bold text-white uppercase tracking-widest text-teal-400 mb-1">{t('Evaluate Assignment Draft')}</h3>
               <h4 className="text-sm font-bold text-white">Record Curricular Grades and Feedback</h4>
             </div>
 
@@ -278,7 +282,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
                   type="submit"
                   className="w-full py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-semibold text-xs rounded-xl cursor-pointer shadow-lg shadow-teal-600/10 transition flex items-center justify-center gap-1.5"
                 >
-                  Compile & Log Evaluation <ArrowRight className="h-4 w-4" />
+                  {t('Compile & Log Evaluation')} <ArrowRight className="h-4 w-4" />
                 </button>
               )}
             </form>
@@ -289,7 +293,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
         {/* Timetables lectures preview */}
         <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
           <div className="mb-4">
-            <h3 className="text-sm font-bold text-white">Prof. Miller's Lecture Timetable</h3>
+            <h3 className="text-sm font-bold text-white">{t('Lecture Timetable')}</h3>
             <span className="text-[11px] text-slate-550 block">Assigned academic slots for active physics curricula</span>
           </div>
 

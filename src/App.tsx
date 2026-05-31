@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { LanguageProvider } from './LanguageContext';
 import { 
   initialStudents, 
   initialTeachers, 
@@ -13,6 +14,7 @@ import {
 import { Student, Teacher, ActivityLog, Course, Bill, Announcement, Screen, Role } from './types';
 
 // Importing Views
+import { PublicNavbar } from './components/PublicNavbar';
 import { LandingPage } from './components/LandingPage';
 import { LoginScreen } from './components/LoginScreen';
 import { RegisterStepper } from './components/RegisterStepper';
@@ -139,129 +141,135 @@ export default function App() {
     setScreen('landing');
   };
 
+  const isPublicPage = ['landing', 'login', 'register'].includes(screen);
+
   return (
-    <div className="bg-slate-950 min-h-screen w-full overflow-x-hidden text-slate-100 flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+    <LanguageProvider>
+      <div className="bg-slate-950 min-h-screen w-full overflow-x-hidden text-slate-100 flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
 
-      {/* Route Render Engine with AnimatePresence */}
-      <div className="flex-1">
-        <AnimatePresence mode="wait">
-          {screen === 'landing' && (
-            <motion.div
-              key="landing"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="w-full"
-            >
-              <LandingPage onNavigate={handleNavigate} />
-            </motion.div>
-          )}
+        {isPublicPage && <PublicNavbar screen={screen} onNavigate={handleNavigate} />}
 
-          {screen === 'login' && (
-            <motion.div
-              key="login"
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              className="w-full"
-            >
-              <LoginScreen 
-                onLoginSuccess={handleLoginSuccess} 
-                onNavigate={handleNavigate} 
-                initialRole={activeRole} 
-              />
-            </motion.div>
-          )}
+        {/* Route Render Engine with AnimatePresence */}
+        <div className="flex-1">
+          <AnimatePresence mode="wait">
+            {screen === 'landing' && (
+              <motion.div
+                key="landing"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="w-full"
+              >
+                <LandingPage onNavigate={handleNavigate} />
+              </motion.div>
+            )}
 
-          {screen === 'register' && (
-            <motion.div
-              key="register"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="w-full"
-            >
-              <RegisterStepper 
-                onNavigate={handleNavigate} 
-                onRegisteredSuccess={handleRegisteredSuccess} 
-              />
-            </motion.div>
-          )}
+            {screen === 'login' && (
+              <motion.div
+                key="login"
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                className="w-full"
+              >
+                <LoginScreen 
+                  onLoginSuccess={handleLoginSuccess} 
+                  onNavigate={handleNavigate} 
+                  initialRole={activeRole} 
+                />
+              </motion.div>
+            )}
 
-          {screen === 'admin' && (
-            <motion.div
-              key="admin"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="w-full animate-fade-in"
-            >
-              <AdminDashboard 
-                students={studentsList}
-                teachers={teachersList}
-                activityLogs={activityLogsList}
-                onAddStudent={handleAddNewStudent}
-                onLogout={handleLogout}
-              />
-            </motion.div>
-          )}
+            {screen === 'register' && (
+              <motion.div
+                key="register"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="w-full"
+              >
+                <RegisterStepper 
+                  onNavigate={handleNavigate} 
+                  onRegisteredSuccess={handleRegisteredSuccess} 
+                />
+              </motion.div>
+            )}
 
-          {screen === 'student' && (
-            <motion.div
-              key="student"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="w-full"
-            >
-              <StudentDashboard 
-                courses={marcusCourses}
-                exams={marcusExams}
-                upcomingExams={upcomingExams}
-                studentName={currentProfileName}
-                onLogout={handleLogout}
-              />
-            </motion.div>
-          )}
+            {screen === 'admin' && (
+              <motion.div
+                key="admin"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="w-full animate-fade-in"
+              >
+                <AdminDashboard 
+                  students={studentsList}
+                  teachers={teachersList}
+                  activityLogs={activityLogsList}
+                  onAddStudent={handleAddNewStudent}
+                  onLogout={handleLogout}
+                />
+              </motion.div>
+            )}
 
-          {screen === 'parent' && (
-            <motion.div
-              key="parent"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="w-full"
-            >
-              <ParentDashboard 
-                bills={parentBillsList}
-                announcements={systemAnnouncements}
-                parentName={currentProfileName}
-                studentName="Marcus Thorne"
-                onUpdateBills={setParentBillsList}
-                onLogout={handleLogout}
-              />
-            </motion.div>
-          )}
+            {screen === 'student' && (
+              <motion.div
+                key="student"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="w-full"
+              >
+                <StudentDashboard 
+                  courses={marcusCourses}
+                  exams={marcusExams}
+                  upcomingExams={upcomingExams}
+                  studentName={currentProfileName}
+                  onLogout={handleLogout}
+                />
+              </motion.div>
+            )}
 
-          {screen === 'tutor' && (
-            <motion.div
-              key="tutor"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="w-full"
-            >
-              <TutorDashboard 
-                students={studentsList}
-                teachers={teachersList}
-                tutorName={currentProfileName}
-                onLogout={handleLogout}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+            {screen === 'parent' && (
+              <motion.div
+                key="parent"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="w-full"
+              >
+                <ParentDashboard 
+                  bills={parentBillsList}
+                  announcements={systemAnnouncements}
+                  parentName={currentProfileName}
+                  studentName="Marcus Thorne"
+                  onUpdateBills={setParentBillsList}
+                  onLogout={handleLogout}
+                />
+              </motion.div>
+            )}
+
+            {screen === 'tutor' && (
+              <motion.div
+                key="tutor"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="w-full"
+              >
+                <TutorDashboard 
+                  students={studentsList}
+                  teachers={teachersList}
+                  tutorName={currentProfileName}
+                  onLogout={handleLogout}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
       </div>
-
-    </div>
+    </LanguageProvider>
   );
 }

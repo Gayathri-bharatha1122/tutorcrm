@@ -16,6 +16,8 @@ import {
   Award
 } from 'lucide-react';
 import { Bill, Announcement } from '../types';
+import { useLanguage } from '../LanguageContext';
+import { LanguageSelector } from './LanguageSelector';
 
 interface ParentDashboardProps {
   bills: Bill[];
@@ -34,6 +36,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
   onUpdateBills,
   onLogout
 }) => {
+  const { t } = useLanguage();
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentSuccessMessage, setPaymentSuccessMessage] = useState<string | null>(null);
@@ -91,7 +94,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
             </div>
             <div>
               <span className="font-sans font-bold text-base text-white tracking-tight">EduManage Parent</span>
-              <span className="text-[10px] block text-slate-500 font-semibold uppercase">Guardian Link Account</span>
+              <span className="text-[10px] block text-slate-500 font-semibold uppercase">{t('Guardian Link Account')}</span>
             </div>
           </div>
 
@@ -101,11 +104,12 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                 <span className="text-xs font-bold text-slate-200 block">{parentName}</span>
                 <span className="text-[10px] text-amber-400 font-bold uppercase font-mono">Linked Child • {studentName}</span>
               </div>
+              <LanguageSelector />
               <button 
                 onClick={onLogout}
                 className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs text-slate-200 font-semibold rounded-lg transition cursor-pointer"
               >
-                Sign Out
+                {t('Sign Out')}
               </button>
             </div>
           </div>
@@ -142,14 +146,14 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
               <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest block bg-amber-500/10 w-max px-2.5 py-0.5 rounded-md">
                 Active Student Linkage
               </span>
-              <h2 className="text-xl font-bold text-white">Student Progress Directory: {studentName}</h2>
+              <h2 className="text-xl font-bold text-white">{studentName === 'Marcus Thorne' ? t('Student Progress Directory: Marcus Thorne') : `${t('Student Progress Directory')}: ${studentName}`}</h2>
               <p className="text-slate-400 text-xs">Educational metrics synchronized directly with Prof. Alistair Miller's study journals.</p>
             </div>
 
             {/* Total Balance block */}
             <div className="bg-slate-950 p-4 rounded-2xl border border-slate-850 flex items-center justify-between gap-6 w-full sm:min-w-xs shrink-0">
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block mb-0.5">Outstanding Balance Due</span>
+                <span className="text-[10px] font-bold text-slate-500 uppercase block mb-0.5">{t('Outstanding Balance Due')}</span>
                 <span className="text-2xl font-extrabold text-white block">${totalOutstanding}</span>
               </div>
               {totalOutstanding > 0 ? (
@@ -173,7 +177,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                 <Calendar className="h-5 w-5" />
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Attendance Rate</span>
+                <span className="text-[10px] font-bold text-slate-500 uppercase block">{t('Attendance Rate')}</span>
                 <span className="text-lg font-bold text-white block mt-0.5">98.2%</span>
                 <span className="text-[10px] text-emerald-400 font-bold block">Excellent • Standard Class 11B</span>
               </div>
@@ -185,7 +189,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                 <Activity className="h-5 w-5" />
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Homework Completion</span>
+                <span className="text-[10px] font-bold text-slate-500 uppercase block">{t('Homework Completion')}</span>
                 <span className="text-lg font-bold text-white block mt-0.5">94.1%</span>
                 <span className="text-[10px] text-teal-400 font-bold block">Highly Consistent • +3% vs. Avg</span>
               </div>
@@ -197,7 +201,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                 <Award className="h-5 w-5" />
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Average Course Grades</span>
+                <span className="text-[10px] font-bold text-slate-500 uppercase block">{t('Average Course Grades')}</span>
                 <span className="text-lg font-bold text-white block mt-0.5">91% (Grade A-)</span>
                 <span className="text-[10px] text-indigo-400 font-bold block">Top 10% of Cohort tier</span>
               </div>
@@ -213,7 +217,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
           <div className="lg:col-span-3 bg-slate-900 border border-slate-800 rounded-3xl p-6">
             <div className="mb-6 flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-bold text-white">Itemized Tuition Billing & Fees Ledger</h3>
+                <h3 className="text-sm font-bold text-white">{t('Itemized Tuition Billing & Fees Ledger')}</h3>
                 <span className="text-xs text-slate-550 block">Complete billing file with authorized gateway links</span>
               </div>
             </div>
@@ -252,7 +256,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                             onClick={() => handlePayClick(bill)}
                             className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-[11px] px-3 py-1.5 rounded-lg transition cursor-pointer"
                           >
-                            Pay Now
+                            {t('Pay Now')}
                           </button>
                         ) : (
                           <span className="text-[10px] font-bold text-slate-500 block mr-2">Paid on {bill.paidDate}</span>
@@ -270,7 +274,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
             <div className="space-y-4">
               <div>
                 <span className="text-xs font-bold text-amber-400 tracking-wider uppercase block mb-1">Campus Announcements</span>
-                <h3 className="text-sm font-bold text-white">Advisory Board Bulletin</h3>
+                <h3 className="text-sm font-bold text-white">{t('Advisory Board Bulletin')}</h3>
               </div>
 
               <div className="space-y-4 max-h-[300px] overflow-y-auto pr-1">
@@ -321,9 +325,9 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
               <div className="flex justify-between items-center mb-6">
                 <div>
                   <h4 className="text-sm font-bold text-white flex items-center gap-1.5">
-                    <CreditCard className="h-4.5 w-4.5 text-indigo-400" /> Secure Payment Gateway
+                    <CreditCard className="h-4.5 w-4.5 text-indigo-400" /> {t('Secure Payment Gateway')}
                   </h4>
-                  <span className="text-[11px] text-slate-500">Authorize instant bank ledger wire transfers</span>
+                  <span className="text-[11px] text-slate-550">{t('Authorize instant bank ledger wire transfers')}</span>
                 </div>
                 <button 
                   onClick={() => setSelectedBill(null)}
@@ -401,7 +405,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                     type="submit"
                     className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl transition cursor-pointer flex justify-center items-center gap-1.5"
                   >
-                    Confirm & Remit Outstanding Dues <ArrowRight className="h-4 w-4" />
+                    {t('Confirm & Remit Outstanding Dues')} <ArrowRight className="h-4 w-4" />
                   </button>
                 )}
               </form>

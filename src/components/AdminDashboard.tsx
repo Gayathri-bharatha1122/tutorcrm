@@ -18,6 +18,8 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { Student, Teacher, ActivityLog } from '../types';
+import { useLanguage } from '../LanguageContext';
+import { LanguageSelector } from './LanguageSelector';
 
 interface AdminDashboardProps {
   students: Student[];
@@ -34,6 +36,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onAddStudent, 
   onLogout 
 }) => {
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'All' | 'Active' | 'Pending' | 'Inactive'>('All');
   const [showEnrollForm, setShowEnrollForm] = useState(false);
@@ -103,7 +106,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
             <div>
               <span className="font-sans font-bold text-base text-white tracking-tight">EduManage CRM</span>
-              <span className="text-[10px] block text-slate-500 font-semibold uppercase">Admin Command Node</span>
+              <span className="text-[10px] block text-slate-500 font-semibold uppercase">{t('Admin Command Node')}</span>
             </div>
           </div>
 
@@ -116,14 +119,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
             <div className="flex items-center gap-3 border-l border-slate-800 pl-4">
               <div className="hidden sm:block text-right">
-                <span className="text-xs font-semibold text-slate-200 block">System Administrator</span>
+                <span className="text-xs font-semibold text-slate-200 block">{t('System Administrator')}</span>
                 <span className="text-[10px] text-slate-500 font-medium font-mono">root_user_01</span>
               </div>
+              <LanguageSelector />
               <button 
                 onClick={onLogout}
                 className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-xs text-slate-200 font-semibold rounded-lg transition-transform cursor-pointer"
               >
-                Sign Out
+                {t('Sign Out')}
               </button>
             </div>
           </div>
@@ -159,7 +163,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <div className="absolute right-3 top-3 w-8 h-8 rounded-lg bg-indigo-600/10 text-indigo-400 flex items-center justify-center">
               <GraduationCap className="h-4.5 w-4.5" />
             </div>
-            <span className="text-[11px] font-bold text-slate-500 uppercase">Active Students</span>
+            <span className="text-[11px] font-bold text-slate-500 uppercase">{t('Active Students')}</span>
             <div className="mt-1 flex items-baseline gap-2">
               <span className="text-2xl font-extrabold text-white">{activeStudentsCount} / {students.length}</span>
               <span className="text-[10px] text-indigo-400 font-semibold">+{pendingStudentsCount} pending</span>
@@ -170,7 +174,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <div className="absolute right-3 top-3 w-8 h-8 rounded-lg bg-teal-600/10 text-teal-400 flex items-center justify-center">
               <Users className="h-4.5 w-4.5" />
             </div>
-            <span className="text-[11px] font-bold text-slate-500 uppercase">Educators</span>
+            <span className="text-[11px] font-bold text-slate-500 uppercase">{t('Educators')}</span>
             <div className="mt-1 flex items-baseline gap-2">
               <span className="text-2xl font-extrabold text-white">{teachers.length}</span>
               <span className="text-[10px] text-teal-400 font-semibold">100% On Duty</span>
@@ -181,7 +185,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <div className="absolute right-3 top-3 w-8 h-8 rounded-lg bg-emerald-600/10 text-emerald-400 flex items-center justify-center">
               <DollarSign className="h-4.5 w-4.5" />
             </div>
-            <span className="text-[11px] font-bold text-slate-500 uppercase">Fees Receivable</span>
+            <span className="text-[11px] font-bold text-slate-500 uppercase">{t('Fees Receivable')}</span>
             <div className="mt-1 flex items-baseline gap-2">
               <span className="text-2xl font-extrabold text-white">$2,140</span>
               <span className="text-[10px] text-emerald-400 font-semibold">+12% vs last term</span>
@@ -192,7 +196,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <div className="absolute right-3 top-3 w-8 h-8 rounded-lg bg-amber-600/10 text-amber-400 flex items-center justify-center">
               <Activity className="h-4.5 w-4.5" />
             </div>
-            <span className="text-[11px] font-bold text-slate-500 uppercase">Audit Records</span>
+            <span className="text-[11px] font-bold text-slate-500 uppercase">{t('Audit Records')}</span>
             <div className="mt-1 flex items-baseline gap-2">
               <span className="text-2xl font-extrabold text-white">{activityLogs.length} Logged</span>
               <span className="text-[10px] text-amber-400 font-semibold">Real-Time Sync</span>
@@ -206,7 +210,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-sm font-bold text-white">Enrollment Growth Trend</h3>
+                <h3 className="text-sm font-bold text-white">{t('Enrollment Growth Trend')}</h3>
                 <span className="text-[11px] text-slate-500">Student registration loads across standard academic periods</span>
               </div>
               <span className="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-full">Primary Cohorts</span>
@@ -245,7 +249,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           {/* Radial Donut chart represented via custom SVG element */}
           <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between">
             <div>
-              <h3 className="text-sm font-bold text-white mb-0.5">Budget Ledger Share</h3>
+              <h3 className="text-sm font-bold text-white mb-0.5">{t('Budget Ledger Share')}</h3>
               <span className="text-[11px] text-slate-500 block mb-6">Tuition fees balance status across directory profiles</span>
             </div>
 
@@ -291,7 +295,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           {/* Filters controls bar */}
           <div className="p-6 border-b border-slate-850 flex flex-col md:flex-row items-center justify-between gap-4">
             <div>
-              <h3 className="text-base font-bold text-white">Student Enrollment Directory</h3>
+              <h3 className="text-base font-bold text-white">{t('Student Enrollment Directory')}</h3>
               <p className="text-xs text-slate-500">Query primary student contact files, class goals, and parent details.</p>
             </div>
 
@@ -301,7 +305,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
                 <input
                   type="text"
-                  placeholder="Query name, grade, standard..."
+                  placeholder={t('Query name, grade, standard...')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-800 text-xs pl-9 pr-4 py-2 rounded-xl focus:border-indigo-500 outline-none transition"
@@ -331,7 +335,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 onClick={() => setShowEnrollForm(true)}
                 className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 cursor-pointer"
               >
-                <PlusCircle className="h-4.5 w-4.5" /> Enroll Student
+                <PlusCircle className="h-4.5 w-4.5" /> {t('Enroll Student')}
               </button>
             </div>
           </div>
@@ -404,7 +408,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           {/* Active Logs tracking table list */}
           <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
             <div className="mb-4">
-              <h3 className="text-sm font-bold text-white">System Security Activity Audits</h3>
+              <h3 className="text-sm font-bold text-white">{t('System Security Activity Audits')}</h3>
               <span className="text-[11px] text-slate-550 block">Live database enrollment and transaction transcripts</span>
             </div>
 
@@ -440,7 +444,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
             <div className="mb-4">
               <span className="text-xs font-bold text-indigo-400 tracking-wider uppercase block mb-1">Academic Faculty</span>
-              <h3 className="text-base font-bold text-white">Certified Educators On-Duty</h3>
+              <h3 className="text-base font-bold text-white">{t('Certified Educators On-Duty')}</h3>
             </div>
 
             <div className="grid grid-cols-1 gap-4">

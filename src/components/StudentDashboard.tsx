@@ -14,6 +14,8 @@ import {
   Info
 } from 'lucide-react';
 import { Course, ExamResult, ExamSchedule } from '../types';
+import { useLanguage } from '../LanguageContext';
+import { LanguageSelector } from './LanguageSelector';
 
 interface StudentDashboardProps {
   courses: Course[];
@@ -30,6 +32,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   studentName,
   onLogout
 }) => {
+  const { t } = useLanguage();
   const [courses, setCourses] = useState<Course[]>(initialCourses);
   const [exams, setExams] = useState<ExamResult[]>(initialExams);
   const [activeTab, setActiveTab] = useState<'schedule' | 'grades'>('schedule');
@@ -89,7 +92,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             </div>
             <div>
               <span className="font-sans font-bold text-base text-white tracking-tight">EduManage Student</span>
-              <span className="text-[10px] block text-slate-500 font-semibold uppercase">Academic Portal</span>
+              <span className="text-[10px] block text-slate-500 font-semibold uppercase">{t('Academic Portal')}</span>
             </div>
           </div>
 
@@ -99,11 +102,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 <span className="text-xs font-bold text-slate-200 block">{studentName}</span>
                 <span className="text-[10px] text-emerald-400 font-bold uppercase font-mono">Enrolled • 11th Grade</span>
               </div>
+              <LanguageSelector />
               <button 
                 onClick={onLogout}
                 className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs text-slate-200 font-semibold rounded-lg transition overflow-hidden cursor-pointer"
               >
-                Sign Out
+                {t('Sign Out')}
               </button>
             </div>
           </div>
@@ -120,18 +124,18 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           </div>
           <div className="space-y-1 relative z-10">
             <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest block">Dashboard Greeting</span>
-            <h2 className="text-2xl font-bold text-white">Welcome back, {studentName.split(' ')[0]}!</h2>
+            <h2 className="text-2xl font-bold text-white">{t('Welcome back')}, {studentName.split(' ')[0]}!</h2>
             <p className="text-slate-400 text-xs max-w-xl">Track your curriculum progress metrics, check scheduled midterm locations, or chat with assigned tutor personnel in real-time.</p>
           </div>
           
           <div className="flex items-center gap-4 shrink-0 relative z-10">
             <div className="bg-slate-950 px-4 py-3 rounded-2xl border border-slate-800 text-center">
               <span className="text-lg font-extrabold text-white block">3.8</span>
-              <span className="text-[9px] text-slate-500 font-bold uppercase block">GPA Trend</span>
+              <span className="text-[9px] text-slate-500 font-bold uppercase block">{t('GPA Trend')}</span>
             </div>
             <div className="bg-slate-950 px-4 py-3 rounded-2xl border border-slate-800 text-center">
               <span className="text-lg font-extrabold text-white block">98%</span>
-              <span className="text-[9px] text-slate-500 font-bold uppercase block">Attendance</span>
+              <span className="text-[9px] text-slate-500 font-bold uppercase block">{t('Attendance')}</span>
             </div>
           </div>
         </div>
@@ -179,13 +183,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                     onClick={() => setActiveTab('schedule')}
                     className={`px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${activeTab === 'schedule' ? 'bg-indigo-600 text-white' : 'text-slate-500 hover:text-slate-300'}`}
                   >
-                    Exams Timeline
+                    {t('Exams Timeline')}
                   </button>
                   <button 
                     onClick={() => setActiveTab('grades')}
-                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${activeTab === 'grades' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-300'}`}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${activeTab === 'grades' ? 'bg-indigo-600 text-white' : 'text-slate-450 hover:text-slate-300'}`}
                   >
-                    Assessments Log
+                    {t('Assessments Log')}
                   </button>
                 </div>
 
@@ -261,7 +265,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             <div className="border-b border-slate-850 pb-3">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                  <MessageSquare className="h-4.5 w-4.5 text-emerald-400" /> Messaging Station
+                  <MessageSquare className="h-4.5 w-4.5 text-emerald-400" /> {t('Messaging Station')}
                 </span>
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping shrink-0" />
               </div>
@@ -336,7 +340,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
         {/* Resources Cards section */}
         <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6" id="materials">
           <div className="mb-4">
-            <h3 className="text-sm font-bold text-white">Student Hub Academic Resources</h3>
+            <h3 className="text-sm font-bold text-white">{t('Student Hub Academic Resources')}</h3>
             <span className="text-[11px] text-slate-500">Curated materials matching active course registration tracks</span>
           </div>
 

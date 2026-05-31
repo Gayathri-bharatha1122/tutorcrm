@@ -16,6 +16,8 @@ import {
   Award
 } from 'lucide-react';
 import { Screen, Role, Student } from '../types';
+import { useLanguage } from '../LanguageContext';
+import { LanguageSelector } from './LanguageSelector';
 import { initialStudents } from '../data';
 
 interface RegisterStepperProps {
@@ -24,6 +26,7 @@ interface RegisterStepperProps {
 }
 
 export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, onRegisteredSuccess }) => {
+  const { t } = useLanguage();
   const [currentStep, setCurrentStep] = useState(1);
   const [roleType, setRoleType] = useState<'student' | 'parent'>('student');
   
@@ -95,17 +98,8 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center py-12 px-4 relative overflow-hidden font-sans">
+    <div className="min-h-[calc(100vh-64px)] bg-slate-950 flex flex-col justify-center items-center py-12 px-4 relative overflow-hidden font-sans">
       
-      {/* Floating Back Button */}
-      <button
-        onClick={() => onNavigate('landing')}
-        className="absolute top-4 left-4 sm:top-6 sm:left-6 px-4 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white rounded-xl text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer shadow-md z-50 group"
-      >
-        <ArrowLeft className="h-4 w-4 group-hover:-translate-x-0.5 transition-transform" />
-        Back to Home
-      </button>
-
       {/* Background radial effects */}
       <div className="absolute top-0 right-1/4 w-[400px] h-[400px] rounded-full bg-slate-900/60 blur-[100px] pointer-events-none" />
 
@@ -130,7 +124,7 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
         <div className="flex items-center justify-between mb-8 border-b border-slate-800/80 pb-5">
           <div className="flex gap-1 items-center text-xs text-indigo-400 font-bold uppercase tracking-wider">
             <Sparkles className="h-3.5 w-3.5" />
-            <span>Step {currentStep} of 3 • {currentStep === 1 ? 'Credential Type' : currentStep === 2 ? 'Profile Registry' : 'Validation Links'}</span>
+            <span>{currentStep === 1 ? t('Step 1 of 3 • Credential Type') : currentStep === 2 ? t('Step 2 of 3 • Profile Registry') : t('Step 3 of 3 • Validation Links')}</span>
           </div>
           <div className="flex items-center gap-1.5 bg-slate-950 border border-slate-850 px-3 py-1 rounded-full">
             <div className={`w-2 h-2 rounded-full ${currentStep >= 1 ? 'bg-indigo-500' : 'bg-slate-800'}`} />
@@ -150,8 +144,8 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
               className="space-y-6"
             >
               <div>
-                <h3 className="text-xl font-bold text-white mb-1.5">Select Your Account Type</h3>
-                <p className="text-sm text-slate-400">Choose between Student or Parent role. EduManage delivers tailored boards based on selection parameters.</p>
+                <h3 className="text-xl font-bold text-white mb-1.5">{t('Select Your Account Type')}</h3>
+                <p className="text-sm text-slate-400">{t('Choose between Student or Parent role. EduManage delivers tailored boards based on selection parameters.')}</p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -171,8 +165,8 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                     {roleType === 'student' && <CheckCircle className="h-5 w-5 text-indigo-400 shrink-0" />}
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-white mb-1">Student Portal Profile</h4>
-                    <p className="text-xs text-slate-400 leading-relaxed">Complete assignment lists, query support tools directly, and track exam updates.</p>
+                    <h4 className="text-sm font-bold text-white mb-1">{t('Student Portal Profile')}</h4>
+                    <p className="text-xs text-slate-400 leading-relaxed">{t('Complete assignment lists, query support tools directly, and track exam updates.')}</p>
                   </div>
                 </div>
 
@@ -192,8 +186,8 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                     {roleType === 'parent' && <CheckCircle className="h-5 w-5 text-indigo-400 shrink-0" />}
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-white mb-1">Parent Guardian Link</h4>
-                    <p className="text-xs text-slate-400 leading-relaxed">Monitor learning attendance metrics, verify unpaid fee balances, and review reports.</p>
+                    <h4 className="text-sm font-bold text-white mb-1">{t('Parent Guardian Link')}</h4>
+                    <p className="text-xs text-slate-400 leading-relaxed">{t('Monitor learning attendance metrics, verify unpaid fee balances, and review reports.')}</p>
                   </div>
                 </div>
               </div>
@@ -211,14 +205,14 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                   onClick={() => onNavigate('landing')}
                   className="px-4 py-2.5 bg-slate-950 border border-slate-850 hover:bg-slate-850 rounded-xl text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
                 >
-                  <ArrowLeft className="h-4 w-4" /> Back to Home
+                  <ArrowLeft className="h-4 w-4" /> {t('Back to Home')}
                 </button>
                 <button
                   type="button"
                   onClick={() => setCurrentStep(2)}
                   className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-xs font-semibold text-white cursor-pointer shadow-lg shadow-indigo-600/20 transition-all flex items-center gap-1.5 group"
                 >
-                  Continue Profile Creation
+                  {t('Continue Profile Creation')}
                   <ChevronRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
                 </button>
               </div>
@@ -234,13 +228,13 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
               className="space-y-4"
             >
               <div>
-                <h3 className="text-lg font-bold text-white">Registry Profile Details</h3>
-                <p className="text-xs text-slate-500">Provide legal identification and access keys for account verification checks.</p>
+                <h3 className="text-lg font-bold text-white">{t('Registry Profile Details')}</h3>
+                <p className="text-xs text-slate-500">{t('Provide legal identification and access keys for account verification checks.')}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[11px] font-medium text-slate-400 mb-1">First Name</label>
+                  <label className="block text-[11px] font-medium text-slate-400 mb-1">{t('First Name')}</label>
                   <input
                     type="text"
                     value={firstName}
@@ -250,7 +244,7 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-medium text-slate-400 mb-1">Last Name</label>
+                  <label className="block text-[11px] font-medium text-slate-400 mb-1">{t('Last Name')}</label>
                   <input
                     type="text"
                     value={lastName}
@@ -263,7 +257,7 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[11px] font-medium text-slate-400 mb-1">Contact Email Address</label>
+                  <label className="block text-[11px] font-medium text-slate-400 mb-1">{t('Contact Email Address')}</label>
                   <div className="relative">
                     <Mail className="absolute left-3.5 top-3 h-4 w-4 text-slate-500 pointer-events-none" />
                     <input
@@ -276,7 +270,7 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                   </div>
                 </div>
                 <div>
-                  <label className="block text-[11px] font-medium text-slate-400 mb-1">Primary Phone Number</label>
+                  <label className="block text-[11px] font-medium text-slate-400 mb-1">{t('Primary Phone Number')}</label>
                   <div className="relative">
                     <Phone className="absolute left-3.5 top-3 h-4 w-4 text-slate-500 pointer-events-none" />
                     <input
@@ -295,7 +289,7 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                 <div className="space-y-4 pt-2 border-t border-slate-850">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[11px] font-medium text-slate-400 mb-1">Grade Standard</label>
+                      <label className="block text-[11px] font-medium text-slate-400 mb-1">{t('Grade Standard')}</label>
                       <select 
                         value={grade}
                         onChange={(e) => setGrade(e.target.value)}
@@ -308,7 +302,7 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[11px] font-medium text-slate-400 mb-1">Parent Mobile Contact (Optional)</label>
+                      <label className="block text-[11px] font-medium text-slate-400 mb-1">{t('Parent Mobile Contact (Optional)')}</label>
                       <input
                         type="tel"
                         value={parentPhoneInput}
@@ -319,7 +313,7 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                     </div>
                   </div>
                   <div>
-                    <label className="block text-[11px] font-medium text-slate-400 mb-1">Learning Motivation Target</label>
+                    <label className="block text-[11px] font-medium text-slate-400 mb-1">{t('Learning Motivation Target')}</label>
                     <textarea
                       value={learningGoal}
                       onChange={(e) => setLearningGoal(e.target.value)}
@@ -330,13 +324,13 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                 </div>
               ) : (
                 <div className="p-3 bg-slate-950 rounded-xl border border-slate-850 text-[11px] text-slate-500">
-                  <span className="font-bold text-slate-400 block mb-1">🛡️ Linkage Policy Acknowledgement</span>
+                  <span className="font-bold text-slate-400 block mb-1">🛡️ {t('Linkage Policy Acknowledgement')}</span>
                   As a registered Parent / Guardian, completing Step 3 requires entering your child's mobile number. EduManage CRM's automatic lookup matches files instantly for security audits.
                 </div>
               )}
 
               <div>
-                <label className="block text-[11px] font-medium text-slate-400 mb-1">Secure Control Key Password</label>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">{t('Secure Control Key Password')}</label>
                 <div className="relative">
                   <Lock className="absolute left-3.5 top-3 h-4 w-4 text-slate-500 pointer-events-none" />
                   <input
@@ -355,14 +349,14 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                   onClick={() => setCurrentStep(1)}
                   className="px-4 py-2.5 bg-slate-950 border border-slate-850 hover:bg-slate-850 rounded-xl text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
                 >
-                  <ArrowLeft className="h-4 w-4" /> Back
+                  <ArrowLeft className="h-4 w-4" /> {t('Back')}
                 </button>
                 <button
                   type="button"
                   onClick={() => setCurrentStep(3)}
                   className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
                 >
-                  Next: Validation Links <ArrowRight className="h-4 w-4" />
+                  {t('Next: Validation Links')} <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
             </motion.div>
@@ -489,7 +483,7 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                   onClick={() => setCurrentStep(2)}
                   className="px-4 py-2.5 bg-slate-950 border border-slate-850 hover:bg-slate-850 rounded-xl text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
                 >
-                  <ArrowLeft className="h-4 w-4" /> Prev Step
+                  <ArrowLeft className="h-4 w-4" /> {t('Back')}
                 </button>
                 <button
                   type="button"
@@ -501,7 +495,7 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                       : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/10'
                   }`}
                 >
-                  Finalize Enrollment <CheckCircle className="h-4 w-4" />
+                  {t('Finalize Enrollment')} <CheckCircle className="h-4 w-4" />
                 </button>
               </div>
             </motion.div>
@@ -510,13 +504,13 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
 
         {/* Dynamic Stepper switcher backer */}
         <div className="mt-6 pt-5 border-t border-slate-800 text-center text-xs text-slate-500 font-semibold">
-          <span>Remembered login details? </span>
+          <span>{t('Remembered login details?')} </span>
           <button 
             type="button"
             onClick={() => onNavigate('login')}
             className="text-indigo-400 hover:underline hover:text-indigo-300 transition-colors font-bold cursor-pointer"
           >
-            Sign in as Demo User Instantly
+            {t('Sign in as Demo User Instantly')}
           </button>
         </div>
       </motion.div>
