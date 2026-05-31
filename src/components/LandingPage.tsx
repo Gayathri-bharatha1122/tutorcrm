@@ -34,9 +34,76 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
     visible: { 
       y: 0, 
       opacity: 1,
-      transition: { type: 'spring', stiffness: 100 }
+      transition: { type: 'spring' as const, stiffness: 100 }
     }
   };
+
+  const coursesList = [
+    {
+      title: "Advanced Physics Honors",
+      grade: "Grade 11-12",
+      desc: "Delve into kinematic vector fields, rotational momentum mechanics, and quantum orbital dynamics models.",
+      tutor: "Prof. Alistair Miller",
+      theme: {
+        bg: "bg-teal-500/10",
+        text: "text-teal-400",
+        border: "border-teal-500/20",
+        hoverBorder: "hover:border-teal-500/50",
+        btnBg: "bg-teal-600/10 hover:bg-teal-600 text-teal-300 hover:text-white",
+        glow: "bg-teal-500",
+        btnBorder: "border-teal-500/30"
+      },
+      icon: <Activity className="h-5.5 w-5.5" />
+    },
+    {
+      title: "Calculus BC & Analysis",
+      grade: "Grade 10-12",
+      desc: "Master integration vectors, infinite series limits, polar coordinates, and advanced differential proofs.",
+      tutor: "Dr. Sarah Jenkins",
+      theme: {
+        bg: "bg-indigo-500/10",
+        text: "text-indigo-400",
+        border: "border-indigo-500/20",
+        hoverBorder: "hover:border-indigo-500/50",
+        btnBg: "bg-indigo-600/10 hover:bg-indigo-600 text-indigo-300 hover:text-white",
+        glow: "bg-indigo-500",
+        btnBorder: "border-indigo-500/30"
+      },
+      icon: <ArrowUpRight className="h-5.5 w-5.5" />
+    },
+    {
+      title: "Chemistry & Carbon Rings",
+      grade: "Grade 11",
+      desc: "Explore atomic orbitals theory, bond dynamic states, molecular synthesis, and basic carbon chains.",
+      tutor: "Dr. Evelyn Sterling",
+      theme: {
+        bg: "bg-emerald-500/10",
+        text: "text-emerald-400",
+        border: "border-emerald-500/20",
+        hoverBorder: "hover:border-emerald-500/50",
+        btnBg: "bg-emerald-600/10 hover:bg-emerald-600 text-emerald-300 hover:text-white",
+        glow: "bg-emerald-500",
+        btnBorder: "border-emerald-500/30"
+      },
+      icon: <GraduationCap className="h-5.5 w-5.5" />
+    },
+    {
+      title: "AP English Composition",
+      grade: "Grade 12",
+      desc: "Develop rhetorical argument formats, analyze historic prose works, and write structured academic papers.",
+      tutor: "Sarah Jenkins",
+      theme: {
+        bg: "bg-amber-500/10",
+        text: "text-amber-400",
+        border: "border-amber-500/20",
+        hoverBorder: "hover:border-amber-500/50",
+        btnBg: "bg-amber-600/10 hover:bg-amber-600 text-amber-300 hover:text-white",
+        glow: "bg-amber-500",
+        btnBorder: "border-amber-500/30"
+      },
+      icon: <BookOpen className="h-5.5 w-5.5" />
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-indigo-500 selection:text-white">
@@ -57,6 +124,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
           
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-400">
             <a href="#features" className="hover:text-slate-100 transition-colors">Features</a>
+            <a href="#courses" className="hover:text-slate-100 transition-colors">Courses</a>
             <a href="#ecosystem" className="hover:text-slate-100 transition-colors">Portals</a>
             <a href="#stats" className="hover:text-slate-100 transition-colors">Metrics</a>
           </nav>
@@ -251,6 +319,68 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
               </button>
             </motion.div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Courses Section with Animated Cards */}
+      <section className="bg-slate-950/65 py-24 border-b border-slate-900" id="courses">
+        <div className="w-full px-4 sm:px-8 lg:px-12">
+          <div className="text-center mb-16">
+            <span className="text-xs font-semibold text-indigo-400 uppercase tracking-widest block mb-2 animate-pulse">
+              Curated Syllabus Programs
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4">
+              Academic Courses Provided
+            </h2>
+            <p className="text-slate-400 max-w-lg mx-auto text-sm">
+              Discover our advanced, tutor-led honors courses. Click to start learning or view course specifics instantly.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {coursesList.map((course, idx) => (
+              <motion.div
+                key={idx}
+                className={`bg-slate-900/60 rounded-3xl p-6 border ${course.theme.border} ${course.theme.hoverBorder} transition-all flex flex-col justify-between relative overflow-hidden group cursor-pointer`}
+                whileHover={{ y: -10, scale: 1.02 }}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ type: "spring", stiffness: 100, delay: idx * 0.1 }}
+              >
+                {/* Accent Background Glow */}
+                <div className={`absolute top-0 right-0 w-24 h-24 rounded-full blur-3xl opacity-10 pointer-events-none ${course.theme.glow}`} />
+
+                <div>
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-6 ${course.theme.bg} ${course.theme.text} border ${course.theme.border}`}>
+                    {course.icon}
+                  </div>
+                  <span className={`text-[10px] font-bold uppercase tracking-wider ${course.theme.bg} ${course.theme.text} px-2 py-0.5 rounded-md inline-block mb-3`}>
+                    {course.grade}
+                  </span>
+                  <h3 className="text-lg font-bold text-white mb-2 group-hover:text-indigo-300 transition-colors">
+                    {course.title}
+                  </h3>
+                  <p className="text-slate-450 text-xs leading-relaxed mb-6">
+                    {course.desc}
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center text-[10px] text-slate-500 font-semibold border-t border-slate-850 pt-4">
+                    <span>Instructed by:</span>
+                    <span className="text-slate-300">{course.tutor}</span>
+                  </div>
+                  <button 
+                    onClick={() => onNavigate('login')}
+                    className={`w-full py-2.5 px-4 ${course.theme.btnBg} border ${course.theme.btnBorder} font-semibold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer`}
+                  >
+                    Enroll Now <ArrowUpRight className="h-3 w-3" />
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
