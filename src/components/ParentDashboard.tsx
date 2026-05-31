@@ -84,7 +84,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
       
       {/* Upper Navigation bars */}
       <nav className="border-b border-slate-900 bg-slate-950/80 backdrop-blur sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div className="w-full px-4 sm:px-8 lg:px-12 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-amber-600 flex items-center justify-center">
               <User className="h-5 w-5 text-white" />
@@ -113,7 +113,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
       </nav>
 
       {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 relative z-10">
+      <main className="w-full px-4 sm:px-8 lg:px-12 py-8 space-y-8 relative z-10">
         
         {/* Payments Status Notification alerts */}
         <AnimatePresence>
@@ -147,7 +147,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
             </div>
 
             {/* Total Balance block */}
-            <div className="bg-slate-950 p-4 rounded-2xl border border-slate-850 flex items-center justify-between gap-6 min-w-xs shrink-0">
+            <div className="bg-slate-950 p-4 rounded-2xl border border-slate-850 flex items-center justify-between gap-6 w-full sm:min-w-xs shrink-0">
               <div>
                 <span className="text-[10px] font-bold text-slate-500 uppercase block mb-0.5">Outstanding Balance Due</span>
                 <span className="text-2xl font-extrabold text-white block">${totalOutstanding}</span>

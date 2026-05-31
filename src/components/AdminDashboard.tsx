@@ -96,7 +96,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       
       {/* Top Console Command Header */}
       <nav className="border-b border-slate-900 bg-slate-950/80 backdrop-blur sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div className="w-full px-4 sm:px-8 lg:px-12 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center">
               <GraduationCap className="h-5 w-5 text-white animate-pulse" />
@@ -131,7 +131,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       </nav>
 
       {/* Main Grid Workspace */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 relative z-10">
+      <main className="w-full px-4 sm:px-8 lg:px-12 py-8 space-y-8 relative z-10">
         
         {/* Real-time reactive notifications popup */}
         <AnimatePresence>

@@ -42,7 +42,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-indigo-500 selection:text-white">
       {/* Top Banner Navigation */}
       <header className="border-b border-slate-900 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div className="w-full px-4 sm:px-8 lg:px-12 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
               <GraduationCap className="h-6 w-6 text-white" />
@@ -142,7 +142,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
 
       {/* Showcase Workspace Grid */}
       <section className="bg-slate-950 pb-20 border-b border-slate-900" id="ecosystem">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-4 sm:px-8 lg:px-12">
           <div className="text-center mb-16">
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-4">
               Explore Our Live Sub-Portals
@@ -255,7 +255,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
       </section>
 
       {/* Unified Features Bento Grid Section */}
-      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" id="features">
+      <section className="py-20 w-full px-4 sm:px-8 lg:px-12" id="features">
         <div className="mb-12 text-left md:text-center">
           <span className="text-xs font-semibold text-indigo-400 uppercase tracking-widest block mb-2">
             CRM Core Capabilities
@@ -328,7 +328,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
 
       {/* Statistics Section */}
       <section className="bg-slate-900/40 border-y border-slate-900 py-16" id="stats">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="w-full px-4 sm:px-8 lg:px-12 text-center">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div>
               <span className="block text-4xl font-extrabold text-white tracking-tight">1,250+</span>
@@ -352,7 +352,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
 
       {/* Footer */}
       <footer className="bg-slate-950 py-12 border-t border-slate-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center md:flex md:items-center md:justify-between text-xs text-slate-500">
+        <div className="w-full px-4 sm:px-8 lg:px-12 text-center md:flex md:items-center md:justify-between text-xs text-slate-500">
           <div className="flex items-center justify-center gap-2 mb-4 md:mb-0">
             <GraduationCap className="h-5 w-5 text-indigo-500" />
             <span className="text-slate-300 font-bold">EduManage Academic Group LTD</span>

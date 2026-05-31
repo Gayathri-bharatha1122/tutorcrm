@@ -82,7 +82,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
       
       {/* Navigation Headers */}
       <nav className="border-b border-slate-900 bg-slate-950/80 backdrop-blur sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div className="w-full px-4 sm:px-8 lg:px-12 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-teal-600 flex items-center justify-center animate-spin [animation-duration:10s]">
               <Users className="h-5 w-5 text-white" />
@@ -111,7 +111,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
       </nav>
 
       {/* Main Containers */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 relative z-10">
+      <main className="w-full px-4 sm:px-8 lg:px-12 py-8 space-y-8 relative z-10">
         
         {/* Dynamic Success alerts */}
         <AnimatePresence>
@@ -167,7 +167,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
 
               <div className="divide-y divide-slate-850">
                 {students.slice(0, 4).map((student) => (
-                  <div key={student.id} className="py-4 flex items-center justify-between hover:bg-slate-950/20 px-2.5 transition rounded-xl">
+                  <div key={student.id} className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-950/20 px-2.5 transition rounded-xl">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-slate-950 border border-slate-850 flex items-center justify-center font-bold text-teal-400">
                         {student.name[0]}

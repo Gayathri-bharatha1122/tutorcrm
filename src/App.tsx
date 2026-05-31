@@ -140,8 +140,8 @@ export default function App() {
   };
 
   return (
-    <div className="bg-slate-950 min-h-screen text-slate-100 flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
-      
+    <div className="bg-slate-950 min-h-screen w-full overflow-x-hidden text-slate-100 flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
       {/* Route Render Engine with AnimatePresence */}
       <div className="flex-1">
         <AnimatePresence mode="wait">
