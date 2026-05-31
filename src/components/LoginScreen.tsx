@@ -11,7 +11,8 @@ import {
   User, 
   ArrowRight,
   Info,
-  Sparkles
+  Sparkles,
+  ArrowLeft
 } from 'lucide-react';
 import { Role, Screen } from '../types';
 
@@ -110,6 +111,15 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavi
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center px-4 relative overflow-hidden font-sans">
+      
+      {/* Floating Back Button */}
+      <button
+        onClick={() => onNavigate('landing')}
+        className="absolute top-4 left-4 sm:top-6 sm:left-6 px-4 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white rounded-xl text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer shadow-md z-50 group"
+      >
+        <ArrowLeft className="h-4 w-4 group-hover:-translate-x-0.5 transition-transform" />
+        Back to Home
+      </button>
       
       {/* Decorative Glow elements */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-slate-900/40 opacity-70 blur-[100px] pointer-events-none" />
@@ -245,15 +255,24 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavi
             )}
           </AnimatePresence>
 
-          {/* Action button */}
-          <button
-            type="submit"
-            className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-xl cursor-pointer shadow-lg shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 group mt-2"
-            id="loginSubmitBtn"
-          >
-            Access Authorized Portal
-            <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-          </button>
+          {/* Action buttons */}
+          <div className="flex gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => onNavigate('landing')}
+              className="flex-1 py-3 bg-slate-950 border border-slate-800 hover:bg-slate-850 text-slate-300 font-semibold text-sm rounded-xl cursor-pointer transition-all flex items-center justify-center gap-1.5"
+            >
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
+            <button
+              type="submit"
+              className="flex-[2] py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-xl cursor-pointer shadow-lg shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 group"
+              id="loginSubmitBtn"
+            >
+              Access Portal
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+            </button>
+          </div>
         </form>
 
         {/* Dynamic Stepper switch backer */}

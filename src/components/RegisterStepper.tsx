@@ -96,6 +96,16 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center py-12 px-4 relative overflow-hidden font-sans">
+      
+      {/* Floating Back Button */}
+      <button
+        onClick={() => onNavigate('landing')}
+        className="absolute top-4 left-4 sm:top-6 sm:left-6 px-4 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white rounded-xl text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer shadow-md z-50 group"
+      >
+        <ArrowLeft className="h-4 w-4 group-hover:-translate-x-0.5 transition-transform" />
+        Back to Home
+      </button>
+
       {/* Background radial effects */}
       <div className="absolute top-0 right-1/4 w-[400px] h-[400px] rounded-full bg-slate-900/60 blur-[100px] pointer-events-none" />
 
@@ -195,7 +205,14 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                 </span>
               </div>
 
-              <div className="flex justify-end pt-4">
+              <div className="flex justify-between pt-4">
+                <button
+                  type="button"
+                  onClick={() => onNavigate('landing')}
+                  className="px-4 py-2.5 bg-slate-950 border border-slate-850 hover:bg-slate-850 rounded-xl text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
+                >
+                  <ArrowLeft className="h-4 w-4" /> Back to Home
+                </button>
                 <button
                   type="button"
                   onClick={() => setCurrentStep(2)}
