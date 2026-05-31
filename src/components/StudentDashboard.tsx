@@ -1,0 +1,382 @@
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { 
+  BookOpen, 
+  Clock, 
+  Send, 
+  GraduationCap, 
+  MessageSquare, 
+  Award, 
+  Calendar, 
+  Bell, 
+  ArrowUpRight,
+  Sparkles,
+  Info
+} from 'lucide-react';
+import { Course, ExamResult, ExamSchedule } from '../types';
+
+interface StudentDashboardProps {
+  courses: Course[];
+  exams: ExamResult[];
+  upcomingExams: ExamSchedule[];
+  studentName: string;
+  onLogout: () => void;
+}
+
+export const StudentDashboard: React.FC<StudentDashboardProps> = ({
+  courses: initialCourses,
+  exams: initialExams,
+  upcomingExams,
+  studentName,
+  onLogout
+}) => {
+  const [courses, setCourses] = useState<Course[]>(initialCourses);
+  const [exams, setExams] = useState<ExamResult[]>(initialExams);
+  const [activeTab, setActiveTab] = useState<'schedule' | 'grades'>('schedule');
+  
+  // Chat simulator state
+  const [selectedTeacher, setSelectedTeacher] = useState('Prof. Alistair Miller');
+  const [chatMessages, setChatMessages] = useState<Array<{ sender: 'user' | 'teacher', text: string, time: string }>>([
+    { sender: 'teacher', text: 'Hello Marcus, received your assessment draft! RotationKinematics are flawless. Do you have any questions on the electromagnetism formulas before the finals?', time: '09:30 AM' }
+  ]);
+  const [newMessage, setNewMessage] = useState('');
+  const [isTeacherTyping, setIsTeacherTyping] = useState(false);
+
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMessage.trim()) return;
+
+    const userMsg = { sender: 'user' as const, text: newMessage, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) };
+    setChatMessages(prev => [...prev, userMsg]);
+    const typedText = newMessage;
+    setNewMessage('');
+    setIsTeacherTyping(true);
+
+    // Simulate teacher automated feedback matching the course context
+    setTimeout(() => {
+      let reply = "Good question, Marcus. I have logged that in our planner. Let's focus on electromagnetic induction chapters in our review session tomorrow.";
+      if (typedText.toLowerCase().includes('calculus') || typedText.toLowerCase().includes('integration')) {
+        reply = "For integration constants, make sure you double-check bounds. Sarah Jenkins is hosting a calculus BC review session this Friday at 4:30 PM!";
+      } else if (typedText.toLowerCase().includes('physics') || typedText.toLowerCase().includes('rotational')) {
+        reply = "Rotation kinematics require calculating the vector moment of inertia first. Keep practicing assessment sheet 4B.";
+      }
+      
+      setChatMessages(prev => [...prev, {
+        sender: 'teacher',
+        text: reply,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }]);
+      setIsTeacherTyping(false);
+    }, 2000);
+  };
+
+  // Helper function to resolve dynamic color themes
+  const getProgressColor = (percent: number) => {
+    if (percent >= 85) return 'stroke-emerald-400';
+    if (percent >= 70) return 'stroke-indigo-400';
+    return 'stroke-amber-400';
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans">
+      
+      {/* Navigation Headers */}
+      <nav className="border-b border-slate-900 bg-slate-950/80 backdrop-blur sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center">
+              <GraduationCap className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <span className="font-sans font-bold text-base text-white tracking-tight">EduManage Student</span>
+              <span className="text-[10px] block text-slate-500 font-semibold uppercase">Academic Portal</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <div className="text-right hidden sm:block">
+                <span className="text-xs font-bold text-slate-200 block">{studentName}</span>
+                <span className="text-[10px] text-emerald-400 font-bold uppercase font-mono">Enrolled • 11th Grade</span>
+              </div>
+              <button 
+                onClick={onLogout}
+                className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs text-slate-200 font-semibold rounded-lg transition overflow-hidden cursor-pointer"
+              >
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Container */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 relative z-10">
+        
+        {/* Customized Student Welcome banner */}
+        <div className="bg-slate-900 border border-slate-800 p-6 rounded-3xl relative overflow-hidden flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+          <div className="absolute right-0 bottom-0 opacity-10 pointer-events-none">
+            <Sparkles className="h-48 w-48 text-emerald-400 translate-x-12 translate-y-12" />
+          </div>
+          <div className="space-y-1 relative z-10">
+            <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest block">Dashboard Greeting</span>
+            <h2 className="text-2xl font-bold text-white">Welcome back, {studentName.split(' ')[0]}!</h2>
+            <p className="text-slate-400 text-xs max-w-xl">Track your curriculum progress metrics, check scheduled midterm locations, or chat with assigned tutor personnel in real-time.</p>
+          </div>
+          
+          <div className="flex items-center gap-4 shrink-0 relative z-10">
+            <div className="bg-slate-950 px-4 py-3 rounded-2xl border border-slate-800 text-center">
+              <span className="text-lg font-extrabold text-white block">3.8</span>
+              <span className="text-[9px] text-slate-500 font-bold uppercase block">GPA Trend</span>
+            </div>
+            <div className="bg-slate-950 px-4 py-3 rounded-2xl border border-slate-800 text-center">
+              <span className="text-lg font-extrabold text-white block">98%</span>
+              <span className="text-[9px] text-slate-500 font-bold uppercase block">Attendance</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Course Status Progress Widgets & Dynamic Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {courses.map((course) => (
+            <div key={course.id} className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex items-center justify-between hover:border-slate-700 transition">
+              <div className="space-y-1.5 flex-1 min-w-0 pr-4">
+                <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block bg-indigo-500/10 w-max px-2 py-0.5 rounded">
+                  {course.iconType}
+                </span>
+                <h4 className="text-sm font-bold text-white truncate">{course.name}</h4>
+                <p className="text-xs text-slate-500 truncate">{course.tutorName} • {course.room || 'Seminar Space'}</p>
+                <div className="flex items-center gap-2 text-[10px] text-slate-400">
+                  <Clock className="h-3.5 w-3.5 text-slate-500" />
+                  <span className="font-semibold">{course.schedule}</span>
+                </div>
+              </div>
+
+              {/* Radial donut indicator representing program completions */}
+              <div className="relative w-16 h-16 shrink-0 flex items-center justify-center">
+                <svg className="w-16 h-16 transform -rotate-90">
+                  <circle cx="32" cy="32" r="26" fill="transparent" stroke="#1e293b" strokeWidth="4" />
+                  <circle cx="32" cy="32" r="26" fill="transparent" strokeWidth="4"
+                          className={`transition-all duration-1000 ${getProgressColor(course.progress)}`}
+                          strokeDasharray="163" strokeDashoffset={163 - (163 * course.progress) / 100}
+                          strokeLinecap="round" />
+                </svg>
+                <span className="absolute font-mono text-[11px] font-extrabold text-slate-300">{course.progress}%</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Workspace splitting: Schedules / Grades left, message simulator right */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          
+          {/* Calendar & Results toggle board */}
+          <div className="lg:col-span-3 bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-850 pb-4">
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => setActiveTab('schedule')}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${activeTab === 'schedule' ? 'bg-indigo-600 text-white' : 'text-slate-500 hover:text-slate-300'}`}
+                  >
+                    Exams Timeline
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab('grades')}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${activeTab === 'grades' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-300'}`}
+                  >
+                    Assessments Log
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-semibold bg-slate-950 px-2.5 py-1 rounded-lg">
+                  <Calendar className="h-3.5 w-3.5" /> Upcoming
+                </div>
+              </div>
+
+              {/* Sub-panels display */}
+              <AnimatePresence mode="wait">
+                {activeTab === 'schedule' ? (
+                  <motion.div 
+                    key="timeline"
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    className="space-y-3"
+                  >
+                    {upcomingExams.map((exam) => (
+                      <div key={exam.id} className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 transition rounded-2xl flex items-center justify-between">
+                        <div>
+                          <span className={`px-2 py-0.5 rounded text-[9px] font-bold block w-max mb-1.5 ${exam.type === 'Midterm' ? 'bg-indigo-500/10 text-indigo-400' : 'bg-teal-500/10 text-teal-400'}`}>
+                            {exam.type} Assessment
+                          </span>
+                          <h5 className="text-sm font-bold text-white mb-0.5">{exam.name}</h5>
+                          <span className="text-xs text-slate-500">{exam.location}</span>
+                        </div>
+
+                        <div className="text-right shrink-0">
+                          <span className="text-xs font-extrabold text-indigo-400 block">{exam.date}</span>
+                          <span className="text-[10px] text-slate-500 font-bold block">{exam.time}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </motion.div>
+                ) : (
+                  <motion.div 
+                    key="grades"
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    className="space-y-3.5"
+                  >
+                    {exams.map((assessment) => (
+                      <div key={assessment.id} className="p-4 bg-slate-950 border border-slate-850 rounded-2xl">
+                        <div className="flex items-center justify-between mb-2">
+                          <h5 className="text-xs font-bold text-white truncate max-w-xs">{assessment.examName}</h5>
+                          <span className="text-xs font-extrabold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
+                            {assessment.score} / {assessment.maxScore}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 leading-normal mb-1">
+                          <strong className="text-slate-500">Instructor Notes:</strong> "{assessment.teacherNotes}"
+                        </p>
+                        <span className="text-[9px] text-slate-500 font-semibold">Compiled on {assessment.date}</span>
+                      </div>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <div className="mt-6 pt-5 border-t border-slate-850 flex items-center justify-between text-[11px] text-slate-500">
+              <span>Looking for homework templates?</span>
+              <a href="#materials" className="text-indigo-400 hover:underline flex items-center gap-1 font-bold">
+                Access PDF Materials <ArrowUpRight className="h-3 w-3" />
+              </a>
+            </div>
+          </div>
+
+          {/* Teacher Message Chatbox Simulator CRM Integration */}
+          <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between h-[420px]">
+            <div className="border-b border-slate-850 pb-3">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                  <MessageSquare className="h-4.5 w-4.5 text-emerald-400" /> Messaging Station
+                </span>
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping shrink-0" />
+              </div>
+              
+              {/* Teacher Selector dropdown */}
+              <select
+                value={selectedTeacher}
+                onChange={(e) => {
+                  setSelectedTeacher(e.target.value);
+                  setChatMessages([
+                    { sender: 'teacher', text: `Hi Marcus, this is ${e.target.value}. Ask me anything about current class curriculums or upcoming evaluations.`, time: '10:00 AM' }
+                  ]);
+                }}
+                className="bg-slate-950 border border-slate-850 text-[10px] text-slate-300 font-bold p-1 px-2 rounded-lg outline-none"
+              >
+                <option>Prof. Alistair Miller</option>
+                <option>Sarah Jenkins</option>
+                <option>Dr. Evelyn Sterling</option>
+              </select>
+            </div>
+
+            {/* Chats messages box */}
+            <div className="flex-1 overflow-y-auto space-y-3 my-4 pr-1 text-xs">
+              {chatMessages.map((msg, i) => (
+                <div key={i} className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
+                  <div className={`p-3 rounded-2xl max-w-[85%] leading-relaxed ${
+                    msg.sender === 'user' 
+                      ? 'bg-indigo-600 text-white rounded-tr-none' 
+                      : 'bg-slate-950 text-slate-300 rounded-tl-none border border-slate-850'
+                  }`}>
+                    {msg.text}
+                  </div>
+                  <span className="text-[9px] text-slate-500 mt-1 font-mono pr-1">{msg.time}</span>
+                </div>
+              ))}
+
+              {isTeacherTyping && (
+                <div className="flex items-center gap-1.5 text-xs text-slate-500 font-bold bg-slate-950/40 p-2 rounded-xl border border-slate-850/40 w-max">
+                  <div className="flex gap-1">
+                    <span className="w-1.5 h-1.5 bg-slate-500 rounded-full animate-bounce"></span>
+                    <span className="w-1.5 h-1.5 bg-slate-500 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                    <span className="w-1.5 h-1.5 bg-slate-500 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+                  </div>
+                  <span>Tutor compiling notes...</span>
+                </div>
+              )}
+            </div>
+
+            {/* Controls input */}
+            <form onSubmit={handleSendMessage} className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Ask about 'Physics Final' or 'CalculusBC'..."
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                className="bg-slate-950 border border-slate-850 text-xs p-2.5 rounded-xl flex-1 outline-none focus:border-indigo-500 text-slate-200"
+              />
+              <button
+                type="submit"
+                disabled={!newMessage.trim()}
+                className={`p-2.5 rounded-xl transition shrink-0 cursor-pointer flex items-center justify-center ${
+                  newMessage.trim() ? 'bg-indigo-600 text-white hover:bg-indigo-500' : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                }`}
+              >
+                <Send className="h-4 w-4" />
+              </button>
+            </form>
+          </div>
+
+        </div>
+
+        {/* Resources Cards section */}
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6" id="materials">
+          <div className="mb-4">
+            <h3 className="text-sm font-bold text-white">Student Hub Academic Resources</h3>
+            <span className="text-[11px] text-slate-500">Curated materials matching active course registration tracks</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            <div className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 transition rounded-2xl flex items-center justify-between">
+              <div>
+                <span className="text-xs font-bold text-white block">Physics Mechanics 4B</span>
+                <span className="text-[10px] text-slate-500">PDF Study Syllabus</span>
+              </div>
+              <Award className="h-5 w-5 text-indigo-400 shrink-0" />
+            </div>
+
+            <div className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 transition rounded-2xl flex items-center justify-between">
+              <div>
+                <span className="text-xs font-bold text-white block">Integration Vectors Assessment</span>
+                <span className="text-[10px] text-slate-500">Practice Exam Questions</span>
+              </div>
+              <Award className="h-5 w-5 text-teal-400 shrink-0" />
+            </div>
+
+            <div className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 transition rounded-2xl flex items-center justify-between">
+              <div>
+                <span className="text-xs font-bold text-white block">Lab safety index Honors</span>
+                <span className="text-[10px] text-slate-500">Lab Assessment Criteria</span>
+              </div>
+              <Award className="h-5 w-5 text-amber-400 shrink-0" />
+            </div>
+
+            <div className="p-4 bg-slate-950 border border-emerald-500/30 bg-emerald-500/5 transition rounded-2xl flex items-center justify-between">
+              <div>
+                <span className="text-xs font-bold text-emerald-400 block">Summer Prep Course Book</span>
+                <span className="text-[10px] text-slate-400">Bonus Academic Guide</span>
+              </div>
+              <Award className="h-5 w-5 text-emerald-400 shrink-0 animate-pulse" />
+            </div>
+          </div>
+        </div>
+
+      </main>
+
+    </div>
+  );
+};

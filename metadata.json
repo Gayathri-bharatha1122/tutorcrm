@@ -1,0 +1,6 @@
+{
+  "name": "EduManage CRM",
+  "description": "Professional Academic Administration and Tutoring CRM Portal.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
