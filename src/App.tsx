@@ -48,6 +48,48 @@ export default function App() {
     return cached ? JSON.parse(cached) : helenaBills;
   });
 
+  const [publishedQuizzes, setPublishedQuizzes] = useState<Array<{
+    id: string;
+    title: string;
+    subject: string;
+    questionsCount: number;
+    questions: Array<{
+      id: number;
+      text: string;
+      options: string[];
+      correctAnswer: string;
+    }>;
+  }>>(() => {
+    const cached = localStorage.getItem('edumanage_quizzes');
+    return cached ? JSON.parse(cached) : [
+      {
+        id: 'q1',
+        title: 'Electromagnetic Fields Intro',
+        subject: 'Electromagnetism',
+        questionsCount: 1,
+        questions: [
+          {
+            id: 1,
+            text: 'What is the SI unit of magnetic flux density?',
+            options: ['Tesla', 'Weber', 'Henry', 'Farad'],
+            correctAnswer: 'A'
+          }
+        ]
+      }
+    ];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('edumanage_quizzes', JSON.stringify(publishedQuizzes));
+  }, [publishedQuizzes]);
+
+  const handlePublishQuiz = (newQuiz: { title: string; subject: string; questions: any[] }) => {
+    setPublishedQuizzes(prev => [
+      { id: `q-${Date.now()}`, ...newQuiz, questionsCount: newQuiz.questions.length },
+      ...prev
+    ]);
+  };
+
   // Cached profile identity
   const [currentProfileName, setCurrentProfileName] = useState<string>('Marcus Thorne');
 
@@ -237,6 +279,7 @@ export default function App() {
                   exams={marcusExams}
                   upcomingExams={upcomingExams}
                   studentName={currentProfileName}
+                  publishedQuizzes={publishedQuizzes}
                   onLogout={handleLogout}
                   onHome={handleHome}
                 />
@@ -275,6 +318,8 @@ export default function App() {
                   students={studentsList}
                   teachers={teachersList}
                   tutorName={currentProfileName}
+                  publishedQuizzes={publishedQuizzes}
+                  onPublishQuiz={handlePublishQuiz}
                   onLogout={handleLogout}
                   onHome={handleHome}
                 />
