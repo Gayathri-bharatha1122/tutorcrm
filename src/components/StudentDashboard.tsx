@@ -37,7 +37,29 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   const { t } = useLanguage();
   const [courses, setCourses] = useState<Course[]>(initialCourses);
   const [exams, setExams] = useState<ExamResult[]>(initialExams);
-  const [activeTab, setActiveTab] = useState<'schedule' | 'grades' | 'results'>('schedule');
+  const [activeTab, setActiveTab] = useState<'schedule' | 'grades' | 'results' | 'attendance'>('schedule');
+  
+  // Predefined attendance data for May 2026
+  // Starts on a Friday (5 empty days padding)
+  const getMay2026Attendance = () => {
+    const days = [];
+    // Padding
+    for (let i = 0; i < 5; i++) {
+      days.push({ dayNum: null, status: 'empty' });
+    }
+    const absentDays = [8, 20];
+    for (let d = 1; d <= 31; d++) {
+      const dayOfWeek = (5 + d - 1) % 7;
+      let status: 'present' | 'absent' | 'weekend' = 'present';
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        status = 'weekend';
+      } else if (absentDays.includes(d)) {
+        status = 'absent';
+      }
+      days.push({ dayNum: d, status });
+    }
+    return days;
+  };
   
   // Chat simulator state
   const [selectedTeacher, setSelectedTeacher] = useState('Prof. Alistair Miller');
@@ -186,7 +208,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <div className="lg:col-span-3 bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between">
             <div className="space-y-4">
               <div className="flex items-center justify-between border-b border-slate-850 pb-4">
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <button 
                     onClick={() => setActiveTab('schedule')}
                     className={`px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${activeTab === 'schedule' ? 'bg-indigo-600 text-white' : 'text-slate-500 hover:text-slate-300'}`}
@@ -204,6 +226,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                     className={`px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${activeTab === 'results' ? 'bg-indigo-600 text-white' : 'text-slate-450 hover:text-slate-300'}`}
                   >
                     {t('Term Results')}
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab('attendance')}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${activeTab === 'attendance' ? 'bg-indigo-600 text-white' : 'text-slate-450 hover:text-slate-300'}`}
+                  >
+                    {t('Attendance Calendar')}
                   </button>
                 </div>
 
@@ -239,7 +267,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                       </div>
                     ))}
                   </motion.div>
-                ) : (
+                ) : activeTab === 'grades' ? (
                   <motion.div 
                     key="grades"
                     initial={{ opacity: 0, y: 5 }}
@@ -261,6 +289,106 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                         <span className="text-[9px] text-slate-500 font-semibold">Compiled on {assessment.date}</span>
                       </div>
                     ))}
+                  </motion.div>
+                ) : activeTab === 'attendance' ? (
+                  <motion.div
+                    key="attendance"
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    className="space-y-3.5"
+                  >
+                    <div className="p-6 bg-slate-950 border border-slate-850 rounded-2xl">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                        
+                        {/* Calendar Left */}
+                        <div className="w-full max-w-xs mx-auto md:mx-0">
+                          <div className="flex flex-col items-center mb-4 gap-2">
+                            <span className="text-xs font-bold text-white">May 2026</span>
+                            <div className="flex gap-3 text-[9px] font-semibold text-slate-400">
+                              <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Present</span>
+                              <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-rose-500" /> Absent</span>
+                              <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-slate-700" /> Weekend</span>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-7 gap-1.5 text-center text-[9px] font-bold text-slate-500 mb-2">
+                            <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                          </div>
+
+                          <div className="grid grid-cols-7 gap-1.5 text-center justify-items-center">
+                            {getMay2026Attendance().map((day, idx) => {
+                              if (day.status === 'empty') {
+                                return <div key={`empty-${idx}`} className="w-8 h-8" />;
+                              }
+                              
+                              let cellStyle = "";
+                              if (day.status === 'present') {
+                                cellStyle = "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-full";
+                              } else if (day.status === 'absent') {
+                                cellStyle = "bg-rose-500/15 text-rose-400 border border-rose-500/30 rounded-full";
+                              } else {
+                                cellStyle = "bg-slate-900/30 text-slate-500 border border-slate-900/50 rounded-full";
+                              }
+
+                              return (
+                                <div
+                                  key={`day-${day.dayNum}`}
+                                  title={day.status === 'present' ? `Present on May ${day.dayNum}` : day.status === 'absent' ? `Absent on May ${day.dayNum}` : `Weekend`}
+                                  className={`w-8 h-8 flex items-center justify-center text-[10px] font-bold font-mono transition-all hover:scale-110 cursor-pointer ${cellStyle}`}
+                                >
+                                  {day.dayNum}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Attendance Statistics Right */}
+                        <div className="space-y-4">
+                          <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-850 pb-2">May Attendance Stats</h4>
+                          
+                          <div className="grid grid-cols-3 gap-3">
+                            <div className="bg-slate-900/55 p-3 rounded-xl border border-slate-850 text-center">
+                              <span className="text-[9px] font-bold text-slate-500 uppercase block">Conducted</span>
+                              <span className="text-sm font-extrabold text-white block mt-1">21</span>
+                              <span className="text-[8px] text-slate-400 block font-semibold">Sessions</span>
+                            </div>
+                            
+                            <div className="bg-emerald-950/20 p-3 rounded-xl border border-emerald-500/10 text-center">
+                              <span className="text-[9px] font-bold text-emerald-550 uppercase block">Attended</span>
+                              <span className="text-sm font-extrabold text-emerald-400 block mt-1">19</span>
+                              <span className="text-[8px] text-emerald-500/70 block font-semibold">Present</span>
+                            </div>
+
+                            <div className="bg-rose-950/20 p-3 rounded-xl border border-rose-500/10 text-center">
+                              <span className="text-[9px] font-bold text-rose-550 uppercase block">Absent</span>
+                              <span className="text-sm font-extrabold text-rose-400 block mt-1">2</span>
+                              <span className="text-[8px] text-rose-500/70 block font-semibold">Missed</span>
+                            </div>
+                          </div>
+
+                          {/* Attendance Ratio Circular Gauge & Text */}
+                          <div className="flex items-center gap-4 bg-slate-900/40 p-4 rounded-xl border border-slate-850/60">
+                            <div className="relative w-14 h-14 shrink-0 flex items-center justify-center">
+                              <svg className="w-14 h-14 transform -rotate-90">
+                                <circle cx="28" cy="28" r="22" fill="transparent" stroke="#1e293b" strokeWidth="3.5" />
+                                <circle cx="28" cy="28" r="22" fill="transparent" strokeWidth="3.5"
+                                        className="stroke-emerald-400 transition-all duration-1000"
+                                        strokeDasharray="138" strokeDashoffset={138 - (138 * 90.5) / 100}
+                                        strokeLinecap="round" />
+                              </svg>
+                              <span className="absolute font-mono text-[9px] font-extrabold text-slate-350">90.5%</span>
+                            </div>
+                            <div className="space-y-0.5">
+                              <span className="text-xs font-bold text-white block">Attendance Percentage</span>
+                              <p className="text-[10px] text-slate-400 leading-snug">Attended 19 out of 21 sessions. Maintain 90%+ attendance to qualify for term exams.</p>
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
                   </motion.div>
                 ) : (
                   <motion.div 
