@@ -24,6 +24,19 @@ interface TutorDashboardProps {
   students: Student[];
   teachers: Teacher[];
   tutorName: string;
+  publishedQuizzes: Array<{
+    id: string;
+    title: string;
+    subject: string;
+    questionsCount: number;
+    questions: Array<{
+      id: number;
+      text: string;
+      options: string[];
+      correctAnswer: string;
+    }>;
+  }>;
+  onPublishQuiz: (newQuiz: { title: string; subject: string; questions: any[] }) => void;
   onLogout: () => void;
   onHome: () => void;
 }
@@ -32,6 +45,8 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
   students,
   teachers,
   tutorName,
+  publishedQuizzes,
+  onPublishQuiz,
   onLogout,
   onHome
 }) => {
@@ -80,6 +95,73 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
     setShowScheduleModal(false);
     setAssignedSuccessMsg(`Scheduled lectures on "${lectureTitle}" hosted on ${lectureDate} at ${lectureTime} successfully.`);
     setTimeout(() => setAssignedSuccessMsg(null), 4000);
+  };
+
+  // Quiz Builder states
+  const [quizSubject, setQuizSubject] = useState('Physics Mechanics');
+  const [quizTitle, setQuizTitle] = useState('Rotational Motion Basics');
+  const [quizQuestions, setQuizQuestions] = useState<Array<{
+    id: number;
+    text: string;
+    options: string[];
+    correctAnswer: string;
+  }>>([
+    {
+      id: 1,
+      text: 'What is the unit of angular momentum?',
+      options: ['kg m²/s', 'kg m/s', 'N m', 'J s²'],
+      correctAnswer: 'A'
+    }
+  ]);
+  
+  // Current question inputs
+  const [newQuestionText, setNewQuestionText] = useState('');
+  const [optionA, setOptionA] = useState('');
+  const [optionB, setOptionB] = useState('');
+  const [optionC, setOptionC] = useState('');
+  const [optionD, setOptionD] = useState('');
+  const [correctOption, setCorrectOption] = useState('A');
+
+  const handleAddQuestion = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newQuestionText.trim() || !optionA.trim() || !optionB.trim() || !optionC.trim() || !optionD.trim()) return;
+
+    const newQuestion = {
+      id: Date.now(),
+      text: newQuestionText,
+      options: [optionA, optionB, optionC, optionD],
+      correctAnswer: correctOption
+    };
+
+    setQuizQuestions(prev => [...prev, newQuestion]);
+    
+    // Clear question inputs
+    setNewQuestionText('');
+    setOptionA('');
+    setOptionB('');
+    setOptionC('');
+    setOptionD('');
+    setCorrectOption('A');
+  };
+
+  const handleSaveQuiz = () => {
+    if (!quizTitle.trim() || quizQuestions.length === 0) return;
+
+    onPublishQuiz({
+      title: quizTitle,
+      subject: quizSubject,
+      questions: quizQuestions
+    });
+
+    setAssignedSuccessMsg(`Successfully published "${quizTitle}" for ${quizSubject} with ${quizQuestions.length} questions.`);
+    
+    // Reset quiz inputs
+    setQuizTitle('');
+    setQuizQuestions([]);
+  };
+
+  const handleRemoveQuestion = (id: number) => {
+    setQuizQuestions(prev => prev.filter(q => q.id !== id));
   };
 
   return (
@@ -296,6 +378,225 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
             </form>
           </div>
 
+        </div>
+
+        {/* Interactive Quiz Builder & Composer */}
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
+          <div className="border-b border-slate-850 pb-4 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="space-y-1">
+              <span className="text-[10px] font-bold text-teal-400 uppercase tracking-widest block bg-teal-500/10 w-max px-2.5 py-0.5 rounded-md">
+                Quiz Workshop
+              </span>
+              <h3 className="text-lg font-bold text-white flex items-center gap-1.5">
+                <BookOpen className="h-5 w-5 text-teal-400" /> {t('Prepare Subject Quiz')}
+              </h3>
+              <p className="text-slate-400 text-xs">Create multi-choice questionnaires to dispatch directly to active student portals.</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Question Composer Form */}
+            <div className="space-y-4 bg-slate-950/60 p-5 rounded-2xl border border-slate-850/60">
+              <h4 className="text-xs font-bold text-teal-400 uppercase tracking-widest">Composer Settings</h4>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Subject Category *</label>
+                  <select
+                    value={quizSubject}
+                    onChange={(e) => setQuizSubject(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-850 text-xs p-2.5 rounded-xl outline-none focus:border-teal-500 text-slate-350"
+                  >
+                    <option>Physics Mechanics</option>
+                    <option>Quantum Dynamics</option>
+                    <option>Calculus BC</option>
+                    <option>Electromagnetism</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Quiz Title *</label>
+                  <input
+                    type="text"
+                    required
+                    value={quizTitle}
+                    onChange={(e) => setQuizTitle(e.target.value)}
+                    placeholder="e.g. Rotational Kinematics Quiz"
+                    className="w-full bg-slate-950 border border-slate-850 text-xs p-2.5 rounded-xl outline-none focus:border-teal-500 text-slate-200"
+                  />
+                </div>
+              </div>
+
+              <div className="border-t border-slate-850/60 pt-4 space-y-4">
+                <h5 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Add a Question</h5>
+                
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Question Text *</label>
+                  <input
+                    type="text"
+                    value={newQuestionText}
+                    onChange={(e) => setNewQuestionText(e.target.value)}
+                    placeholder="Enter question description..."
+                    className="w-full bg-slate-950 border border-slate-850 text-xs p-2.5 rounded-xl outline-none focus:border-teal-500 text-slate-200"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-550 uppercase mb-1">Option A *</label>
+                    <input
+                      type="text"
+                      value={optionA}
+                      onChange={(e) => setOptionA(e.target.value)}
+                      placeholder="Choice A"
+                      className="w-full bg-slate-950 border border-slate-850 text-xs p-2 rounded-xl outline-none focus:border-teal-500 text-slate-300"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-550 uppercase mb-1">Option B *</label>
+                    <input
+                      type="text"
+                      value={optionB}
+                      onChange={(e) => setOptionB(e.target.value)}
+                      placeholder="Choice B"
+                      className="w-full bg-slate-950 border border-slate-850 text-xs p-2 rounded-xl outline-none focus:border-teal-500 text-slate-300"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-550 uppercase mb-1">Option C *</label>
+                    <input
+                      type="text"
+                      value={optionC}
+                      onChange={(e) => setOptionC(e.target.value)}
+                      placeholder="Choice C"
+                      className="w-full bg-slate-950 border border-slate-850 text-xs p-2 rounded-xl outline-none focus:border-teal-500 text-slate-300"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-550 uppercase mb-1">Option D *</label>
+                    <input
+                      type="text"
+                      value={optionD}
+                      onChange={(e) => setOptionD(e.target.value)}
+                      placeholder="Choice D"
+                      className="w-full bg-slate-950 border border-slate-850 text-xs p-2 rounded-xl outline-none focus:border-teal-500 text-slate-300"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-2">
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase">Correct Option:</label>
+                    <select
+                      value={correctOption}
+                      onChange={(e) => setCorrectOption(e.target.value)}
+                      className="bg-slate-950 border border-slate-850 text-xs p-1.5 rounded-lg outline-none focus:border-teal-500 text-slate-300 font-bold"
+                    >
+                      <option>A</option>
+                      <option>B</option>
+                      <option>C</option>
+                      <option>D</option>
+                    </select>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleAddQuestion}
+                    className="px-3.5 py-2 bg-slate-900 hover:bg-slate-850 border border-slate-800 text-teal-400 hover:text-teal-300 text-xs font-bold rounded-xl transition cursor-pointer flex items-center gap-1"
+                  >
+                    <Plus className="h-4 w-4" /> Add Question
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Live Preview Panel */}
+            <div className="space-y-4 flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-850 pb-2">
+                  <h4 className="text-xs font-bold text-teal-400 uppercase tracking-widest">Live Quiz Preview</h4>
+                  <span className="text-[9px] font-bold bg-teal-500/10 text-teal-400 px-2 py-0.5 rounded">
+                    {quizQuestions.length} {quizQuestions.length === 1 ? 'Question' : 'Questions'} Staged
+                  </span>
+                </div>
+
+                {quizTitle ? (
+                  <div className="p-4 bg-slate-950 border border-slate-850 rounded-2xl space-y-3 max-h-60 overflow-y-auto">
+                    <div className="flex justify-between items-start gap-2">
+                      <div>
+                        <span className="text-[9px] font-bold text-teal-500 uppercase tracking-wider block">{quizSubject}</span>
+                        <h5 className="text-sm font-bold text-white">{quizTitle}</h5>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3.5 pt-2">
+                      {quizQuestions.map((q, index) => (
+                        <div key={q.id} className="p-3 bg-slate-900/60 border border-slate-850/80 rounded-xl relative group">
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveQuestion(q.id)}
+                            className="absolute top-2 right-2 text-slate-500 hover:text-rose-400 transition opacity-0 group-hover:opacity-100 cursor-pointer"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                          <p className="text-xs font-semibold text-slate-200 pr-4">
+                            {index + 1}. {q.text}
+                          </p>
+                          <div className="grid grid-cols-2 gap-1.5 mt-2 text-[10px] text-slate-400 font-medium">
+                            <span className={q.correctAnswer === 'A' ? 'text-teal-400 font-bold' : ''}>A: {q.options[0]}</span>
+                            <span className={q.correctAnswer === 'B' ? 'text-teal-400 font-bold' : ''}>B: {q.options[1]}</span>
+                            <span className={q.correctAnswer === 'C' ? 'text-teal-400 font-bold' : ''}>C: {q.options[2]}</span>
+                            <span className={q.correctAnswer === 'D' ? 'text-teal-400 font-bold' : ''}>D: {q.options[3]}</span>
+                          </div>
+                        </div>
+                      ))}
+                      {quizQuestions.length === 0 && (
+                        <div className="text-center py-6 text-xs text-slate-550 italic">
+                          No questions added yet. Compile questions using the composer on the left.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-6 bg-slate-950/40 border border-slate-850/40 rounded-2xl text-center text-xs text-slate-500 italic">
+                    Enter a Quiz Title and Subject to activate the live preview board.
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-4 pt-4 border-t border-slate-850/60">
+                <button
+                  type="button"
+                  onClick={handleSaveQuiz}
+                  disabled={!quizTitle.trim() || quizQuestions.length === 0}
+                  className={`w-full py-2.5 rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 ${
+                    quizTitle.trim() && quizQuestions.length > 0
+                      ? 'bg-teal-600 hover:bg-teal-500 text-white shadow-lg shadow-teal-600/15'
+                      : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                  }`}
+                >
+                  <Check className="h-4 w-4" /> Publish & Dispatch Quiz
+                </button>
+
+                {/* Published Quizzes log */}
+                <div>
+                  <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block mb-2">Active Published Quizzes</span>
+                  <div className="space-y-2">
+                    {publishedQuizzes.map((quiz, i) => (
+                      <div key={i} className="p-3 bg-slate-950 border border-slate-850/60 rounded-xl flex items-center justify-between text-xs">
+                        <div>
+                          <span className="font-semibold text-slate-200 block">{quiz.title}</span>
+                          <span className="text-[10px] text-slate-500">{quiz.subject}</span>
+                        </div>
+                        <span className="text-[10px] font-mono font-bold text-teal-400 bg-teal-500/5 border border-teal-500/10 px-2 py-0.5 rounded">
+                          {quiz.questionsCount} Qs
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Timetables lectures preview */}

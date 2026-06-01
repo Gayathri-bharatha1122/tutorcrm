@@ -11,7 +11,9 @@ import {
   Bell, 
   ArrowUpRight,
   Sparkles,
-  Info
+  Info,
+  Check,
+  X
 } from 'lucide-react';
 import { Course, ExamResult, ExamSchedule } from '../types';
 import { useLanguage } from '../LanguageContext';
@@ -22,6 +24,18 @@ interface StudentDashboardProps {
   exams: ExamResult[];
   upcomingExams: ExamSchedule[];
   studentName: string;
+  publishedQuizzes: Array<{
+    id: string;
+    title: string;
+    subject: string;
+    questionsCount: number;
+    questions: Array<{
+      id: number;
+      text: string;
+      options: string[];
+      correctAnswer: string;
+    }>;
+  }>;
   onLogout: () => void;
   onHome: () => void;
 }
@@ -31,13 +45,19 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   exams: initialExams,
   upcomingExams,
   studentName,
+  publishedQuizzes,
   onLogout,
   onHome
 }) => {
   const { t } = useLanguage();
   const [courses, setCourses] = useState<Course[]>(initialCourses);
   const [exams, setExams] = useState<ExamResult[]>(initialExams);
-  const [activeTab, setActiveTab] = useState<'schedule' | 'grades' | 'results' | 'attendance'>('schedule');
+  const [activeTab, setActiveTab] = useState<'schedule' | 'grades' | 'results' | 'attendance' | 'quizzes'>('schedule');
+  
+  // Quiz taking states
+  const [activeQuizId, setActiveQuizId] = useState<string | null>(null);
+  const [studentAnswers, setStudentAnswers] = useState<Record<number, string>>({});
+  const [quizScoreResult, setQuizScoreResult] = useState<{ score: number; total: number } | null>(null);
   
   // Predefined attendance data for May 2026
   // Starts on a Friday (5 empty days padding)
@@ -233,6 +253,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   >
                     {t('Attendance Calendar')}
                   </button>
+                  <button 
+                    onClick={() => setActiveTab('quizzes')}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${activeTab === 'quizzes' ? 'bg-indigo-600 text-white' : 'text-slate-450 hover:text-slate-300'}`}
+                  >
+                    {t('Subject Quizzes')}
+                  </button>
                 </div>
 
                 <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-semibold bg-slate-950 px-2.5 py-1 rounded-lg">
@@ -390,6 +416,53 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                       </div>
                     </div>
                   </motion.div>
+                ) : activeTab === 'quizzes' ? (
+                  <motion.div
+                    key="quizzes"
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    className="space-y-4"
+                  >
+                    <div className="p-4 bg-slate-950 border border-slate-850 rounded-2xl">
+                      <div className="border-b border-slate-850 pb-3 mb-4 flex items-center justify-between">
+                        <div>
+                          <h5 className="text-xs font-bold text-white uppercase tracking-wider">{t('Assigned Topic Quizzes')}</h5>
+                          <span className="text-[10px] text-slate-500">Test your conceptual knowledge in registered courses</span>
+                        </div>
+                        <span className="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded">Active Evaluation</span>
+                      </div>
+
+                      <div className="space-y-3">
+                        {publishedQuizzes.map((quiz) => (
+                          <div key={quiz.id} className="p-4 bg-slate-900 border border-slate-850 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="space-y-1">
+                              <span className="text-[9px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded w-max block">
+                                {quiz.subject}
+                              </span>
+                              <h6 className="text-sm font-bold text-white">{quiz.title}</h6>
+                              <span className="text-[10px] text-slate-500 block">Total Questions: {quiz.questions.length} • Format: MCQ</span>
+                            </div>
+                            <button
+                              onClick={() => {
+                                setActiveQuizId(quiz.id);
+                                setStudentAnswers({});
+                                setQuizScoreResult(null);
+                              }}
+                              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition cursor-pointer"
+                            >
+                              Start Quiz
+                            </button>
+                          </div>
+                        ))}
+                        {publishedQuizzes.length === 0 && (
+                          <div className="text-center py-8 text-xs text-slate-550 italic">
+                            No quizzes have been published by the instructor yet.
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
                 ) : (
                   <motion.div 
                     key="results"
@@ -539,6 +612,151 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
         </div>
 
       </main>
+
+      {/* Quiz Modal */}
+      <AnimatePresence>
+        {activeQuizId && (
+          <>
+            {/* Backdrop */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.5 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black z-40"
+              onClick={() => setActiveQuizId(null)}
+            />
+
+            {/* Modal Body */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="fixed inset-0 m-auto w-full max-w-lg h-[90vh] sm:h-max sm:max-h-[85vh] bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl z-50 p-6 text-slate-100 flex flex-col justify-between overflow-hidden"
+            >
+              {/* Modal Header */}
+              <div className="flex justify-between items-center border-b border-slate-850 pb-4 shrink-0">
+                <div>
+                  <span className="text-[9px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded uppercase tracking-wider block w-max">
+                    {publishedQuizzes.find(q => q.id === activeQuizId)?.subject}
+                  </span>
+                  <h4 className="text-sm font-bold text-white mt-1">
+                    {publishedQuizzes.find(q => q.id === activeQuizId)?.title}
+                  </h4>
+                </div>
+                <button 
+                  onClick={() => setActiveQuizId(null)}
+                  className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition cursor-pointer"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Questions Content */}
+              <div className="flex-1 overflow-y-auto my-6 pr-1 space-y-6">
+                {quizScoreResult ? (
+                  /* Quiz score result */
+                  <div className="flex flex-col items-center justify-center py-6 space-y-4">
+                    <div className="relative w-24 h-24 flex items-center justify-center">
+                      <svg className="w-24 h-24 transform -rotate-90">
+                        <circle cx="48" cy="48" r="40" fill="transparent" stroke="#1e293b" strokeWidth="6" />
+                        <circle cx="48" cy="48" r="40" fill="transparent" strokeWidth="6"
+                                className="stroke-indigo-500 transition-all duration-1000"
+                                strokeDasharray="251" strokeDashoffset={251 - (251 * (quizScoreResult.score / quizScoreResult.total))}
+                                strokeLinecap="round" />
+                      </svg>
+                      <span className="absolute font-mono text-lg font-extrabold text-white">
+                        {Math.round((quizScoreResult.score / quizScoreResult.total) * 100)}%
+                      </span>
+                    </div>
+
+                    <div className="text-center space-y-1">
+                      <h5 className="text-base font-bold text-white">Evaluation Complete</h5>
+                      <p className="text-xs text-slate-400">
+                        You scored <strong className="text-indigo-400">{quizScoreResult.score}</strong> out of <strong className="text-slate-350">{quizScoreResult.total}</strong> questions correctly.
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveQuizId(null)}
+                      className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                    >
+                      Close Evaluation Board
+                    </button>
+                  </div>
+                ) : (
+                  /* Render list of questions to answer */
+                  publishedQuizzes.find(q => q.id === activeQuizId)?.questions.map((question, idx) => (
+                    <div key={question.id} className="space-y-3">
+                      <h5 className="text-xs font-bold text-slate-200">
+                        {idx + 1}. {question.text}
+                      </h5>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {question.options.map((opt, oIdx) => {
+                          const optionLetter = ['A', 'B', 'C', 'D'][oIdx];
+                          const isSelected = studentAnswers[question.id] === optionLetter;
+                          return (
+                            <button
+                              key={oIdx}
+                              type="button"
+                              onClick={() => {
+                                setStudentAnswers(prev => ({ ...prev, [question.id]: optionLetter }));
+                              }}
+                              className={`p-3 rounded-xl border text-xs text-left font-medium transition-all cursor-pointer flex items-center justify-between ${
+                                isSelected
+                                  ? 'bg-indigo-600/20 text-indigo-400 border-indigo-500/50 shadow-md shadow-indigo-500/5'
+                                  : 'bg-slate-950 border-slate-850 text-slate-400 hover:text-slate-300 hover:border-slate-750'
+                              }`}
+                            >
+                              <span>{optionLetter}. {opt}</span>
+                              {isSelected && <Check className="h-4 w-4 text-indigo-400 shrink-0" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Footer */}
+              {!quizScoreResult && (
+                <div className="border-t border-slate-850 pt-4 flex justify-between items-center shrink-0">
+                  <span className="text-[10px] text-slate-500 font-semibold">
+                    Ensure all questions are completed before submitting.
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const quiz = publishedQuizzes.find(q => q.id === activeQuizId);
+                      if (!quiz) return;
+                      let correctCount = 0;
+                      quiz.questions.forEach(q => {
+                        if (studentAnswers[q.id] === q.correctAnswer) {
+                          correctCount++;
+                        }
+                      });
+                      setQuizScoreResult({ score: correctCount, total: quiz.questions.length });
+                    }}
+                    disabled={
+                      Object.keys(studentAnswers).length < 
+                      (publishedQuizzes.find(q => q.id === activeQuizId)?.questions.length || 0)
+                    }
+                    className={`px-5 py-2.5 rounded-xl font-bold text-xs transition cursor-pointer flex items-center gap-1.5 ${
+                      Object.keys(studentAnswers).length === 
+                      (publishedQuizzes.find(q => q.id === activeQuizId)?.questions.length || 0)
+                        ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/10'
+                        : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                    }`}
+                  >
+                    Submit & Evaluate <ArrowUpRight className="h-4 w-4" />
+                  </button>
+                </div>
+              )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
     </div>
   );
