@@ -37,7 +37,29 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   const { t } = useLanguage();
   const [courses, setCourses] = useState<Course[]>(initialCourses);
   const [exams, setExams] = useState<ExamResult[]>(initialExams);
-  const [activeTab, setActiveTab] = useState<'schedule' | 'grades' | 'results'>('schedule');
+  const [activeTab, setActiveTab] = useState<'schedule' | 'grades' | 'results' | 'attendance'>('schedule');
+  
+  // Predefined attendance data for May 2026
+  // Starts on a Friday (5 empty days padding)
+  const getMay2026Attendance = () => {
+    const days = [];
+    // Padding
+    for (let i = 0; i < 5; i++) {
+      days.push({ dayNum: null, status: 'empty' });
+    }
+    const absentDays = [8, 20];
+    for (let d = 1; d <= 31; d++) {
+      const dayOfWeek = (5 + d - 1) % 7;
+      let status: 'present' | 'absent' | 'weekend' = 'present';
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        status = 'weekend';
+      } else if (absentDays.includes(d)) {
+        status = 'absent';
+      }
+      days.push({ dayNum: d, status });
+    }
+    return days;
+  };
   
   // Chat simulator state
   const [selectedTeacher, setSelectedTeacher] = useState('Prof. Alistair Miller');
@@ -186,7 +208,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <div className="lg:col-span-3 bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between">
             <div className="space-y-4">
               <div className="flex items-center justify-between border-b border-slate-850 pb-4">
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <button 
                     onClick={() => setActiveTab('schedule')}
                     className={`px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${activeTab === 'schedule' ? 'bg-indigo-600 text-white' : 'text-slate-500 hover:text-slate-300'}`}
@@ -204,6 +226,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                     className={`px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${activeTab === 'results' ? 'bg-indigo-600 text-white' : 'text-slate-450 hover:text-slate-300'}`}
                   >
                     {t('Term Results')}
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab('attendance')}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${activeTab === 'attendance' ? 'bg-indigo-600 text-white' : 'text-slate-450 hover:text-slate-300'}`}
+                  >
+                    {t('Attendance Calendar')}
                   </button>
                 </div>
 
@@ -239,7 +267,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                       </div>
                     ))}
                   </motion.div>
-                ) : (
+                ) : activeTab === 'grades' ? (
                   <motion.div 
                     key="grades"
                     initial={{ opacity: 0, y: 5 }}
@@ -261,6 +289,56 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                         <span className="text-[9px] text-slate-500 font-semibold">Compiled on {assessment.date}</span>
                       </div>
                     ))}
+                  </motion.div>
+                ) : activeTab === 'attendance' ? (
+                  <motion.div
+                    key="attendance"
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    className="space-y-3.5"
+                  >
+                    <div className="p-4 bg-slate-950 border border-slate-850 rounded-2xl max-w-xs mx-auto">
+                      <div className="flex flex-col items-center mb-4 gap-2">
+                        <span className="text-xs font-bold text-white">May 2026</span>
+                        <div className="flex gap-3 text-[9px] font-semibold text-slate-400">
+                          <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Present</span>
+                          <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-rose-500" /> Absent</span>
+                          <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-slate-700" /> Weekend</span>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-7 gap-1.5 text-center text-[9px] font-bold text-slate-500 mb-2">
+                        <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                      </div>
+
+                      <div className="grid grid-cols-7 gap-1.5 text-center justify-items-center">
+                        {getMay2026Attendance().map((day, idx) => {
+                          if (day.status === 'empty') {
+                            return <div key={`empty-${idx}`} className="w-8 h-8" />;
+                          }
+                          
+                          let cellStyle = "";
+                          if (day.status === 'present') {
+                            cellStyle = "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-full";
+                          } else if (day.status === 'absent') {
+                            cellStyle = "bg-rose-500/15 text-rose-400 border border-rose-500/30 rounded-full";
+                          } else {
+                            cellStyle = "bg-slate-900/30 text-slate-500 border border-slate-900/50 rounded-full";
+                          }
+
+                          return (
+                            <div
+                              key={`day-${day.dayNum}`}
+                              title={day.status === 'present' ? `Present on May ${day.dayNum}` : day.status === 'absent' ? `Absent on May ${day.dayNum}` : `Weekend`}
+                              className={`w-8 h-8 flex items-center justify-center text-[10px] font-bold font-mono transition-all hover:scale-110 cursor-pointer ${cellStyle}`}
+                            >
+                              {day.dayNum}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </motion.div>
                 ) : (
                   <motion.div 

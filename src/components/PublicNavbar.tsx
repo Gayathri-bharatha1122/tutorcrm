@@ -1,6 +1,6 @@
 import React from 'react';
 import { GraduationCap } from 'lucide-react';
-import { Screen } from '../types';
+import { Screen, Role } from '../types';
 import { useLanguage } from '../LanguageContext';
 import { LanguageSelector } from './LanguageSelector';
 

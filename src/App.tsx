@@ -23,6 +23,7 @@ import { StudentDashboard } from './components/StudentDashboard';
 import { ParentDashboard } from './components/ParentDashboard';
 import { TutorDashboard } from './components/TutorDashboard';
 
+
 export default function App() {
   const [screen, setScreen] = useState<Screen>('landing');
   const [activeRole, setActiveRole] = useState<Role>('student');
@@ -280,7 +281,6 @@ export default function App() {
             )}
           </AnimatePresence>
         </div>
-
       </div>
     </LanguageProvider>
   );

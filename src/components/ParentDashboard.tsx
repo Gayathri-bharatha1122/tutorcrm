@@ -25,7 +25,6 @@ interface ParentDashboardProps {
   parentName: string;
   studentName: string;
   onUpdateBills: (updatedBills: Bill[]) => void;
-  onUpdateBills: (updatedBills: Bill[]) => void;
   onLogout: () => void;
   onHome: () => void;
 }
@@ -85,6 +84,28 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
   const totalOutstanding = bills
     .filter((b) => b.status === 'Pending' || b.status === 'Overdue')
     .reduce((sum, b) => sum + b.amount, 0);
+
+  // Predefined attendance data for May 2026
+  // Starts on a Friday (5 empty days padding)
+  const getMay2026Attendance = () => {
+    const days = [];
+    // Padding
+    for (let i = 0; i < 5; i++) {
+      days.push({ dayNum: null, status: 'empty' });
+    }
+    const absentDays = [8, 20];
+    for (let d = 1; d <= 31; d++) {
+      const dayOfWeek = (5 + d - 1) % 7;
+      let status: 'present' | 'absent' | 'weekend' = 'present';
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        status = 'weekend';
+      } else if (absentDays.includes(d)) {
+        status = 'absent';
+      }
+      days.push({ dayNum: d, status });
+    }
+    return days;
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans">
@@ -217,6 +238,60 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
               </div>
             </div>
 
+          </div>
+        </div>
+
+        {/* Attendance Calendar Card */}
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+            <div className="space-y-1">
+              <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest block bg-emerald-500/10 w-max px-2.5 py-0.5 rounded-md">
+                Attendance Log
+              </span>
+              <h3 className="text-lg font-bold text-white flex items-center gap-1.5">
+                <Calendar className="h-5 w-5 text-emerald-400" /> {t('Attendance Calendar')}
+              </h3>
+              <p className="text-slate-400 text-xs">Verify your child's daily presence and session check-ins for the current month.</p>
+            </div>
+            <div className="flex flex-wrap gap-3 text-[10px] font-semibold text-slate-400">
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500" /> Present</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-rose-500" /> Absent</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-slate-700" /> Weekend</span>
+            </div>
+          </div>
+
+          <div className="p-4 bg-slate-950 border border-slate-850 rounded-2xl max-w-xs mx-auto">
+            <div className="text-center font-bold text-xs text-slate-350 mb-3">May 2026</div>
+            <div className="grid grid-cols-7 gap-1.5 text-center text-[9px] font-bold text-slate-500 mb-2">
+              <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+            </div>
+
+            <div className="grid grid-cols-7 gap-1.5 text-center justify-items-center">
+              {getMay2026Attendance().map((day, idx) => {
+                if (day.status === 'empty') {
+                  return <div key={`empty-${idx}`} className="w-8 h-8" />;
+                }
+                
+                let cellStyle = "";
+                if (day.status === 'present') {
+                  cellStyle = "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-full";
+                } else if (day.status === 'absent') {
+                  cellStyle = "bg-rose-500/15 text-rose-400 border border-rose-500/30 rounded-full";
+                } else {
+                  cellStyle = "bg-slate-900/30 text-slate-500 border border-slate-900/50 rounded-full";
+                }
+
+                return (
+                  <div
+                    key={`day-${day.dayNum}`}
+                    title={day.status === 'present' ? `Present on May ${day.dayNum}` : day.status === 'absent' ? `Absent on May ${day.dayNum}` : `Weekend`}
+                    className={`w-8 h-8 flex items-center justify-center text-[10px] font-bold font-mono transition-all hover:scale-110 cursor-pointer ${cellStyle}`}
+                  >
+                    {day.dayNum}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
 
