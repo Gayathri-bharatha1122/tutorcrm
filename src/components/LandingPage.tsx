@@ -1,15 +1,15 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { 
-  GraduationCap, 
-  Users, 
-  BookOpen, 
-  Activity, 
-  Shield, 
-  PlusSquare, 
-  Calendar, 
-  ChevronRight, 
-  Sparkles, 
+import {
+  GraduationCap,
+  Users,
+  BookOpen,
+  Activity,
+  Shield,
+  PlusSquare,
+  Calendar,
+  ChevronRight,
+  Sparkles,
   CheckCircle,
   Menu,
   ArrowUpRight
@@ -34,8 +34,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
-    visible: { 
-      y: 0, 
+    visible: {
+      y: 0,
       opacity: 1,
       transition: { type: 'spring' as const, stiffness: 100 }
     }
@@ -118,7 +118,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
         <div className="absolute top-1/3 right-1/4 translate-y-1/2 w-[400px] h-[400px] rounded-full bg-emerald-500/5 blur-[120px] pointer-events-none" />
 
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 relative z-10">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6 }}
@@ -128,19 +128,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
             <span>{t('Unified Management Ecosystem v2.0 is Live')}</span>
           </motion.div>
 
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.6 }}
             className="text-4xl sm:text-5xl md:text-6xl font-sans font-bold tracking-tight text-white mb-6"
           >
-            {t('Empowering Education through')} <br />
+            {t('Where Learning')} <br />
             <span className="bg-gradient-to-r from-indigo-400 via-indigo-300 to-emerald-400 bg-clip-text text-transparent">
-              {t('Intelligent Management crm')}
+              {t('Meets Success')}
             </span>
           </motion.h1>
 
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
@@ -149,20 +149,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
             {t('Connecting Administrators, Tutors, Parents, and Students into a cohesive learning workspace. View reports, compile grades, clear billing invoices, and message teachers in real-time.')}
           </motion.p>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <button 
+            <button
               onClick={() => onNavigate('register')}
               className="w-full sm:w-auto px-6 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 group cursor-pointer"
             >
               {t('Start Registration Stepper')}
               <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </button>
-            <button 
+            <button
               onClick={() => onNavigate('login')}
               className="w-full sm:w-auto px-6 py-3.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
@@ -185,7 +185,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
             </p>
           </div>
 
-          <motion.div 
+          <motion.div
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
@@ -193,7 +193,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
           >
             {/* Admin Portal Info Card */}
-            <motion.div 
+            <motion.div
               variants={itemVariants}
               whileHover={{ y: -6 }}
               className="bg-slate-900/60 p-6 rounded-2xl border border-indigo-500/20 hover:border-indigo-500/40 transition-all flex flex-col justify-between"
@@ -207,7 +207,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                   {t('Manage standard student directory databases, track fee metrics, monitor real-time security audits and logs, & enroll students securely.')}
                 </p>
               </div>
-              <button 
+              <button
                 onClick={() => onNavigate('login', 'admin')}
                 className="w-full py-2.5 px-4 bg-indigo-600/10 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 font-medium text-xs rounded-xl transition-all mt-auto flex items-center justify-center gap-1 cursor-pointer"
               >
@@ -216,7 +216,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
             </motion.div>
 
             {/* Tutor Dashboard Card */}
-            <motion.div 
+            <motion.div
               variants={itemVariants}
               whileHover={{ y: -6 }}
               className="bg-slate-900/60 p-6 rounded-2xl border border-teal-500/20 hover:border-teal-500/40 transition-all flex flex-col justify-between"
@@ -230,7 +230,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                   {t('Log class attendances quickly, record progress indicators, add grades to historic exams, & edit curriculum trackers with zero delay.')}
                 </p>
               </div>
-              <button 
+              <button
                 onClick={() => onNavigate('login', 'tutor')}
                 className="w-full py-2.5 px-4 bg-teal-600/10 hover:bg-teal-600 text-teal-350 hover:text-white border border-teal-500/30 font-medium text-xs rounded-xl transition-all mt-auto flex items-center justify-center gap-1 cursor-pointer"
               >
@@ -239,7 +239,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
             </motion.div>
 
             {/* Parent Linkage Portal */}
-            <motion.div 
+            <motion.div
               variants={itemVariants}
               whileHover={{ y: -6 }}
               className="bg-slate-900/60 p-6 rounded-2xl border border-amber-500/20 hover:border-amber-500/40 transition-all flex flex-col justify-between"
@@ -253,7 +253,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                   {t('Track child metrics (attendance gauges, homework grades), review notifications transcripts, pay bills & invoices via payment gateways.')}
                 </p>
               </div>
-              <button 
+              <button
                 onClick={() => onNavigate('login', 'parent')}
                 className="w-full py-2.5 px-4 bg-amber-600/10 hover:bg-amber-600 text-amber-300 hover:text-white border border-amber-500/30 font-medium text-xs rounded-xl transition-all mt-auto flex items-center justify-center gap-1 cursor-pointer"
               >
@@ -262,7 +262,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
             </motion.div>
 
             {/* Student Learning Portal */}
-            <motion.div 
+            <motion.div
               variants={itemVariants}
               whileHover={{ y: -6 }}
               className="bg-slate-900/60 p-6 rounded-2xl border border-emerald-500/20 hover:border-emerald-500/40 transition-all flex flex-col justify-between"
@@ -276,7 +276,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                   {t('View customized curricula, monitor active homework completions, check class schedules, and simulate communication using active support channels.')}
                 </p>
               </div>
-              <button 
+              <button
                 onClick={() => onNavigate('login', 'student')}
                 className="w-full py-2.5 px-4 bg-emerald-600/10 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/30 font-medium text-xs rounded-xl transition-all mt-auto flex items-center justify-center gap-1 cursor-pointer"
               >
@@ -336,7 +336,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                     <span>{t('Instructed by:')}</span>
                     <span className="text-slate-300">{course.tutor}</span>
                   </div>
-                  <button 
+                  <button
                     onClick={() => onNavigate('login')}
                     className={`w-full py-2.5 px-4 ${course.theme.btnBg} border ${course.theme.btnBorder} font-semibold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer`}
                   >
