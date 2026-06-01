@@ -260,39 +260,6 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
             </div>
           </div>
 
-<<<<<<< HEAD
-          <div className="p-4 bg-slate-950 border border-slate-850 rounded-2xl max-w-xs mx-auto">
-            <div className="text-center font-bold text-xs text-slate-350 mb-3">May 2026</div>
-            <div className="grid grid-cols-7 gap-1.5 text-center text-[9px] font-bold text-slate-500 mb-2">
-              <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
-            </div>
-
-            <div className="grid grid-cols-7 gap-1.5 text-center justify-items-center">
-              {getMay2026Attendance().map((day, idx) => {
-                if (day.status === 'empty') {
-                  return <div key={`empty-${idx}`} className="w-8 h-8" />;
-                }
-                
-                let cellStyle = "";
-                if (day.status === 'present') {
-                  cellStyle = "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-full";
-                } else if (day.status === 'absent') {
-                  cellStyle = "bg-rose-500/15 text-rose-400 border border-rose-500/30 rounded-full";
-                } else {
-                  cellStyle = "bg-slate-900/30 text-slate-500 border border-slate-900/50 rounded-full";
-                }
-
-                return (
-                  <div
-                    key={`day-${day.dayNum}`}
-                    title={day.status === 'present' ? `Present on May ${day.dayNum}` : day.status === 'absent' ? `Absent on May ${day.dayNum}` : `Weekend`}
-                    className={`w-8 h-8 flex items-center justify-center text-[10px] font-bold font-mono transition-all hover:scale-110 cursor-pointer ${cellStyle}`}
-                  >
-                    {day.dayNum}
-                  </div>
-                );
-              })}
-=======
           <div className="p-6 bg-slate-950 border border-slate-850 rounded-2xl">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
               
@@ -374,7 +341,6 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                 </div>
               </div>
 
->>>>>>> 2f7b20dccc1520cc44620a11ab5a9d1f8a3cd7a9
             </div>
           </div>
         </div>
