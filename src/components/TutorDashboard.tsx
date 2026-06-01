@@ -25,13 +25,15 @@ interface TutorDashboardProps {
   teachers: Teacher[];
   tutorName: string;
   onLogout: () => void;
+  onHome: () => void;
 }
 
 export const TutorDashboard: React.FC<TutorDashboardProps> = ({
   students,
   teachers,
   tutorName,
-  onLogout
+  onLogout,
+  onHome
 }) => {
   const { t } = useLanguage();
   const [markedAttendance, setMarkedAttendance] = useState<Record<string, 'Present' | 'Absent' | 'Excused'>>({
@@ -103,6 +105,12 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
                 <span className="text-[10px] text-teal-400 font-bold uppercase font-mono">Senior Instructor Faculty</span>
               </div>
               <LanguageSelector />
+              <button 
+                onClick={onHome}
+                className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs text-slate-200 font-semibold rounded-lg transition overflow-hidden cursor-pointer"
+              >
+                {t('Home')}
+              </button>
               <button 
                 onClick={onLogout}
                 className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs text-slate-200 font-semibold rounded-lg transition overflow-hidden cursor-pointer"

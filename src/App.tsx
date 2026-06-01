@@ -26,6 +26,7 @@ import { TutorDashboard } from './components/TutorDashboard';
 export default function App() {
   const [screen, setScreen] = useState<Screen>('landing');
   const [activeRole, setActiveRole] = useState<Role>('student');
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   // Persistence States synced with LocalStorage
   const [studentsList, setStudentsList] = useState<Student[]>(() => {
@@ -99,6 +100,7 @@ export default function App() {
 
   const handleLoginSuccess = (role: Role) => {
     setActiveRole(role);
+    setIsLoggedIn(true);
     // Resolve personal name tags corresponding to roles for display
     if (role === 'admin') {
       setCurrentProfileName('System Administrator');
@@ -118,6 +120,7 @@ export default function App() {
   const handleRegisteredSuccess = (role: Role, customName: string) => {
     setActiveRole(role);
     setCurrentProfileName(customName);
+    setIsLoggedIn(true);
     
     // Auto insert child student if register as parent
     if (role === 'parent') {
@@ -138,6 +141,11 @@ export default function App() {
   };
 
   const handleLogout = () => {
+    setIsLoggedIn(false);
+    setScreen('landing');
+  };
+
+  const handleHome = () => {
     setScreen('landing');
   };
 
@@ -147,7 +155,7 @@ export default function App() {
     <LanguageProvider>
       <div className="bg-slate-950 min-h-screen w-full overflow-x-hidden text-slate-100 flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
 
-        {isPublicPage && <PublicNavbar screen={screen} onNavigate={handleNavigate} />}
+        {isPublicPage && <PublicNavbar screen={screen} onNavigate={handleNavigate} isLoggedIn={isLoggedIn} activeRole={activeRole} />}
 
         {/* Route Render Engine with AnimatePresence */}
         <div className="flex-1">
@@ -160,7 +168,7 @@ export default function App() {
                 exit={{ opacity: 0 }}
                 className="w-full"
               >
-                <LandingPage onNavigate={handleNavigate} />
+                <LandingPage onNavigate={handleNavigate} isLoggedIn={isLoggedIn} activeRole={activeRole} />
               </motion.div>
             )}
 
@@ -209,6 +217,7 @@ export default function App() {
                   activityLogs={activityLogsList}
                   onAddStudent={handleAddNewStudent}
                   onLogout={handleLogout}
+                  onHome={handleHome}
                 />
               </motion.div>
             )}
@@ -227,6 +236,7 @@ export default function App() {
                   upcomingExams={upcomingExams}
                   studentName={currentProfileName}
                   onLogout={handleLogout}
+                  onHome={handleHome}
                 />
               </motion.div>
             )}
@@ -246,6 +256,7 @@ export default function App() {
                   studentName="Marcus Thorne"
                   onUpdateBills={setParentBillsList}
                   onLogout={handleLogout}
+                  onHome={handleHome}
                 />
               </motion.div>
             )}
@@ -263,6 +274,7 @@ export default function App() {
                   teachers={teachersList}
                   tutorName={currentProfileName}
                   onLogout={handleLogout}
+                  onHome={handleHome}
                 />
               </motion.div>
             )}

@@ -23,6 +23,7 @@ interface StudentDashboardProps {
   upcomingExams: ExamSchedule[];
   studentName: string;
   onLogout: () => void;
+  onHome: () => void;
 }
 
 export const StudentDashboard: React.FC<StudentDashboardProps> = ({
@@ -30,12 +31,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   exams: initialExams,
   upcomingExams,
   studentName,
-  onLogout
+  onLogout,
+  onHome
 }) => {
   const { t } = useLanguage();
   const [courses, setCourses] = useState<Course[]>(initialCourses);
   const [exams, setExams] = useState<ExamResult[]>(initialExams);
-  const [activeTab, setActiveTab] = useState<'schedule' | 'grades'>('schedule');
+  const [activeTab, setActiveTab] = useState<'schedule' | 'grades' | 'results'>('schedule');
   
   // Chat simulator state
   const [selectedTeacher, setSelectedTeacher] = useState('Prof. Alistair Miller');
@@ -103,6 +105,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 <span className="text-[10px] text-emerald-400 font-bold uppercase font-mono">Enrolled • 11th Grade</span>
               </div>
               <LanguageSelector />
+              <button 
+                onClick={onHome}
+                className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs text-slate-200 font-semibold rounded-lg transition overflow-hidden cursor-pointer"
+              >
+                {t('Home')}
+              </button>
               <button 
                 onClick={onLogout}
                 className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs text-slate-200 font-semibold rounded-lg transition overflow-hidden cursor-pointer"
@@ -191,6 +199,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   >
                     {t('Assessments Log')}
                   </button>
+                  <button 
+                    onClick={() => setActiveTab('results')}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${activeTab === 'results' ? 'bg-indigo-600 text-white' : 'text-slate-450 hover:text-slate-300'}`}
+                  >
+                    {t('Term Results')}
+                  </button>
                 </div>
 
                 <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-semibold bg-slate-950 px-2.5 py-1 rounded-lg">
@@ -247,6 +261,23 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                         <span className="text-[9px] text-slate-500 font-semibold">Compiled on {assessment.date}</span>
                       </div>
                     ))}
+                  </motion.div>
+                ) : (
+                  <motion.div 
+                    key="results"
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    className="space-y-3.5"
+                  >
+                    <div className="p-4 bg-slate-950 border border-slate-850 rounded-2xl flex flex-col items-center justify-center py-8">
+                      <Award className="h-12 w-12 text-indigo-400 mb-3 opacity-50" />
+                      <h5 className="text-sm font-bold text-white mb-1">Final Term Results Published</h5>
+                      <p className="text-xs text-slate-500 max-w-sm text-center">Your final grades for this semester have been compiled. Download the full PDF report below.</p>
+                      <button className="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition cursor-pointer flex items-center gap-1.5">
+                        Download Report
+                      </button>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>

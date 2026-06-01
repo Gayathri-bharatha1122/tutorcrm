@@ -7,9 +7,11 @@ import { LanguageSelector } from './LanguageSelector';
 interface PublicNavbarProps {
   screen: Screen;
   onNavigate: (screen: Screen) => void;
+  isLoggedIn?: boolean;
+  activeRole?: Role;
 }
 
-export const PublicNavbar: React.FC<PublicNavbarProps> = ({ screen, onNavigate }) => {
+export const PublicNavbar: React.FC<PublicNavbarProps> = ({ screen, onNavigate, isLoggedIn, activeRole }) => {
   const { t } = useLanguage();
 
   const handleNavLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, anchorId: string) => {
@@ -79,26 +81,41 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({ screen, onNavigate }
         {/* Language & Auth Actions */}
         <div className="flex items-center gap-3">
           <LanguageSelector />
-          <button 
-            onClick={() => onNavigate('login')}
-            className={`px-4 py-2 text-sm font-medium transition-colors cursor-pointer ${
-              screen === 'login' 
-                ? 'text-indigo-400' 
-                : 'text-slate-300 hover:text-white'
-            }`}
-          >
-            {t('Sign In')}
-          </button>
-          <button 
-            onClick={() => onNavigate('register')}
-            className={`px-4 py-2 text-sm font-medium rounded-lg shadow-lg transition-all cursor-pointer ${
-              screen === 'register'
-                ? 'bg-indigo-700 text-white shadow-indigo-700/20'
-                : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/20'
-            }`}
-          >
-            {t('Get Started')}
-          </button>
+          {!isLoggedIn ? (
+            <>
+              <button 
+                onClick={() => onNavigate('login')}
+                className={`px-4 py-2 text-sm font-medium transition-colors cursor-pointer ${
+                  screen === 'login' 
+                    ? 'text-indigo-400' 
+                    : 'text-slate-300 hover:text-white'
+                }`}
+              >
+                {t('Sign In')}
+              </button>
+              <button 
+                onClick={() => onNavigate('register')}
+                className={`px-4 py-2 text-sm font-medium rounded-lg shadow-lg transition-all cursor-pointer ${
+                  screen === 'register'
+                    ? 'bg-indigo-700 text-white shadow-indigo-700/20'
+                    : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/20'
+                }`}
+              >
+                {t('Get Started')}
+              </button>
+            </>
+          ) : (
+            <button 
+              onClick={() => {
+                if (activeRole) {
+                  onNavigate(activeRole);
+                }
+              }}
+              className="px-4 py-2 text-sm font-medium bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg shadow-lg shadow-indigo-600/20 transition-all cursor-pointer"
+            >
+              {t('Go to Dashboard')}
+            </button>
+          )}
         </div>
       </div>
     </header>

@@ -27,6 +27,7 @@ interface AdminDashboardProps {
   activityLogs: ActivityLog[];
   onAddStudent: (newStudent: Omit<Student, 'id' | 'avgGrade' | 'progress' | 'initials'>) => void;
   onLogout: () => void;
+  onHome: () => void;
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ 
@@ -34,7 +35,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   teachers, 
   activityLogs, 
   onAddStudent, 
-  onLogout 
+  onLogout,
+  onHome
 }) => {
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
@@ -123,6 +125,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <span className="text-[10px] text-slate-500 font-medium font-mono">root_user_01</span>
               </div>
               <LanguageSelector />
+              <button 
+                onClick={onHome}
+                className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-xs text-slate-200 font-semibold rounded-lg transition-transform cursor-pointer"
+              >
+                {t('Home')}
+              </button>
               <button 
                 onClick={onLogout}
                 className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-xs text-slate-200 font-semibold rounded-lg transition-transform cursor-pointer"

@@ -20,9 +20,11 @@ import { LanguageSelector } from './LanguageSelector';
 
 interface LandingPageProps {
   onNavigate: (screen: Screen, initialRole?: Role) => void;
+  isLoggedIn?: boolean;
+  activeRole?: Role;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, isLoggedIn, activeRole }) => {
   const { t } = useLanguage();
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -208,10 +210,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                 </p>
               </div>
               <button
-                onClick={() => onNavigate('login', 'admin')}
-                className="w-full py-2.5 px-4 bg-indigo-600/10 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 font-medium text-xs rounded-xl transition-all mt-auto flex items-center justify-center gap-1 cursor-pointer"
+                onClick={() => {
+                  if (!isLoggedIn) onNavigate('login', 'admin');
+                  else if (activeRole === 'admin') onNavigate('admin');
+                }}
+                className={`w-full py-2.5 px-4 bg-indigo-600/10 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 font-medium text-xs rounded-xl transition-all mt-auto flex items-center justify-center gap-1 cursor-pointer ${isLoggedIn && activeRole !== 'admin' ? 'opacity-50 cursor-not-allowed hover:bg-indigo-600/10 hover:text-indigo-300' : ''}`}
+                disabled={isLoggedIn && activeRole !== 'admin'}
               >
-                {t('Quick Preview CRM Panel')} <ArrowUpRight className="h-3 w-3" />
+                {isLoggedIn && activeRole === 'admin' ? t('Go to Dashboard') : t('Quick Preview CRM Panel')} <ArrowUpRight className="h-3 w-3" />
               </button>
             </motion.div>
 
@@ -231,10 +237,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                 </p>
               </div>
               <button
-                onClick={() => onNavigate('login', 'tutor')}
-                className="w-full py-2.5 px-4 bg-teal-600/10 hover:bg-teal-600 text-teal-350 hover:text-white border border-teal-500/30 font-medium text-xs rounded-xl transition-all mt-auto flex items-center justify-center gap-1 cursor-pointer"
+                onClick={() => {
+                  if (!isLoggedIn) onNavigate('login', 'tutor');
+                  else if (activeRole === 'tutor') onNavigate('tutor');
+                }}
+                className={`w-full py-2.5 px-4 bg-teal-600/10 hover:bg-teal-600 text-teal-350 hover:text-white border border-teal-500/30 font-medium text-xs rounded-xl transition-all mt-auto flex items-center justify-center gap-1 cursor-pointer ${isLoggedIn && activeRole !== 'tutor' ? 'opacity-50 cursor-not-allowed hover:bg-teal-600/10 hover:text-teal-350' : ''}`}
+                disabled={isLoggedIn && activeRole !== 'tutor'}
               >
-                {t('Launch Tutor Control')} <ArrowUpRight className="h-3 w-3" />
+                {isLoggedIn && activeRole === 'tutor' ? t('Go to Dashboard') : t('Launch Tutor Control')} <ArrowUpRight className="h-3 w-3" />
               </button>
             </motion.div>
 
@@ -254,10 +264,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                 </p>
               </div>
               <button
-                onClick={() => onNavigate('login', 'parent')}
-                className="w-full py-2.5 px-4 bg-amber-600/10 hover:bg-amber-600 text-amber-300 hover:text-white border border-amber-500/30 font-medium text-xs rounded-xl transition-all mt-auto flex items-center justify-center gap-1 cursor-pointer"
+                onClick={() => {
+                  if (!isLoggedIn) onNavigate('login', 'parent');
+                  else if (activeRole === 'parent') onNavigate('parent');
+                }}
+                className={`w-full py-2.5 px-4 bg-amber-600/10 hover:bg-amber-600 text-amber-300 hover:text-white border border-amber-500/30 font-medium text-xs rounded-xl transition-all mt-auto flex items-center justify-center gap-1 cursor-pointer ${isLoggedIn && activeRole !== 'parent' ? 'opacity-50 cursor-not-allowed hover:bg-amber-600/10 hover:text-amber-300' : ''}`}
+                disabled={isLoggedIn && activeRole !== 'parent'}
               >
-                {t('Configure Parent Linkage')} <ArrowUpRight className="h-3 w-3" />
+                {isLoggedIn && activeRole === 'parent' ? t('Go to Dashboard') : t('Configure Parent Linkage')} <ArrowUpRight className="h-3 w-3" />
               </button>
             </motion.div>
 
@@ -277,10 +291,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                 </p>
               </div>
               <button
-                onClick={() => onNavigate('login', 'student')}
-                className="w-full py-2.5 px-4 bg-emerald-600/10 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/30 font-medium text-xs rounded-xl transition-all mt-auto flex items-center justify-center gap-1 cursor-pointer"
+                onClick={() => {
+                  if (!isLoggedIn) onNavigate('login', 'student');
+                  else if (activeRole === 'student') onNavigate('student');
+                }}
+                className={`w-full py-2.5 px-4 bg-emerald-600/10 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/30 font-medium text-xs rounded-xl transition-all mt-auto flex items-center justify-center gap-1 cursor-pointer ${isLoggedIn && activeRole !== 'student' ? 'opacity-50 cursor-not-allowed hover:bg-emerald-600/10 hover:text-emerald-300' : ''}`}
+                disabled={isLoggedIn && activeRole !== 'student'}
               >
-                {t('Access Learning Board')} <ArrowUpRight className="h-3 w-3" />
+                {isLoggedIn && activeRole === 'student' ? t('Go to Dashboard') : t('Access Learning Board')} <ArrowUpRight className="h-3 w-3" />
               </button>
             </motion.div>
           </motion.div>

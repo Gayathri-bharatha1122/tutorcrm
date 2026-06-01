@@ -25,7 +25,9 @@ interface ParentDashboardProps {
   parentName: string;
   studentName: string;
   onUpdateBills: (updatedBills: Bill[]) => void;
+  onUpdateBills: (updatedBills: Bill[]) => void;
   onLogout: () => void;
+  onHome: () => void;
 }
 
 export const ParentDashboard: React.FC<ParentDashboardProps> = ({
@@ -34,12 +36,14 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
   parentName,
   studentName,
   onUpdateBills,
-  onLogout
+  onLogout,
+  onHome
 }) => {
   const { t } = useLanguage();
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentSuccessMessage, setPaymentSuccessMessage] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'announcements' | 'messages'>('announcements');
   
   // Card details mock states
   const [cardNumber, setCardNumber] = useState('•••• •••• •••• 4921');
@@ -105,6 +109,12 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                 <span className="text-[10px] text-amber-400 font-bold uppercase font-mono">Linked Child • {studentName}</span>
               </div>
               <LanguageSelector />
+              <button 
+                onClick={onHome}
+                className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs text-slate-200 font-semibold rounded-lg transition cursor-pointer"
+              >
+                {t('Home')}
+              </button>
               <button 
                 onClick={onLogout}
                 className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs text-slate-200 font-semibold rounded-lg transition cursor-pointer"
@@ -273,20 +283,44 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
           <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between">
             <div className="space-y-4">
               <div>
-                <span className="text-xs font-bold text-amber-400 tracking-wider uppercase block mb-1">Campus Announcements</span>
-                <h3 className="text-sm font-bold text-white">{t('Advisory Board Bulletin')}</h3>
+                <div className="flex gap-2 mb-2">
+                  <button 
+                    onClick={() => setActiveTab('announcements')}
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${activeTab === 'announcements' ? 'bg-amber-600 text-white' : 'text-slate-500 hover:text-slate-300'}`}
+                  >
+                    Campus Announcements
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab('messages')}
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${activeTab === 'messages' ? 'bg-amber-600 text-white' : 'text-slate-500 hover:text-slate-300'}`}
+                  >
+                    Direct Messages
+                  </button>
+                </div>
+                <h3 className="text-sm font-bold text-white mt-4">{activeTab === 'announcements' ? t('Advisory Board Bulletin') : t('Teacher Communications')}</h3>
               </div>
 
               <div className="space-y-4 max-h-[300px] overflow-y-auto pr-1">
-                {announcements.map((ann) => (
-                  <div key={ann.id} className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 transition rounded-2xl relative">
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-xs font-bold text-slate-200 block truncate max-w-[180px]">{ann.title}</span>
-                      <span className="text-[9px] text-slate-500 font-mono italic">{ann.timeAgo}</span>
+                {activeTab === 'announcements' ? (
+                  announcements.map((ann) => (
+                    <div key={ann.id} className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 transition rounded-2xl relative">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-xs font-bold text-slate-200 block truncate max-w-[180px]">{ann.title}</span>
+                        <span className="text-[9px] text-slate-500 font-mono italic">{ann.timeAgo}</span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 leading-relaxed font-sans">{ann.content}</p>
                     </div>
-                    <p className="text-[11px] text-slate-400 leading-relaxed font-sans">{ann.content}</p>
+                  ))
+                ) : (
+                  <div className="p-4 bg-slate-950 border border-slate-850 rounded-2xl flex flex-col gap-2">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-bold text-slate-200 block">Prof. Alistair Miller</span>
+                      <span className="text-[9px] text-slate-500 font-mono italic">Today, 10:30 AM</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 leading-relaxed font-sans">Marcus has been doing exceptionally well in his rotational physics units. Let's touch base next week regarding the upcoming science fair.</p>
+                    <button className="mt-2 text-[10px] bg-amber-600/10 text-amber-400 border border-amber-500/20 px-3 py-1.5 rounded-lg font-bold hover:bg-amber-600/20 transition-all self-start">Reply to Message</button>
                   </div>
-                ))}
+                )}
               </div>
             </div>
 
