@@ -22,6 +22,7 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { StudentDashboard } from './components/StudentDashboard';
 import { ParentDashboard } from './components/ParentDashboard';
 import { TutorDashboard } from './components/TutorDashboard';
+import { AIChatBox } from './components/AIChatBox';
 
 
 export default function App() {
@@ -281,6 +282,7 @@ export default function App() {
             )}
           </AnimatePresence>
         </div>
+        <AIChatBox />
       </div>
     </LanguageProvider>
   );
