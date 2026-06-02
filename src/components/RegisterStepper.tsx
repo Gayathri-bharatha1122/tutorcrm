@@ -120,6 +120,16 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
         transition={{ duration: 0.4 }}
         className="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-8 relative z-10 shadow-2xl text-slate-100"
       >
+        {/* Progress Bar Track */}
+        <div className="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden mb-6 border border-slate-850">
+          <motion.div 
+            className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full"
+            initial={{ width: '33.33%' }}
+            animate={{ width: currentStep === 1 ? '33.33%' : currentStep === 2 ? '66.66%' : '100%' }}
+            transition={{ type: 'spring', stiffness: 80, damping: 15 }}
+          />
+        </div>
+
         {/* Step Indicator Header */}
         <div className="flex items-center justify-between mb-8 border-b border-slate-800/80 pb-5">
           <div className="flex gap-1 items-center text-xs text-indigo-400 font-bold uppercase tracking-wider">
@@ -150,12 +160,14 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Student Select Card */}
-                <div
+                <motion.div
+                  whileHover={{ scale: 1.03, translateY: -2 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => setRoleType('student')}
                   className={`p-6 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between h-44 ${
                     roleType === 'student'
-                      ? 'border-indigo-500 bg-indigo-500/10'
-                      : 'border-slate-800 bg-slate-950/20 hover:border-slate-700'
+                      ? 'border-indigo-500 bg-indigo-500/10 shadow-lg shadow-indigo-500/10'
+                      : 'border-slate-800 bg-slate-950/20 hover:border-indigo-500/30'
                   }`}
                 >
                   <div className="flex justify-between items-start">
@@ -168,15 +180,17 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                     <h4 className="text-sm font-bold text-white mb-1">{t('Student Portal Profile')}</h4>
                     <p className="text-xs text-slate-400 leading-relaxed">{t('Complete assignment lists, query support tools directly, and track exam updates.')}</p>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Parent Select Card */}
-                <div
+                <motion.div
+                  whileHover={{ scale: 1.03, translateY: -2 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => setRoleType('parent')}
                   className={`p-6 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between h-44 ${
                     roleType === 'parent'
-                      ? 'border-indigo-500 bg-indigo-500/10'
-                      : 'border-slate-800 bg-slate-950/20 hover:border-slate-700'
+                      ? 'border-indigo-500 bg-indigo-500/10 shadow-lg shadow-indigo-500/10'
+                      : 'border-slate-800 bg-slate-950/20 hover:border-indigo-500/30'
                   }`}
                 >
                   <div className="flex justify-between items-start">
@@ -189,7 +203,7 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                     <h4 className="text-sm font-bold text-white mb-1">{t('Parent Guardian Link')}</h4>
                     <p className="text-xs text-slate-400 leading-relaxed">{t('Monitor learning attendance metrics, verify unpaid fee balances, and review reports.')}</p>
                   </div>
-                </div>
+                </motion.div>
               </div>
 
               <div className="bg-slate-950/50 p-4 rounded-xl border border-slate-800/80 flex items-center gap-3">
@@ -203,14 +217,14 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                 <button
                   type="button"
                   onClick={() => onNavigate('landing')}
-                  className="px-4 py-2.5 bg-slate-950 border border-slate-850 hover:bg-slate-850 rounded-xl text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
+                  className="px-4 py-2.5 bg-slate-950 border border-slate-850 hover:bg-slate-850 rounded-xl text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] btn-ripple"
                 >
                   <ArrowLeft className="h-4 w-4" /> {t('Back to Home')}
                 </button>
                 <button
                   type="button"
                   onClick={() => setCurrentStep(2)}
-                  className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-xs font-semibold text-white cursor-pointer shadow-lg shadow-indigo-600/20 transition-all flex items-center gap-1.5 group"
+                  className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-xs font-semibold text-white cursor-pointer shadow-lg shadow-indigo-600/20 transition-all flex items-center gap-1.5 group hover:scale-[1.02] active:scale-[0.98] btn-shine-effect btn-ripple"
                 >
                   {t('Continue Profile Creation')}
                   <ChevronRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
@@ -239,7 +253,7 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                     type="text"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    className="w-full bg-slate-950/40 border border-slate-850 text-slate-200 text-sm px-4 py-2 rounded-xl focus:border-indigo-500 outline-none transition"
+                    className="w-full bg-slate-950/40 border border-slate-850 text-slate-200 text-sm px-4 py-2 rounded-xl focus:border-indigo-500 outline-none transition input-focus-glow"
                     placeholder="Helena"
                   />
                 </div>
@@ -249,7 +263,7 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                     type="text"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
-                    className="w-full bg-slate-950/40 border border-slate-850 text-slate-200 text-sm px-4 py-2 rounded-xl focus:border-indigo-500 outline-none transition"
+                    className="w-full bg-slate-950/40 border border-slate-850 text-slate-200 text-sm px-4 py-2 rounded-xl focus:border-indigo-500 outline-none transition input-focus-glow"
                     placeholder="Thorne"
                   />
                 </div>
@@ -264,7 +278,7 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-slate-950/40 border border-slate-850 text-slate-200 text-xs pl-10 pr-4 py-2.5 rounded-xl focus:border-indigo-500 outline-none transition"
+                      className="w-full bg-slate-950/40 border border-slate-850 text-slate-200 text-xs pl-10 pr-4 py-2.5 rounded-xl focus:border-indigo-500 outline-none transition input-focus-glow"
                       placeholder="helena@example.com"
                     />
                   </div>
@@ -277,7 +291,7 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                       type="tel"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full bg-slate-950/40 border border-slate-850 text-slate-200 text-xs pl-10 pr-4 py-2.5 rounded-xl focus:border-indigo-500 outline-none transition"
+                      className="w-full bg-slate-950/40 border border-slate-850 text-slate-200 text-xs pl-10 pr-4 py-2.5 rounded-xl focus:border-indigo-500 outline-none transition input-focus-glow"
                       placeholder="14155554921"
                     />
                   </div>
@@ -293,7 +307,7 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                       <select 
                         value={grade}
                         onChange={(e) => setGrade(e.target.value)}
-                        className="w-full bg-slate-950 text-slate-200 text-xs p-2.5 rounded-xl border border-slate-850 outline-none focus:border-indigo-500"
+                        className="w-full bg-slate-950 text-slate-200 text-xs p-2.5 rounded-xl border border-slate-850 outline-none focus:border-indigo-500 transition input-focus-glow"
                       >
                         <option>9th Grade</option>
                         <option>10th Grade</option>
@@ -307,7 +321,7 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                         type="tel"
                         value={parentPhoneInput}
                         onChange={(e) => setParentPhoneInput(e.target.value)}
-                        className="w-full bg-slate-950/40 border border-slate-850 text-slate-200 text-xs p-2.5 rounded-xl focus:border-indigo-500 outline-none transition"
+                        className="w-full bg-slate-950/40 border border-slate-850 text-slate-200 text-xs p-2.5 rounded-xl focus:border-indigo-500 outline-none transition input-focus-glow"
                         placeholder="14155554921"
                       />
                     </div>
@@ -318,7 +332,7 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                       value={learningGoal}
                       onChange={(e) => setLearningGoal(e.target.value)}
                       rows={2}
-                      className="w-full bg-slate-950/40 border border-slate-850 text-slate-200 text-xs p-3 rounded-xl focus:border-indigo-500 outline-none transition resize-none"
+                      className="w-full bg-slate-950/40 border border-slate-850 text-slate-200 text-xs p-3 rounded-xl focus:border-indigo-500 outline-none transition resize-none input-focus-glow"
                     />
                   </div>
                 </div>
@@ -337,7 +351,7 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-slate-950/40 border border-slate-850 text-slate-200 text-xs pl-10 pr-4 py-2.5 rounded-xl focus:border-indigo-500 outline-none transition"
+                    className="w-full bg-slate-950/40 border border-slate-850 text-slate-200 text-xs pl-10 pr-4 py-2.5 rounded-xl focus:border-indigo-500 outline-none transition input-focus-glow"
                     placeholder="Create dashboard key password"
                   />
                 </div>
@@ -347,14 +361,14 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                 <button
                   type="button"
                   onClick={() => setCurrentStep(1)}
-                  className="px-4 py-2.5 bg-slate-950 border border-slate-850 hover:bg-slate-850 rounded-xl text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
+                  className="px-4 py-2.5 bg-slate-950 border border-slate-850 hover:bg-slate-850 rounded-xl text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] btn-ripple"
                 >
                   <ArrowLeft className="h-4 w-4" /> {t('Back')}
                 </button>
                 <button
                   type="button"
                   onClick={() => setCurrentStep(3)}
-                  className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
+                  className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] btn-shine-effect btn-ripple"
                 >
                   {t('Next: Validation Links')} <ArrowRight className="h-4 w-4" />
                 </button>
@@ -373,14 +387,24 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
               {roleType === 'student' ? (
                 <div className="space-y-4">
                   <div className="text-center py-4">
-                    <div className="w-16 h-16 bg-indigo-500/10 text-indigo-400 rounded-full flex items-center justify-center mx-auto mb-4 border border-indigo-500/20">
-                      <GraduationCap className="h-8 w-8" />
-                    </div>
+                    <motion.div 
+                      initial={{ scale: 0, rotate: -45 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+                      className="w-16 h-16 bg-indigo-500/10 text-indigo-400 rounded-full flex items-center justify-center mx-auto mb-4 border border-indigo-500/20"
+                    >
+                      <GraduationCap className="h-8 w-8 text-indigo-400" />
+                    </motion.div>
                     <h3 className="text-lg font-bold text-white">Student Pre-Approval Complete!</h3>
                     <p className="text-xs text-slate-400 max-w-sm mx-auto">No cellular linkages required. Student registration uses parent backup contacts to bypass SMS wait queues.</p>
                   </div>
 
-                  <div className="bg-slate-950/80 p-5 rounded-2xl border border-slate-850 space-y-2">
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="bg-slate-950/80 p-5 rounded-2xl border border-slate-850 space-y-2"
+                  >
                     <span className="text-[11px] font-bold text-slate-500 uppercase block">Registry Summary</span>
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div><span className="text-slate-400">FullName:</span> <span className="text-slate-200 font-semibold">{firstName || 'Marcus'} {lastName || 'Thorne'}</span></div>
@@ -389,7 +413,7 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                         <span className="font-bold text-slate-400">Target Curriculum:</span> Applied general science vectors & Advanced BC Calculus assessments.
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -407,13 +431,13 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                           type="tel"
                           value={studentLookupPhone}
                           onChange={(e) => setStudentLookupPhone(e.target.value)}
-                          className="bg-slate-900 border border-slate-800 text-slate-200 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 flex-1"
+                          className="bg-slate-900 border border-slate-800 text-slate-200 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 flex-1 transition input-focus-glow"
                           placeholder="e.g., 14155550218"
                         />
                         <button
                           type="button"
                           onClick={handleSearchStudent}
-                          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 transition-all text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer"
+                          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 transition-all text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer hover:scale-[1.02] active:scale-[0.98] btn-shine-effect btn-ripple"
                         >
                           <RefreshCw className="h-3 w-3 animate-spin" /> Search Directory
                         </button>
@@ -422,7 +446,12 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
 
                     {/* Lookup matches */}
                     {linkedStudent && (
-                      <div className="bg-emerald-950/20 border border-emerald-500/30 rounded-xl p-4 space-y-3 animate-fade-in">
+                      <motion.div 
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        transition={{ duration: 0.3 }}
+                        className="bg-emerald-950/20 border border-emerald-500/30 rounded-xl p-4 space-y-3 overflow-hidden"
+                      >
                         <div className="flex items-start gap-3">
                           <CheckCircle className="h-5 w-5 text-emerald-400 shrink-0" />
                           <div>
@@ -442,12 +471,12 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                                 placeholder="Enter Verification Code"
                                 value={otpCode}
                                 onChange={(e) => setOtpCode(e.target.value)}
-                                className="bg-slate-950 border border-slate-800 text-white font-mono text-center tracking-widest text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 w-36"
+                                className="bg-slate-950 border border-slate-800 text-white font-mono text-center tracking-widest text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 w-36 transition input-focus-glow"
                               />
                               <button
                                 type="button"
                                 onClick={handleVerifyOtp}
-                                className="px-3 bg-emerald-600 text-white font-bold text-xs rounded-xl cursor-pointer"
+                                className="px-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98] btn-shine-effect btn-ripple"
                               >
                                 Link Profile
                               </button>
@@ -460,14 +489,19 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                         )}
 
                         {otpVerified && (
-                          <div className="bg-indigo-500/10 border border-indigo-400/30 p-2.5 rounded-lg flex items-center gap-2">
+                          <motion.div 
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ type: "spring", stiffness: 150, damping: 15 }}
+                            className="bg-indigo-500/10 border border-indigo-400/30 p-2.5 rounded-lg flex items-center gap-2"
+                          >
                             <Award className="h-4 w-4 text-indigo-400 shrink-0" />
                             <span className="text-[11px] text-indigo-200 font-semibold leading-normal">
                               Linkage established! Parent database linkage authorized for {linkedStudent.name}.
                             </span>
-                          </div>
+                          </motion.div>
                         )}
-                      </div>
+                      </motion.div>
                     )}
 
                     {lookupFeedback && (
@@ -481,7 +515,7 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                 <button
                   type="button"
                   onClick={() => setCurrentStep(2)}
-                  className="px-4 py-2.5 bg-slate-950 border border-slate-850 hover:bg-slate-850 rounded-xl text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
+                  className="px-4 py-2.5 bg-slate-950 border border-slate-850 hover:bg-slate-850 rounded-xl text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] btn-ripple"
                 >
                   <ArrowLeft className="h-4 w-4" /> {t('Back')}
                 </button>
@@ -489,10 +523,10 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                   type="button"
                   disabled={roleType === 'parent' && !otpVerified}
                   onClick={executeCompleteRegistration}
-                  className={`px-5 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
+                  className={`px-5 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                     roleType === 'parent' && !otpVerified
                       ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                      : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/10'
+                      : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/10 hover:scale-[1.02] active:scale-[0.98] btn-shine-effect btn-ripple'
                   }`}
                 >
                   {t('Finalize Enrollment')} <CheckCircle className="h-4 w-4" />

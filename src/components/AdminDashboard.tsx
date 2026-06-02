@@ -21,6 +21,27 @@ import { Student, Teacher, ActivityLog } from '../types';
 import { useLanguage } from '../LanguageContext';
 import { LanguageSelector } from './LanguageSelector';
 
+const AnimatedCounter: React.FC<{ value: number; duration?: number; prefix?: string; suffix?: string; decimals?: number }> = ({ value, duration = 1000, prefix = '', suffix = '', decimals = 0 }) => {
+  const [count, setCount] = useState(0);
+
+  React.useEffect(() => {
+    let startTimestamp: number | null = null;
+    const step = (timestamp: number) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      const current = progress * value;
+      setCount(decimals > 0 ? parseFloat(current.toFixed(decimals)) : Math.floor(current));
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      }
+    };
+    window.requestAnimationFrame(step);
+  }, [value, duration, decimals]);
+
+  const displayVal = decimals > 0 ? count.toFixed(decimals) : count.toLocaleString();
+  return <>{prefix}{displayVal}{suffix}</>;
+};
+
 interface AdminDashboardProps {
   students: Student[];
   teachers: Teacher[];
@@ -167,49 +188,81 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         {/* Highlight Metrics Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
+          <motion.div 
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05, duration: 0.5 }}
+            whileHover={{ y: -4, scale: 1.02 }}
+            className="bg-slate-900 border border-slate-800 rounded-2xl p-5 relative overflow-hidden transition-all hover:shadow-[0_10px_20px_-10px_rgba(99,102,241,0.15)]"
+          >
             <div className="absolute right-3 top-3 w-8 h-8 rounded-lg bg-indigo-600/10 text-indigo-400 flex items-center justify-center">
               <GraduationCap className="h-4.5 w-4.5" />
             </div>
             <span className="text-[11px] font-bold text-slate-500 uppercase">{t('Active Students')}</span>
             <div className="mt-1 flex items-baseline gap-2">
-              <span className="text-2xl font-extrabold text-white">{activeStudentsCount} / {students.length}</span>
+              <span className="text-2xl font-extrabold text-white">
+                <AnimatedCounter value={activeStudentsCount} /> / <AnimatedCounter value={students.length} />
+              </span>
               <span className="text-[10px] text-indigo-400 font-semibold">+{pendingStudentsCount} pending</span>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
+          <motion.div 
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.5 }}
+            whileHover={{ y: -4, scale: 1.02 }}
+            className="bg-slate-900 border border-slate-800 rounded-2xl p-5 relative overflow-hidden transition-all hover:shadow-[0_10px_20px_-10px_rgba(20,184,166,0.15)]"
+          >
             <div className="absolute right-3 top-3 w-8 h-8 rounded-lg bg-teal-600/10 text-teal-400 flex items-center justify-center">
               <Users className="h-4.5 w-4.5" />
             </div>
             <span className="text-[11px] font-bold text-slate-500 uppercase">{t('Educators')}</span>
             <div className="mt-1 flex items-baseline gap-2">
-              <span className="text-2xl font-extrabold text-white">{teachers.length}</span>
+              <span className="text-2xl font-extrabold text-white">
+                <AnimatedCounter value={teachers.length} />
+              </span>
               <span className="text-[10px] text-teal-400 font-semibold">100% On Duty</span>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
+          <motion.div 
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, duration: 0.5 }}
+            whileHover={{ y: -4, scale: 1.02 }}
+            className="bg-slate-900 border border-slate-800 rounded-2xl p-5 relative overflow-hidden transition-all hover:shadow-[0_10px_20px_-10px_rgba(16,185,129,0.15)]"
+          >
             <div className="absolute right-3 top-3 w-8 h-8 rounded-lg bg-emerald-600/10 text-emerald-400 flex items-center justify-center">
               <DollarSign className="h-4.5 w-4.5" />
             </div>
             <span className="text-[11px] font-bold text-slate-500 uppercase">{t('Fees Receivable')}</span>
             <div className="mt-1 flex items-baseline gap-2">
-              <span className="text-2xl font-extrabold text-white">$2,140</span>
+              <span className="text-2xl font-extrabold text-white">
+                <AnimatedCounter value={2140} prefix="$" />
+              </span>
               <span className="text-[10px] text-emerald-400 font-semibold">+12% vs last term</span>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
+          <motion.div 
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            whileHover={{ y: -4, scale: 1.02 }}
+            className="bg-slate-900 border border-slate-800 rounded-2xl p-5 relative overflow-hidden transition-all hover:shadow-[0_10px_20px_-10px_rgba(245,158,11,0.15)]"
+          >
             <div className="absolute right-3 top-3 w-8 h-8 rounded-lg bg-amber-600/10 text-amber-400 flex items-center justify-center">
               <Activity className="h-4.5 w-4.5" />
             </div>
             <span className="text-[11px] font-bold text-slate-500 uppercase">{t('Audit Records')}</span>
             <div className="mt-1 flex items-baseline gap-2">
-              <span className="text-2xl font-extrabold text-white">{activityLogs.length} Logged</span>
+              <span className="text-2xl font-extrabold text-white">
+                <AnimatedCounter value={activityLogs.length} /> Logged
+              </span>
               <span className="text-[10px] text-amber-400 font-semibold">Real-Time Sync</span>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Custom SVG Data Visualization Block */}
@@ -267,15 +320,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 {/* Background path */}
                 <circle cx="64" cy="64" r="50" fill="transparent" stroke="#1e293b" strokeWidth="12" />
                 {/* Active path representing (Paid portion: 65%) */}
-                <circle cx="64" cy="64" r="50" fill="transparent" stroke="#6366f1" strokeWidth="12" 
-                        strokeDasharray="314" strokeDashoffset="110" strokeLinecap="round" />
+                <motion.circle cx="64" cy="64" r="50" fill="transparent" stroke="#6366f1" strokeWidth="12" 
+                        strokeDasharray="314" 
+                        initial={{ strokeDashoffset: 314 }}
+                        animate={{ strokeDashoffset: 110 }}
+                        transition={{ duration: 1.2, ease: "easeOut" }}
+                        strokeLinecap="round" />
                 {/* Pending path (20%) */}
-                <circle cx="64" cy="64" r="50" fill="transparent" stroke="#06b6d4" strokeWidth="12" 
-                        strokeDasharray="314" strokeDashoffset="260" strokeLinecap="round" />
+                <motion.circle cx="64" cy="64" r="50" fill="transparent" stroke="#06b6d4" strokeWidth="12" 
+                        strokeDasharray="314" 
+                        initial={{ strokeDashoffset: 314 }}
+                        animate={{ strokeDashoffset: 260 }}
+                        transition={{ duration: 1.2, ease: "easeOut", delay: 0.25 }}
+                        strokeLinecap="round" />
               </svg>
               {/* Abs center labels */}
               <div className="absolute text-center">
-                <span className="text-lg font-extrabold text-white block">$2,140</span>
+                <span className="text-lg font-extrabold text-white block">
+                  <AnimatedCounter value={2140} prefix="$" />
+                </span>
                 <span className="text-[10px] text-slate-500 font-bold uppercase block">Total</span>
               </div>
             </div>
@@ -363,8 +426,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </thead>
               <tbody className="divide-y divide-slate-850">
                 {filteredStudents.length > 0 ? (
-                  filteredStudents.map((student) => (
-                    <tr key={student.id} className="hover:bg-slate-950/40 transition">
+                  filteredStudents.map((student, sIdx) => (
+                    <motion.tr 
+                      key={student.id}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: Math.min(sIdx * 0.04, 0.4), duration: 0.3 }}
+                      className="hover:bg-slate-950/40 transition"
+                    >
                       <td className="p-4">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-indigo-900/45 text-indigo-400 border border-indigo-500/20 font-bold flex items-center justify-center">
@@ -391,12 +460,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <td className="p-4 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <div className="w-16 bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                            <div className="bg-indigo-500 h-full rounded-full" style={{ width: `${student.progress}%` }} />
+                            <motion.div 
+                              initial={{ width: 0 }}
+                              animate={{ width: `${student.progress}%` }}
+                              transition={{ duration: 0.8, ease: "easeOut", delay: Math.min(sIdx * 0.04, 0.4) }}
+                              className="bg-indigo-500 h-full rounded-full" 
+                            />
                           </div>
                           <span className="font-mono text-[10px] text-slate-400">{student.progress}%</span>
                         </div>
                       </td>
-                    </tr>
+                    </motion.tr>
                   ))
                 ) : (
                   <tr>
@@ -421,8 +495,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
 
             <div className="space-y-3.5 max-h-80 overflow-y-auto pr-1">
-              {activityLogs.map((log) => (
-                <div key={log.id} className="p-3 bg-slate-950 border border-slate-850 hover:border-slate-800 transition rounded-xl flex items-start gap-3.5">
+              {activityLogs.map((log, lIdx) => (
+                <motion.div 
+                  key={log.id}
+                  initial={{ opacity: 0, x: -15 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: Math.min(lIdx * 0.04, 0.4), duration: 0.3 }}
+                  whileHover={{ scale: 1.01, x: 2 }}
+                  className="p-3 bg-slate-950 border border-slate-850 hover:border-slate-800 transition rounded-xl flex items-start gap-3.5"
+                >
                   <div className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center ${
                     log.type === 'New Enrollment' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' :
                     log.type === 'Fee Payment' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
@@ -443,7 +524,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <span className="inline-block mt-1 text-[10px] font-bold text-indigo-400">Ledger balance: -${log.amount}</span>
                     )}
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -456,8 +537,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
 
             <div className="grid grid-cols-1 gap-4">
-              {teachers.map((teacher) => (
-                <div key={teacher.id} className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 transition-all rounded-2xl flex items-center justify-between">
+              {teachers.map((teacher, tIdx) => (
+                <motion.div 
+                  key={teacher.id}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: Math.min(tIdx * 0.08, 0.4), duration: 0.3 }}
+                  whileHover={{ scale: 1.01, x: 4 }}
+                  className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 transition-all rounded-2xl flex items-center justify-between"
+                >
                   <div>
                     <span className="text-sm font-bold text-white block">{teacher.name}</span>
                     <span className="text-xs text-slate-500 block mb-2">{teacher.subject} • {teacher.experience} Experience</span>
@@ -474,7 +562,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-teal-500/10 text-teal-400 border border-teal-500/30">
                     {teacher.status}
                   </span>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>

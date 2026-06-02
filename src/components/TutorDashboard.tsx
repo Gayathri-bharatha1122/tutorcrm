@@ -20,6 +20,27 @@ import { Student, Teacher } from '../types';
 import { useLanguage } from '../LanguageContext';
 import { LanguageSelector } from './LanguageSelector';
 
+const AnimatedCounter: React.FC<{ value: number; duration?: number; prefix?: string; suffix?: string; decimals?: number }> = ({ value, duration = 1000, prefix = '', suffix = '', decimals = 0 }) => {
+  const [count, setCount] = useState(0);
+
+  React.useEffect(() => {
+    let startTimestamp: number | null = null;
+    const step = (timestamp: number) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      const current = progress * value;
+      setCount(decimals > 0 ? parseFloat(current.toFixed(decimals)) : Math.floor(current));
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      }
+    };
+    window.requestAnimationFrame(step);
+  }, [value, duration, decimals]);
+
+  const displayVal = decimals > 0 ? count.toFixed(decimals) : count.toLocaleString();
+  return <>{prefix}{displayVal}{suffix}</>;
+};
+
 interface TutorDashboardProps {
   students: Student[];
   teachers: Teacher[];
@@ -238,7 +259,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
           <div className="flex items-center gap-3 w-full md:w-auto shrink-0">
             <button
               onClick={() => setShowScheduleModal(true)}
-              className="px-4 py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 transition-all shadow-lg shadow-teal-600/15 cursor-pointer"
+              className="px-4 py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 transition-all hover:scale-[1.02] active:scale-[0.98] btn-shine-effect btn-ripple shadow-lg shadow-teal-600/15 cursor-pointer"
             >
               <Plus className="h-4 w-4" /> {t('Schedule seminar session')}
             </button>
@@ -260,8 +281,14 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
               </div>
 
               <div className="divide-y divide-slate-850">
-                {students.slice(0, 4).map((student) => (
-                  <div key={student.id} className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-950/20 px-2.5 transition rounded-xl">
+                {students.slice(0, 4).map((student, sIdx) => (
+                  <motion.div 
+                    key={student.id}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: Math.min(sIdx * 0.05, 0.4), duration: 0.3 }}
+                    className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-950/20 px-2.5 transition rounded-xl"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-slate-950 border border-slate-850 flex items-center justify-center font-bold text-teal-400">
                         {student.name[0]}
@@ -281,14 +308,14 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
                           className={`px-2.5 py-1 rounded-md cursor-pointer transition ${
                             markedAttendance[student.id] === status 
                               ? 'bg-teal-600 text-white' 
-                              : 'text-slate-500 hover:text-slate-350'
+                              : 'text-slate-500 hover:text-slate-355'
                           }`}
                         >
                           {status}
                         </button>
                       ))}
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
@@ -607,7 +634,14 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 transition rounded-2xl flex items-center gap-4">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.05 }}
+              whileHover={{ y: -4, scale: 1.02 }}
+              className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 hover:shadow-[0_10px_20px_-10px_rgba(20,184,166,0.1)] transition rounded-2xl flex items-center gap-4 cursor-pointer"
+            >
               <div className="w-10 h-10 rounded-lg bg-teal-500/10 border border-teal-500/20 text-teal-400 flex items-center justify-center shrink-0">
                 <Clock className="h-5 w-5" />
               </div>
@@ -615,9 +649,16 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
                 <span className="text-xs font-bold text-white block">Kinematic Vectors theory</span>
                 <span className="text-[10px] text-slate-500">Tuesdays at 3:00 PM • Room B1</span>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 transition rounded-2xl flex items-center gap-4">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              whileHover={{ y: -4, scale: 1.02 }}
+              className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 hover:shadow-[0_10px_20px_-10px_rgba(20,184,166,0.1)] transition rounded-2xl flex items-center gap-4 cursor-pointer"
+            >
               <div className="w-10 h-10 rounded-lg bg-teal-500/10 border border-teal-500/20 text-teal-400 flex items-center justify-center shrink-0">
                 <Clock className="h-5 w-5" />
               </div>
@@ -625,9 +666,16 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
                 <span className="text-xs font-bold text-white block">Quantum mechanics fundamentals</span>
                 <span className="text-[10px] text-slate-500">Thursdays at 3:00 PM • Lab Hall 1</span>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="p-4 bg-slate-950 border border-teal-500/30 bg-teal-500/5 transition rounded-2xl flex items-center gap-4">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.15 }}
+              whileHover={{ y: -4, scale: 1.02 }}
+              className="p-4 bg-slate-950 border border-teal-500/30 bg-teal-500/5 hover:shadow-[0_10px_20px_-10px_rgba(20,184,166,0.15)] transition rounded-2xl flex items-center gap-4 cursor-pointer"
+            >
               <div className="w-10 h-10 rounded-lg bg-teal-500/15 text-teal-400 flex items-center justify-center shrink-0 animate-pulse">
                 <Sparkles className="h-5 w-5 animate-spin [animation-duration:8s]" />
               </div>
@@ -635,7 +683,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
                 <span className="text-xs font-bold text-teal-400 block">General electromagnetic finals prep</span>
                 <span className="text-[10px] text-slate-400">Fridays at 2:30 PM • Seminar Studio</span>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
 

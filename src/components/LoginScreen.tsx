@@ -186,7 +186,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavi
                   setEmail(e.target.value);
                   setErrorStatus(null);
                 }}
-                className="w-full bg-slate-950/40 border border-slate-800 text-slate-200 text-sm pl-10 pr-4 py-2.5 rounded-xl focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all font-mono"
+                className="w-full bg-slate-950/40 border border-slate-800 text-slate-200 text-sm pl-10 pr-4 py-2.5 rounded-xl focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all font-mono input-focus-glow"
                 placeholder={roleConfig[selectedRole].demoUser}
               />
             </div>
@@ -208,7 +208,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavi
                   setPassword(e.target.value);
                   setErrorStatus(null);
                 }}
-                className="w-full bg-slate-950/40 border border-slate-800 text-slate-200 text-sm pl-10 pr-10 py-2.5 rounded-xl focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all font-mono"
+                className="w-full bg-slate-950/40 border border-slate-800 text-slate-200 text-sm pl-10 pr-10 py-2.5 rounded-xl focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all font-mono input-focus-glow"
                 placeholder={roleConfig[selectedRole].demoPass}
               />
               <button
@@ -254,13 +254,13 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavi
             <button
               type="button"
               onClick={() => onNavigate('landing')}
-              className="flex-1 py-3 bg-slate-950 border border-slate-800 hover:bg-slate-850 text-slate-300 font-semibold text-sm rounded-xl cursor-pointer transition-all flex items-center justify-center gap-1.5"
+              className="flex-1 py-3 bg-slate-950 border border-slate-800 hover:bg-slate-850 text-slate-300 font-semibold text-sm rounded-xl cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98] btn-shine-effect btn-ripple flex items-center justify-center gap-1.5"
             >
               <ArrowLeft className="h-4 w-4" /> {t('Back')}
             </button>
             <button
               type="submit"
-              className="flex-[2] py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-xl cursor-pointer shadow-lg shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 group"
+              className="flex-[2] py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-xl cursor-pointer shadow-lg shadow-indigo-600/20 transition-all hover:scale-[1.02] active:scale-[0.98] btn-shine-effect btn-ripple flex items-center justify-center gap-2 group"
               id="loginSubmitBtn"
             >
               {t('Access Portal')}

@@ -19,6 +19,27 @@ import { Course, ExamResult, ExamSchedule } from '../types';
 import { useLanguage } from '../LanguageContext';
 import { LanguageSelector } from './LanguageSelector';
 
+const AnimatedCounter: React.FC<{ value: number; duration?: number; prefix?: string; suffix?: string; decimals?: number }> = ({ value, duration = 1000, prefix = '', suffix = '', decimals = 0 }) => {
+  const [count, setCount] = useState(0);
+
+  React.useEffect(() => {
+    let startTimestamp: number | null = null;
+    const step = (timestamp: number) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      const current = progress * value;
+      setCount(decimals > 0 ? parseFloat(current.toFixed(decimals)) : Math.floor(current));
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      }
+    };
+    window.requestAnimationFrame(step);
+  }, [value, duration, decimals]);
+
+  const displayVal = decimals > 0 ? count.toFixed(decimals) : count.toLocaleString();
+  return <>{prefix}{displayVal}{suffix}</>;
+};
+
 interface StudentDashboardProps {
   courses: Course[];
   exams: ExamResult[];
@@ -180,11 +201,15 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           
           <div className="flex items-center gap-4 shrink-0 relative z-10">
             <div className="bg-slate-950 px-4 py-3 rounded-2xl border border-slate-800 text-center">
-              <span className="text-lg font-extrabold text-white block">3.8</span>
+              <span className="text-lg font-extrabold text-white block">
+                <AnimatedCounter value={3.8} decimals={1} />
+              </span>
               <span className="text-[9px] text-slate-500 font-bold uppercase block">{t('GPA Trend')}</span>
             </div>
             <div className="bg-slate-950 px-4 py-3 rounded-2xl border border-slate-800 text-center">
-              <span className="text-lg font-extrabold text-white block">98%</span>
+              <span className="text-lg font-extrabold text-white block">
+                <AnimatedCounter value={98} suffix="%" />
+              </span>
               <span className="text-[9px] text-slate-500 font-bold uppercase block">{t('Attendance')}</span>
             </div>
           </div>
@@ -192,8 +217,15 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
         {/* Course Status Progress Widgets & Dynamic Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {courses.map((course) => (
-            <div key={course.id} className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex items-center justify-between hover:border-slate-700 transition">
+          {courses.map((course, idx) => (
+            <motion.div 
+              key={course.id}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.08, duration: 0.4 }}
+              whileHover={{ y: -4, scale: 1.02 }}
+              className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex items-center justify-between hover:border-slate-700 transition-all hover:shadow-[0_10px_20px_-10px_rgba(99,102,241,0.15)] cursor-pointer"
+            >
               <div className="space-y-1.5 flex-1 min-w-0 pr-4">
                 <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block bg-indigo-500/10 w-max px-2 py-0.5 rounded">
                   {course.iconType}
@@ -210,14 +242,19 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               <div className="relative w-16 h-16 shrink-0 flex items-center justify-center">
                 <svg className="w-16 h-16 transform -rotate-90">
                   <circle cx="32" cy="32" r="26" fill="transparent" stroke="#1e293b" strokeWidth="4" />
-                  <circle cx="32" cy="32" r="26" fill="transparent" strokeWidth="4"
+                  <motion.circle cx="32" cy="32" r="26" fill="transparent" strokeWidth="4"
                           className={`transition-all duration-1000 ${getProgressColor(course.progress)}`}
-                          strokeDasharray="163" strokeDashoffset={163 - (163 * course.progress) / 100}
+                          initial={{ strokeDashoffset: 163 }}
+                          animate={{ strokeDashoffset: 163 - (163 * course.progress) / 100 }}
+                          transition={{ duration: 1.2, ease: "easeOut", delay: idx * 0.1 }}
+                          strokeDasharray="163"
                           strokeLinecap="round" />
                 </svg>
-                <span className="absolute font-mono text-[11px] font-extrabold text-slate-300">{course.progress}%</span>
+                <span className="absolute font-mono text-[11px] font-extrabold text-slate-300">
+                  <AnimatedCounter value={course.progress} />%
+                </span>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 
@@ -373,23 +410,28 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                         {/* Attendance Statistics Right */}
                         <div className="space-y-4">
                           <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-850 pb-2">May Attendance Stats</h4>
-                          
-                          <div className="grid grid-cols-3 gap-3">
+                                                  <div className="grid grid-cols-3 gap-3">
                             <div className="bg-slate-900/55 p-3 rounded-xl border border-slate-850 text-center">
                               <span className="text-[9px] font-bold text-slate-500 uppercase block">Conducted</span>
-                              <span className="text-sm font-extrabold text-white block mt-1">21</span>
+                              <span className="text-sm font-extrabold text-white block mt-1">
+                                <AnimatedCounter value={21} />
+                              </span>
                               <span className="text-[8px] text-slate-400 block font-semibold">Sessions</span>
                             </div>
                             
                             <div className="bg-emerald-950/20 p-3 rounded-xl border border-emerald-500/10 text-center">
                               <span className="text-[9px] font-bold text-emerald-550 uppercase block">Attended</span>
-                              <span className="text-sm font-extrabold text-emerald-400 block mt-1">19</span>
+                              <span className="text-sm font-extrabold text-emerald-400 block mt-1">
+                                <AnimatedCounter value={19} />
+                              </span>
                               <span className="text-[8px] text-emerald-500/70 block font-semibold">Present</span>
                             </div>
 
                             <div className="bg-rose-950/20 p-3 rounded-xl border border-rose-500/10 text-center">
                               <span className="text-[9px] font-bold text-rose-550 uppercase block">Absent</span>
-                              <span className="text-sm font-extrabold text-rose-400 block mt-1">2</span>
+                              <span className="text-sm font-extrabold text-rose-400 block mt-1">
+                                <AnimatedCounter value={2} />
+                              </span>
                               <span className="text-[8px] text-rose-500/70 block font-semibold">Missed</span>
                             </div>
                           </div>
@@ -399,12 +441,17 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                             <div className="relative w-14 h-14 shrink-0 flex items-center justify-center">
                               <svg className="w-14 h-14 transform -rotate-90">
                                 <circle cx="28" cy="28" r="22" fill="transparent" stroke="#1e293b" strokeWidth="3.5" />
-                                <circle cx="28" cy="28" r="22" fill="transparent" strokeWidth="3.5"
+                                <motion.circle cx="28" cy="28" r="22" fill="transparent" strokeWidth="3.5"
                                         className="stroke-emerald-400 transition-all duration-1000"
-                                        strokeDasharray="138" strokeDashoffset={138 - (138 * 90.5) / 100}
+                                        initial={{ strokeDashoffset: 138 }}
+                                        animate={{ strokeDashoffset: 138 - (138 * 90.5) / 100 }}
+                                        transition={{ duration: 1.2, ease: "easeOut" }}
+                                        strokeDasharray="138"
                                         strokeLinecap="round" />
                               </svg>
-                              <span className="absolute font-mono text-[9px] font-extrabold text-slate-350">90.5%</span>
+                              <span className="absolute font-mono text-[9px] font-extrabold text-slate-350">
+                                <AnimatedCounter value={90.5} decimals={1} />%
+                              </span>
                             </div>
                             <div className="space-y-0.5">
                               <span className="text-xs font-bold text-white block">Attendance Percentage</span>
@@ -577,37 +624,65 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-            <div className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 transition rounded-2xl flex items-center justify-between">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.05 }}
+              whileHover={{ y: -4, scale: 1.02 }}
+              className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 hover:shadow-[0_10px_20px_-10px_rgba(99,102,241,0.15)] transition rounded-2xl flex items-center justify-between cursor-pointer"
+            >
               <div>
                 <span className="text-xs font-bold text-white block">Physics Mechanics 4B</span>
                 <span className="text-[10px] text-slate-500">PDF Study Syllabus</span>
               </div>
               <Award className="h-5 w-5 text-indigo-400 shrink-0" />
-            </div>
+            </motion.div>
 
-            <div className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 transition rounded-2xl flex items-center justify-between">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              whileHover={{ y: -4, scale: 1.02 }}
+              className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 hover:shadow-[0_10px_20px_-10px_rgba(20,184,166,0.15)] transition rounded-2xl flex items-center justify-between cursor-pointer"
+            >
               <div>
                 <span className="text-xs font-bold text-white block">Integration Vectors Assessment</span>
                 <span className="text-[10px] text-slate-500">Practice Exam Questions</span>
               </div>
               <Award className="h-5 w-5 text-teal-400 shrink-0" />
-            </div>
+            </motion.div>
 
-            <div className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 transition rounded-2xl flex items-center justify-between">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.15 }}
+              whileHover={{ y: -4, scale: 1.02 }}
+              className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 hover:shadow-[0_10px_20px_-10px_rgba(245,158,11,0.15)] transition rounded-2xl flex items-center justify-between cursor-pointer"
+            >
               <div>
                 <span className="text-xs font-bold text-white block">Lab safety index Honors</span>
                 <span className="text-[10px] text-slate-500">Lab Assessment Criteria</span>
               </div>
               <Award className="h-5 w-5 text-amber-400 shrink-0" />
-            </div>
+            </motion.div>
 
-            <div className="p-4 bg-slate-950 border border-emerald-500/30 bg-emerald-500/5 transition rounded-2xl flex items-center justify-between">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              whileHover={{ y: -4, scale: 1.02 }}
+              className="p-4 bg-slate-950 border border-emerald-500/30 bg-emerald-500/5 hover:shadow-[0_10px_20px_-10px_rgba(16,185,129,0.15)] transition rounded-2xl flex items-center justify-between cursor-pointer"
+            >
               <div>
                 <span className="text-xs font-bold text-emerald-400 block">Summer Prep Course Book</span>
                 <span className="text-[10px] text-slate-400">Bonus Academic Guide</span>
               </div>
               <Award className="h-5 w-5 text-emerald-400 shrink-0 animate-pulse" />
-            </div>
+            </motion.div>
           </div>
         </div>
 

@@ -19,6 +19,27 @@ import { Bill, Announcement } from '../types';
 import { useLanguage } from '../LanguageContext';
 import { LanguageSelector } from './LanguageSelector';
 
+const AnimatedCounter: React.FC<{ value: number; duration?: number; prefix?: string; suffix?: string; decimals?: number }> = ({ value, duration = 1000, prefix = '', suffix = '', decimals = 0 }) => {
+  const [count, setCount] = useState(0);
+
+  React.useEffect(() => {
+    let startTimestamp: number | null = null;
+    const step = (timestamp: number) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      const current = progress * value;
+      setCount(decimals > 0 ? parseFloat(current.toFixed(decimals)) : Math.floor(current));
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      }
+    };
+    window.requestAnimationFrame(step);
+  }, [value, duration, decimals]);
+
+  const displayVal = decimals > 0 ? count.toFixed(decimals) : count.toLocaleString();
+  return <>{prefix}{displayVal}{suffix}</>;
+};
+
 interface ParentDashboardProps {
   bills: Bill[];
   announcements: Announcement[];
@@ -185,7 +206,9 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
             <div className="bg-slate-950 p-4 rounded-2xl border border-slate-850 flex items-center justify-between gap-6 w-full sm:min-w-xs shrink-0">
               <div>
                 <span className="text-[10px] font-bold text-slate-500 uppercase block mb-0.5">{t('Outstanding Balance Due')}</span>
-                <span className="text-2xl font-extrabold text-white block">${totalOutstanding}</span>
+                <span className="text-2xl font-extrabold text-white block">
+                  <AnimatedCounter value={totalOutstanding} prefix="$" />
+                </span>
               </div>
               {totalOutstanding > 0 ? (
                 <span className="px-3 py-1 bg-amber-500/10 text-amber-400 rounded-full text-[10px] font-bold border border-amber-500/20 flex items-center gap-1 animate-pulse">
@@ -203,40 +226,64 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             
             {/* Metric 1 */}
-            <div className="bg-slate-950/60 p-5 rounded-2xl border border-slate-850 flex items-center gap-4">
+            <motion.div 
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 }}
+              whileHover={{ y: -4, scale: 1.02 }}
+              className="bg-slate-950/60 p-5 rounded-2xl border border-slate-850 flex items-center gap-4 transition-all hover:shadow-[0_10px_20px_-10px_rgba(99,102,241,0.1)] cursor-pointer"
+            >
               <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
                 <Calendar className="h-5 w-5" />
               </div>
               <div>
                 <span className="text-[10px] font-bold text-slate-500 uppercase block">{t('Attendance Rate')}</span>
-                <span className="text-lg font-bold text-white block mt-0.5">98.2%</span>
+                <span className="text-lg font-bold text-white block mt-0.5">
+                  <AnimatedCounter value={98.2} decimals={1} suffix="%" />
+                </span>
                 <span className="text-[10px] text-emerald-400 font-bold block">Excellent • Standard Class 11B</span>
               </div>
-            </div>
+            </motion.div>
 
             {/* Metric 2 */}
-            <div className="bg-slate-950/60 p-5 rounded-2xl border border-slate-850 flex items-center gap-4">
+            <motion.div 
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              whileHover={{ y: -4, scale: 1.02 }}
+              className="bg-slate-950/60 p-5 rounded-2xl border border-slate-850 flex items-center gap-4 transition-all hover:shadow-[0_10px_20px_-10px_rgba(20,184,166,0.1)] cursor-pointer"
+            >
               <div className="w-12 h-12 rounded-xl bg-teal-500/10 border border-teal-500/20 text-teal-400 flex items-center justify-center shrink-0">
                 <Activity className="h-5 w-5" />
               </div>
               <div>
                 <span className="text-[10px] font-bold text-slate-500 uppercase block">{t('Homework Completion')}</span>
-                <span className="text-lg font-bold text-white block mt-0.5">94.1%</span>
+                <span className="text-lg font-bold text-white block mt-0.5">
+                  <AnimatedCounter value={94.1} decimals={1} suffix="%" />
+                </span>
                 <span className="text-[10px] text-teal-400 font-bold block">Highly Consistent • +3% vs. Avg</span>
               </div>
-            </div>
+            </motion.div>
 
             {/* Metric 3 */}
-            <div className="bg-slate-950/60 p-5 rounded-2xl border border-slate-850 flex items-center gap-4">
+            <motion.div 
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              whileHover={{ y: -4, scale: 1.02 }}
+              className="bg-slate-950/60 p-5 rounded-2xl border border-slate-850 flex items-center gap-4 transition-all hover:shadow-[0_10px_20px_-10px_rgba(16,185,129,0.1)] cursor-pointer"
+            >
               <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
                 <Award className="h-5 w-5" />
               </div>
               <div>
                 <span className="text-[10px] font-bold text-slate-500 uppercase block">{t('Average Course Grades')}</span>
-                <span className="text-lg font-bold text-white block mt-0.5">91% (Grade A-)</span>
+                <span className="text-lg font-bold text-white block mt-0.5">
+                  <AnimatedCounter value={91} suffix="% (Grade A-)" />
+                </span>
                 <span className="text-[10px] text-indigo-400 font-bold block">Top 10% of Cohort tier</span>
               </div>
-            </div>
+            </motion.div>
 
           </div>
         </div>
@@ -305,19 +352,25 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                 <div className="grid grid-cols-3 gap-3">
                   <div className="bg-slate-900/55 p-3 rounded-xl border border-slate-850 text-center">
                     <span className="text-[9px] font-bold text-slate-500 uppercase block">Conducted</span>
-                    <span className="text-sm font-extrabold text-white block mt-1">21</span>
+                    <span className="text-sm font-extrabold text-white block mt-1">
+                      <AnimatedCounter value={21} />
+                    </span>
                     <span className="text-[8px] text-slate-400 block font-semibold">Sessions</span>
                   </div>
                   
                   <div className="bg-emerald-950/20 p-3 rounded-xl border border-emerald-500/10 text-center">
                     <span className="text-[9px] font-bold text-emerald-550 uppercase block">Attended</span>
-                    <span className="text-sm font-extrabold text-emerald-400 block mt-1">19</span>
+                    <span className="text-sm font-extrabold text-emerald-400 block mt-1">
+                      <AnimatedCounter value={19} />
+                    </span>
                     <span className="text-[8px] text-emerald-500/70 block font-semibold">Present</span>
                   </div>
 
                   <div className="bg-rose-950/20 p-3 rounded-xl border border-rose-500/10 text-center">
                     <span className="text-[9px] font-bold text-rose-550 uppercase block">Absent</span>
-                    <span className="text-sm font-extrabold text-rose-400 block mt-1">2</span>
+                    <span className="text-sm font-extrabold text-rose-400 block mt-1">
+                      <AnimatedCounter value={2} />
+                    </span>
                     <span className="text-[8px] text-rose-500/70 block font-semibold">Missed</span>
                   </div>
                 </div>
@@ -327,12 +380,17 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                   <div className="relative w-14 h-14 shrink-0 flex items-center justify-center">
                     <svg className="w-14 h-14 transform -rotate-90">
                       <circle cx="28" cy="28" r="22" fill="transparent" stroke="#1e293b" strokeWidth="3.5" />
-                      <circle cx="28" cy="28" r="22" fill="transparent" strokeWidth="3.5"
+                      <motion.circle cx="28" cy="28" r="22" fill="transparent" strokeWidth="3.5"
                               className="stroke-emerald-400 transition-all duration-1000"
-                              strokeDasharray="138" strokeDashoffset={138 - (138 * 90.5) / 100}
+                              initial={{ strokeDashoffset: 138 }}
+                              animate={{ strokeDashoffset: 138 - (138 * 90.5) / 100 }}
+                              transition={{ duration: 1.2, ease: "easeOut" }}
+                              strokeDasharray="138"
                               strokeLinecap="round" />
                     </svg>
-                    <span className="absolute font-mono text-[9px] font-extrabold text-slate-350">90.5%</span>
+                    <span className="absolute font-mono text-[9px] font-extrabold text-slate-350">
+                      <AnimatedCounter value={90.5} decimals={1} suffix="%" />
+                    </span>
                   </div>
                   <div className="space-y-0.5">
                     <span className="text-xs font-bold text-white block">Attendance Percentage</span>
@@ -368,8 +426,14 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-850 text-xs">
-                  {bills.map((bill) => (
-                    <tr key={bill.id} className="hover:bg-slate-950/20 transition">
+                  {bills.map((bill, bIdx) => (
+                    <motion.tr 
+                      key={bill.id}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: Math.min(bIdx * 0.05, 0.4), duration: 0.3 }}
+                      className="hover:bg-slate-950/20 transition"
+                    >
                       <td className="p-4">
                         <span className="font-bold text-white block">{bill.itemName}</span>
                         <span className="text-[10px] text-slate-500 block">Billing Code: {bill.id} • Date compiled: {bill.status === 'Paid' ? bill.paidDate : 'Overdue Period'}</span>
@@ -389,7 +453,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                           <button
                             type="button"
                             onClick={() => handlePayClick(bill)}
-                            className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-[11px] px-3 py-1.5 rounded-lg transition cursor-pointer"
+                            className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-[11px] px-3 py-1.5 rounded-lg transition hover:scale-[1.03] active:scale-[0.97] btn-shine-effect btn-ripple cursor-pointer"
                           >
                             {t('Pay Now')}
                           </button>
@@ -397,7 +461,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                           <span className="text-[10px] font-bold text-slate-500 block mr-2">Paid on {bill.paidDate}</span>
                         )}
                       </td>
-                    </tr>
+                    </motion.tr>
                   ))}
                 </tbody>
               </table>
@@ -427,24 +491,35 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
 
               <div className="space-y-4 max-h-[300px] overflow-y-auto pr-1">
                 {activeTab === 'announcements' ? (
-                  announcements.map((ann) => (
-                    <div key={ann.id} className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 transition rounded-2xl relative">
+                  announcements.map((ann, aIdx) => (
+                    <motion.div 
+                      key={ann.id}
+                      initial={{ opacity: 0, x: 15 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: Math.min(aIdx * 0.05, 0.4), duration: 0.3 }}
+                      whileHover={{ x: 2, scale: 1.01 }}
+                      className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 transition rounded-2xl relative"
+                    >
                       <div className="flex items-center justify-between mb-1.5">
                         <span className="text-xs font-bold text-slate-200 block truncate max-w-[180px]">{ann.title}</span>
                         <span className="text-[9px] text-slate-500 font-mono italic">{ann.timeAgo}</span>
                       </div>
                       <p className="text-[11px] text-slate-400 leading-relaxed font-sans">{ann.content}</p>
-                    </div>
+                    </motion.div>
                   ))
                 ) : (
-                  <div className="p-4 bg-slate-950 border border-slate-850 rounded-2xl flex flex-col gap-2">
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="p-4 bg-slate-950 border border-slate-850 rounded-2xl flex flex-col gap-2"
+                  >
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs font-bold text-slate-200 block">Prof. Alistair Miller</span>
                       <span className="text-[9px] text-slate-500 font-mono italic">Today, 10:30 AM</span>
                     </div>
                     <p className="text-[11px] text-slate-400 leading-relaxed font-sans">Marcus has been doing exceptionally well in his rotational physics units. Let's touch base next week regarding the upcoming science fair.</p>
-                    <button className="mt-2 text-[10px] bg-amber-600/10 text-amber-400 border border-amber-500/20 px-3 py-1.5 rounded-lg font-bold hover:bg-amber-600/20 transition-all self-start">Reply to Message</button>
-                  </div>
+                    <button className="mt-2 text-[10px] bg-amber-600/10 text-amber-400 border border-amber-500/20 px-3 py-1.5 rounded-lg font-bold hover:bg-amber-600/20 hover:scale-[1.03] active:scale-[0.97] transition-all self-start cursor-pointer btn-ripple">Reply to Message</button>
+                  </motion.div>
                 )}
               </div>
             </div>

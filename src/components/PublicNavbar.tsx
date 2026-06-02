@@ -13,6 +13,15 @@ interface PublicNavbarProps {
 
 export const PublicNavbar: React.FC<PublicNavbarProps> = ({ screen, onNavigate, isLoggedIn, activeRole }) => {
   const { t } = useLanguage();
+  const [isScrolled, setIsScrolled] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleNavLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, anchorId: string) => {
     if (screen !== 'landing') {
@@ -28,12 +37,16 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({ screen, onNavigate, 
   };
 
   return (
-    <header className="border-b border-slate-900 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+    <header className={`transition-all duration-300 sticky top-0 z-50 border-b ${
+      isScrolled 
+        ? 'bg-slate-950/70 border-indigo-500/10 backdrop-blur-md shadow-[0_10px_30px_-15px_rgba(99,102,241,0.15)] py-1' 
+        : 'bg-slate-950/90 border-slate-900 backdrop-blur-sm py-0'
+    }`}>
       <div className="w-full px-4 sm:px-8 lg:px-12 h-16 flex items-center justify-between">
         {/* Logo and Brand */}
         <div 
           onClick={() => onNavigate('landing')}
-          className="flex items-center gap-2.5 cursor-pointer hover:opacity-90 transition-opacity"
+          className="flex items-center gap-2.5 cursor-pointer hover:scale-[1.03] hover:opacity-100 active:scale-[0.97] transition-all duration-200"
         >
           <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/20 animate-pulse">
             <GraduationCap className="h-6 w-6 text-white" />
@@ -51,28 +64,28 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({ screen, onNavigate, 
           <a 
             href="#features" 
             onClick={(e) => handleNavLinkClick(e, 'features')}
-            className="hover:text-slate-100 transition-colors"
+            className="hover:text-slate-100 nav-link-hover py-1 transition-colors"
           >
             {t('Features')}
           </a>
           <a 
             href="#courses" 
             onClick={(e) => handleNavLinkClick(e, 'courses')}
-            className="hover:text-slate-100 transition-colors"
+            className="hover:text-slate-100 nav-link-hover py-1 transition-colors"
           >
             {t('Courses')}
           </a>
           <a 
             href="#ecosystem" 
             onClick={(e) => handleNavLinkClick(e, 'ecosystem')}
-            className="hover:text-slate-100 transition-colors"
+            className="hover:text-slate-100 nav-link-hover py-1 transition-colors"
           >
             {t('Portals')}
           </a>
           <a 
             href="#stats" 
             onClick={(e) => handleNavLinkClick(e, 'stats')}
-            className="hover:text-slate-100 transition-colors"
+            className="hover:text-slate-100 nav-link-hover py-1 transition-colors"
           >
             {t('Metrics')}
           </a>
@@ -85,7 +98,7 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({ screen, onNavigate, 
             <>
               <button 
                 onClick={() => onNavigate('login')}
-                className={`px-4 py-2 text-sm font-medium transition-colors cursor-pointer ${
+                className={`px-4 py-2 text-sm font-medium transition-all hover:scale-[1.05] active:scale-[0.95] cursor-pointer ${
                   screen === 'login' 
                     ? 'text-indigo-400' 
                     : 'text-slate-300 hover:text-white'
@@ -95,10 +108,10 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({ screen, onNavigate, 
               </button>
               <button 
                 onClick={() => onNavigate('register')}
-                className={`px-4 py-2 text-sm font-medium rounded-lg shadow-lg transition-all cursor-pointer ${
+                className={`px-4 py-2 text-sm font-medium rounded-lg shadow-lg hover:shadow-indigo-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] btn-shine-effect btn-ripple cursor-pointer ${
                   screen === 'register'
-                    ? 'bg-indigo-700 text-white shadow-indigo-700/20'
-                    : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/20'
+                    ? 'bg-indigo-700 text-white'
+                    : 'bg-indigo-600 hover:bg-indigo-500 text-white'
                 }`}
               >
                 {t('Get Started')}
@@ -111,7 +124,7 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({ screen, onNavigate, 
                   onNavigate(activeRole);
                 }
               }}
-              className="px-4 py-2 text-sm font-medium bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg shadow-lg shadow-indigo-600/20 transition-all cursor-pointer"
+              className="px-4 py-2 text-sm font-medium bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg shadow-lg hover:shadow-indigo-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] btn-shine-effect btn-ripple cursor-pointer"
             >
               {t('Go to Dashboard')}
             </button>

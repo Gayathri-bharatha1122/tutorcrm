@@ -17,6 +17,7 @@ import {
 import { Screen, Role } from '../types';
 import { useLanguage } from '../LanguageContext';
 import { LanguageSelector } from './LanguageSelector';
+import heroImage from '../../assets/tutor_crm_hero.png';
 
 interface LandingPageProps {
   onNavigate: (screen: Screen, initialRole?: Role) => void;
@@ -26,6 +27,23 @@ interface LandingPageProps {
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, isLoggedIn, activeRole }) => {
   const { t } = useLanguage();
+
+  const handleMouseMove3D = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const xc = x / rect.width - 0.5;
+    const yc = y / rect.height - 0.5;
+    card.style.transform = `perspective(1000px) rotateY(${xc * 10}deg) rotateX(${yc * -10}deg) scale3d(1.02, 1.02, 1.02)`;
+    card.style.boxShadow = `0 25px 45px -15px rgba(99, 102, 241, 0.25)`;
+  };
+
+  const handleMouseLeave3D = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget;
+    card.style.transform = `perspective(1000px) rotateY(0deg) rotateX(0deg) scale3d(1, 1, 1)`;
+    card.style.boxShadow = ``;
+  };
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -159,18 +177,99 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, isLoggedIn
           >
             <button
               onClick={() => onNavigate('register')}
-              className="w-full sm:w-auto px-6 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 group cursor-pointer"
+              className="w-full sm:w-auto px-6 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] btn-shine-effect btn-ripple flex items-center justify-center gap-2 group cursor-pointer"
             >
               {t('Start Registration Stepper')}
               <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </button>
             <button
               onClick={() => onNavigate('login')}
-              className="w-full sm:w-auto px-6 py-3.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto px-6 py-3.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white font-semibold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] btn-shine-effect btn-ripple flex items-center justify-center gap-2 cursor-pointer"
             >
               {t('Access Multi-Role Dashboards')}
               <ArrowUpRight className="h-4 w-4" />
             </button>
+          </motion.div>
+
+          {/* Premium Animated Tutor CRM Illustration */}
+          <motion.div
+            initial={{ opacity: 0, y: 40, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ delay: 0.4, duration: 0.8, type: 'spring', stiffness: 50 }}
+            className="mt-16 relative w-full max-w-4xl mx-auto perspective-1000"
+          >
+            {/* Background Glow */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-indigo-500/10 blur-[80px] rounded-full pointer-events-none animate-pulse-glow" />
+
+            {/* Main Interactive 3D Frame */}
+            <motion.div 
+              className="relative w-full h-auto rounded-2xl border border-slate-800 bg-slate-950/40 p-4 backdrop-blur-sm shadow-2xl overflow-visible transform-style-3d group"
+              whileHover={{ rotateX: 2, rotateY: -2 }}
+              transition={{ type: "spring", stiffness: 150, damping: 15 }}
+            >
+              {/* Laptop frame holding the CRM dashboard illustration */}
+              <div className="relative overflow-hidden rounded-xl border border-slate-800 bg-slate-900 shadow-inner">
+                <img
+                  src={heroImage}
+                  alt="Tutor CRM Dashboard Showcase"
+                  className="w-full h-auto object-cover rounded-xl"
+                />
+              </div>
+
+              {/* Floating Widgets */}
+              {/* Widget 1: Student Card (Top-Left) */}
+              <motion.div
+                animate={{ y: [-6, 6, -6], rotate: [-1, 1, -1] }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute -top-6 -left-6 md:-left-12 p-3 bg-slate-900/90 border border-slate-800 rounded-xl shadow-xl backdrop-blur-md hidden sm:flex items-center gap-3 max-w-[200px]"
+              >
+                <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-bold text-white">MT</div>
+                <div className="text-left">
+                  <span className="text-[10px] text-slate-500 font-bold block">STUDENT</span>
+                  <span className="text-xs font-bold text-white block">Marcus Thorne</span>
+                  <span className="text-[9px] text-emerald-400 block font-semibold">Active • 98% Attend</span>
+                </div>
+              </motion.div>
+
+              {/* Widget 2: AI assistant bubble (Top-Right) */}
+              <motion.div
+                animate={{ y: [6, -6, 6], rotate: [1, -1, 1] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute -top-10 -right-6 md:-right-10 p-3 bg-indigo-950/80 border border-indigo-500/30 rounded-xl shadow-xl backdrop-blur-md hidden sm:flex items-center gap-2 max-w-[180px]"
+              >
+                <div className="w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center text-[10px] text-white">🤖</div>
+                <div className="text-left">
+                  <span className="text-[9px] text-indigo-400 font-bold block">AI CRM TUTOR</span>
+                  <span className="text-[10px] text-slate-200 block leading-tight font-medium">Drafting response...</span>
+                </div>
+              </motion.div>
+
+              {/* Widget 3: Fee status indicator (Bottom-Left) */}
+              <motion.div
+                animate={{ y: [4, -4, 4] }}
+                transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute -bottom-8 -left-4 md:-left-8 p-3 bg-slate-900/95 border border-slate-800 rounded-xl shadow-xl backdrop-blur-md hidden sm:flex items-center gap-3"
+              >
+                <div className="w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold">$</div>
+                <div className="text-left">
+                  <span className="text-[9px] text-slate-500 font-bold block">FEE INVOICE</span>
+                  <span className="text-xs font-extrabold text-white block">$2,140 Paid</span>
+                </div>
+              </motion.div>
+
+              {/* Widget 4: Real-time notification (Bottom-Right) */}
+              <motion.div
+                animate={{ y: [-4, 4, -4] }}
+                transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute -bottom-6 -right-4 md:-right-8 p-3 bg-slate-900/90 border border-slate-800 rounded-xl shadow-xl backdrop-blur-md hidden sm:flex items-center gap-2.5 max-w-[160px]"
+              >
+                <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+                <div className="text-left">
+                  <span className="text-[9px] text-slate-500 font-bold block">PARENT INBOX</span>
+                  <span className="text-[10px] text-slate-300 block font-medium leading-tight">Miller sent a message</span>
+                </div>
+              </motion.div>
+            </motion.div>
           </motion.div>
         </div>
       </section>
@@ -197,8 +296,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, isLoggedIn
             {/* Admin Portal Info Card */}
             <motion.div
               variants={itemVariants}
-              whileHover={{ y: -6 }}
-              className="bg-slate-900/60 p-6 rounded-2xl border border-indigo-500/20 hover:border-indigo-500/40 transition-all flex flex-col justify-between"
+              onMouseMove={handleMouseMove3D}
+              onMouseLeave={handleMouseLeave3D}
+              className="bg-slate-900/60 p-6 rounded-2xl border border-indigo-500/20 hover:border-indigo-500/40 transition-all flex flex-col justify-between transform-style-3d"
             >
               <div>
                 <div className="w-12 h-12 bg-indigo-900/40 text-indigo-400 rounded-xl flex items-center justify-center mb-5 border border-indigo-500/30">
@@ -214,7 +314,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, isLoggedIn
                   if (!isLoggedIn) onNavigate('login', 'admin');
                   else if (activeRole === 'admin') onNavigate('admin');
                 }}
-                className={`w-full py-2.5 px-4 bg-indigo-600/10 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 font-medium text-xs rounded-xl transition-all mt-auto flex items-center justify-center gap-1 cursor-pointer ${isLoggedIn && activeRole !== 'admin' ? 'opacity-50 cursor-not-allowed hover:bg-indigo-600/10 hover:text-indigo-300' : ''}`}
+                className={`w-full py-2.5 px-4 bg-indigo-600/10 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 font-medium text-xs rounded-xl transition-all mt-auto flex items-center justify-center gap-1 cursor-pointer hover:scale-[1.02] active:scale-[0.98] btn-shine-effect btn-ripple ${isLoggedIn && activeRole !== 'admin' ? 'opacity-50 cursor-not-allowed hover:bg-indigo-600/10 hover:text-indigo-300' : ''}`}
                 disabled={isLoggedIn && activeRole !== 'admin'}
               >
                 {isLoggedIn && activeRole === 'admin' ? t('Go to Dashboard') : t('Quick Preview CRM Panel')} <ArrowUpRight className="h-3 w-3" />
@@ -224,8 +324,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, isLoggedIn
             {/* Tutor Dashboard Card */}
             <motion.div
               variants={itemVariants}
-              whileHover={{ y: -6 }}
-              className="bg-slate-900/60 p-6 rounded-2xl border border-teal-500/20 hover:border-teal-500/40 transition-all flex flex-col justify-between"
+              onMouseMove={handleMouseMove3D}
+              onMouseLeave={handleMouseLeave3D}
+              className="bg-slate-900/60 p-6 rounded-2xl border border-teal-500/20 hover:border-teal-500/40 transition-all flex flex-col justify-between transform-style-3d"
             >
               <div>
                 <div className="w-12 h-12 bg-teal-900/40 text-teal-400 rounded-xl flex items-center justify-center mb-5 border border-teal-500/30">
@@ -241,7 +342,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, isLoggedIn
                   if (!isLoggedIn) onNavigate('login', 'tutor');
                   else if (activeRole === 'tutor') onNavigate('tutor');
                 }}
-                className={`w-full py-2.5 px-4 bg-teal-600/10 hover:bg-teal-600 text-teal-350 hover:text-white border border-teal-500/30 font-medium text-xs rounded-xl transition-all mt-auto flex items-center justify-center gap-1 cursor-pointer ${isLoggedIn && activeRole !== 'tutor' ? 'opacity-50 cursor-not-allowed hover:bg-teal-600/10 hover:text-teal-350' : ''}`}
+                className={`w-full py-2.5 px-4 bg-teal-600/10 hover:bg-teal-600 text-teal-350 hover:text-white border border-teal-500/30 font-medium text-xs rounded-xl transition-all mt-auto flex items-center justify-center gap-1 cursor-pointer hover:scale-[1.02] active:scale-[0.98] btn-shine-effect btn-ripple ${isLoggedIn && activeRole !== 'tutor' ? 'opacity-50 cursor-not-allowed hover:bg-teal-600/10 hover:text-teal-355' : ''}`}
                 disabled={isLoggedIn && activeRole !== 'tutor'}
               >
                 {isLoggedIn && activeRole === 'tutor' ? t('Go to Dashboard') : t('Launch Tutor Control')} <ArrowUpRight className="h-3 w-3" />
@@ -251,8 +352,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, isLoggedIn
             {/* Parent Linkage Portal */}
             <motion.div
               variants={itemVariants}
-              whileHover={{ y: -6 }}
-              className="bg-slate-900/60 p-6 rounded-2xl border border-amber-500/20 hover:border-amber-500/40 transition-all flex flex-col justify-between"
+              onMouseMove={handleMouseMove3D}
+              onMouseLeave={handleMouseLeave3D}
+              className="bg-slate-900/60 p-6 rounded-2xl border border-amber-500/20 hover:border-amber-500/40 transition-all flex flex-col justify-between transform-style-3d"
             >
               <div>
                 <div className="w-12 h-12 bg-amber-900/40 text-amber-400 rounded-xl flex items-center justify-center mb-5 border border-amber-500/30">
@@ -268,7 +370,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, isLoggedIn
                   if (!isLoggedIn) onNavigate('login', 'parent');
                   else if (activeRole === 'parent') onNavigate('parent');
                 }}
-                className={`w-full py-2.5 px-4 bg-amber-600/10 hover:bg-amber-600 text-amber-300 hover:text-white border border-amber-500/30 font-medium text-xs rounded-xl transition-all mt-auto flex items-center justify-center gap-1 cursor-pointer ${isLoggedIn && activeRole !== 'parent' ? 'opacity-50 cursor-not-allowed hover:bg-amber-600/10 hover:text-amber-300' : ''}`}
+                className={`w-full py-2.5 px-4 bg-amber-600/10 hover:bg-amber-600 text-amber-300 hover:text-white border border-amber-500/30 font-medium text-xs rounded-xl transition-all mt-auto flex items-center justify-center gap-1 cursor-pointer hover:scale-[1.02] active:scale-[0.98] btn-shine-effect btn-ripple ${isLoggedIn && activeRole !== 'parent' ? 'opacity-50 cursor-not-allowed hover:bg-amber-600/10 hover:text-amber-300' : ''}`}
                 disabled={isLoggedIn && activeRole !== 'parent'}
               >
                 {isLoggedIn && activeRole === 'parent' ? t('Go to Dashboard') : t('Configure Parent Linkage')} <ArrowUpRight className="h-3 w-3" />
@@ -278,8 +380,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, isLoggedIn
             {/* Student Learning Portal */}
             <motion.div
               variants={itemVariants}
-              whileHover={{ y: -6 }}
-              className="bg-slate-900/60 p-6 rounded-2xl border border-emerald-500/20 hover:border-emerald-500/40 transition-all flex flex-col justify-between"
+              onMouseMove={handleMouseMove3D}
+              onMouseLeave={handleMouseLeave3D}
+              className="bg-slate-900/60 p-6 rounded-2xl border border-emerald-500/20 hover:border-emerald-500/40 transition-all flex flex-col justify-between transform-style-3d"
             >
               <div>
                 <div className="w-12 h-12 bg-emerald-900/40 text-emerald-400 rounded-xl flex items-center justify-center mb-5 border border-emerald-500/30">
@@ -295,7 +398,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, isLoggedIn
                   if (!isLoggedIn) onNavigate('login', 'student');
                   else if (activeRole === 'student') onNavigate('student');
                 }}
-                className={`w-full py-2.5 px-4 bg-emerald-600/10 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/30 font-medium text-xs rounded-xl transition-all mt-auto flex items-center justify-center gap-1 cursor-pointer ${isLoggedIn && activeRole !== 'student' ? 'opacity-50 cursor-not-allowed hover:bg-emerald-600/10 hover:text-emerald-300' : ''}`}
+                className={`w-full py-2.5 px-4 bg-emerald-600/10 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/30 font-medium text-xs rounded-xl transition-all mt-auto flex items-center justify-center gap-1 cursor-pointer hover:scale-[1.02] active:scale-[0.98] btn-shine-effect btn-ripple ${isLoggedIn && activeRole !== 'student' ? 'opacity-50 cursor-not-allowed hover:bg-emerald-600/10 hover:text-emerald-300' : ''}`}
                 disabled={isLoggedIn && activeRole !== 'student'}
               >
                 {isLoggedIn && activeRole === 'student' ? t('Go to Dashboard') : t('Access Learning Board')} <ArrowUpRight className="h-3 w-3" />
@@ -324,8 +427,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, isLoggedIn
             {coursesList.map((course, idx) => (
               <motion.div
                 key={idx}
-                className={`bg-slate-900/60 rounded-3xl p-6 border ${course.theme.border} ${course.theme.hoverBorder} transition-all flex flex-col justify-between relative overflow-hidden group cursor-pointer`}
-                whileHover={{ y: -10, scale: 1.02 }}
+                className={`bg-slate-900/60 rounded-3xl p-6 border ${course.theme.border} ${course.theme.hoverBorder} transition-all flex flex-col justify-between relative overflow-hidden group cursor-pointer transform-style-3d`}
+                onMouseMove={handleMouseMove3D}
+                onMouseLeave={handleMouseLeave3D}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -356,7 +460,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, isLoggedIn
                   </div>
                   <button
                     onClick={() => onNavigate('login')}
-                    className={`w-full py-2.5 px-4 ${course.theme.btnBg} border ${course.theme.btnBorder} font-semibold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer`}
+                    className={`w-full py-2.5 px-4 ${course.theme.btnBg} border ${course.theme.btnBorder} font-semibold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer hover:scale-[1.02] active:scale-[0.98] btn-shine-effect btn-ripple`}
                   >
                     {t('Enroll Now')} <ArrowUpRight className="h-3 w-3" />
                   </button>
