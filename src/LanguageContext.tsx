@@ -167,6 +167,25 @@ const translations: Record<Language, Record<string, string>> = {
     "Evaluate Assignment Draft": "అసైన్‌మెంట్ డ్రాఫ్ట్‌ను మూల్యాంకనం చేయండి",
     "Compile & Log Evaluation": "మూల్యాంకనాన్ని క్రోడీకరించి నమోదు చేయండి",
     "Lecture Timetable": "ఉపన్యాస కాలపట్టిక",
+
+    // AI Chatbox
+    "Hello! I am your EduManage Support Assistant. Select a quick question below or ask me about attendance, fees, messaging, grades, or study materials.": "హలో! నేను మీ EduManage సహాయక అసిస్టెంట్‌ని. క్రింది శీఘ్ర ప్రశ్నను ఎంచుకోండి లేదా హాజరు, ఫీజులు, సందేశాలు, గ్రేడ్‌లు లేదా అధ్యయన సామగ్రి గురించి నన్ను అడగండి.",
+    "📅 How to check attendance?": "📅 హాజరును ఎలా తనిఖీ చేయాలి?",
+    "You can view the Attendance Calendar card on the Parent Dashboard, or under the 'Attendance Calendar' tab on the Student Dashboard. Present days are green, absent days (May 8 and May 20) are red, and weekends are grey.": "మీరు పేరెంట్ డాష్‌బోర్డ్‌లో హాజరు క్యాలెండర్ కార్డ్‌ని చూడవచ్చు లేదా స్టూడెంట్ డాష్‌బోర్డ్‌లోని 'హాజరు క్యాలెండర్' ట్యాబ్ కింద చూడవచ్చు. హాజరైన రోజులు ఆకుపచ్చగా, లేని రోజులు (మే 8 మరియు మే 20) ఎరుపు రంగులో మరియు వారాంతాలు బూడిద రంగులో ఉంటాయి.",
+    "💳 How to pay tuition fees?": "💳 ట్యూషన్ ఫీజు ఎలా చెల్లించాలి?",
+    "Navigate to the Tuition Billing Ledger on the Parent Dashboard. Click the 'Pay Now' button next to any pending/overdue item, enter your card details in the secure payment gateway modal, and confirm the transaction.": "పేరెంట్ డాష్‌బోర్డ్‌లోని ట్యూషన్ బిల్లింగ్ లెడ్జర్‌కి నావిగేట్ చేయండి. ఏదైనా పెండింగ్/గడువు ముగిసిన అంశం పక్కన ఉన్న 'ఇప్పుడే చెల్లించండి' బటన్‌ను క్లిక్ చేసి, సురక్షిత చెల్లింపు గేట్‌వే మోడల్‌లో మీ కార్డ్ వివరాలను నమోదు చేసి, లావాదేవీని ధృవీకరించండి.",
+    "💬 How to contact my tutor?": "💬 నా ట్యూటర్‌ను ఎలా సంప్రదించాలి?",
+    "Use the 'Messaging Station' on the Student Dashboard or the 'Direct Messages' tab on the Parent Dashboard. You can select your tutor from the dropdown menu and type a message to receive immediate simulated responses.": "స్టూడెంట్ డాష్‌బోర్డ్‌లోని 'సందేశ కేంద్రం' లేదా పేరెంట్ డాష్‌బోర్డ్‌లోని 'ప్రత్యక్ష సందేశాలు' ట్యాబ్‌ను ఉపయోగించండి. మీరు డ్రాప్‌డౌన్ మెను నుండి మీ ట్యూటర్‌ను ఎంచుకోవచ్చు మరియు తక్షణ ప్రతిస్పందనలను పొందడానికి సందేశాన్ని టైప్ చేయవచ్చు.",
+    "📚 Where are study resources?": "📚 అధ్యయన వనరులు ఎక్కడ ఉన్నాయి?",
+    "Academic materials and PDFs matching your registered courses are available under the 'Student Hub Academic Resources' section at the bottom of the Student Dashboard.": "మీరు నమోదు చేసుకున్న కోర్సులకు సరిపోయే విద్యా సామగ్రి మరియు PDFలు స్టూడెంట్ డాష్‌బోర్డ్ దిగువన ఉన్న 'విద్యార్థి కేంద్రం విద్యా వనరులు' విభాగంలో అందుబాటులో ఉన్నాయి.",
+    "📝 How to view exam results?": "📝 పరీక్ష ఫలితాలను ఎలా వీక్షించాలి?",
+    "Go to the Student Dashboard. Under the selector menu, check the 'Exams Timeline' tab for upcoming assessments, the 'Assessments Log' tab for instructor notes and marks, or 'Term Results' to download your final PDF report.": "స్టూడెంట్ డాష్‌బోర్డ్‌కి వెళ్లండి. సెలెక్టర్ మెను కింద, రాబోయే మూల్యాంకనాల కోసం 'పరీక్షల కాలక్రమం' ట్యాబ్, బోధకుని గమనికలు మరియు మార్కుల కోసం 'మూల్యాంకనాల లాగ్' ట్యాబ్ లేదా మీ తుది PDF నివేదికను డౌన్‌లోడ్ చేయడానికి 'టర్మ్ ఫలితాలు' తనిఖీ చేయండి.",
+    "I am operating in offline mode. Please click one of the quick questions below, or try searching for keywords like 'attendance', 'fees', 'message', 'materials', or 'results'.": "నేను ఆఫ్‌లైన్ మోడ్‌లో పని చేస్తున్నాను. దయచేసి క్రింది శీఘ్ర ప్రశ్నలలో ఒకదానిపై క్లిక్ చేయండి లేదా 'హాజరు', 'ఫీజులు', 'సందేశం', 'సామగ్రి' లేదా 'ఫలితాలు' వంటి కీలక పదాల కోసం వెతకడానికి ప్రయత్నించండి.",
+    "Assistant searching FAQ files...": "అసిస్టెంట్ తరచుగా అడిగే ప్రశ్నల ఫైల్‌లను వెతుకుతోంది...",
+    "EduManage AI Support": "EduManage AI మద్దతు",
+    "Offline Assistant": "ఆఫ్‌లైన్ అసిస్టెంట్",
+    "Quick Questions": "శీఘ్ర ప్రశ్నలు",
+    "Ask about attendance, fees, messaging...": "హాజరు, ఫీజులు, సందేశాల గురించి అడగండి..."
   },
   hi: {
     // Top banner
@@ -325,6 +344,25 @@ const translations: Record<Language, Record<string, string>> = {
     "Evaluate Assignment Draft": "असाइनमेंट ड्राफ्ट का मूल्यांकन करें",
     "Compile & Log Evaluation": "मूल्यांकन संकलित और दर्ज करें",
     "Lecture Timetable": "व्याख्यान समय सारिणी",
+
+    // AI Chatbox
+    "Hello! I am your EduManage Support Assistant. Select a quick question below or ask me about attendance, fees, messaging, grades, or study materials.": "नमस्ते! मैं आपका एडुमैनेज सहायता सहायक हूँ। नीचे एक त्वरित प्रश्न चुनें या मुझसे उपस्थिति, शुल्क, संदेश, ग्रेड या अध्ययन सामग्री के बारे में पूछें।",
+    "📅 How to check attendance?": "📅 उपस्थिति की जांच कैसे करें?",
+    "You can view the Attendance Calendar card on the Parent Dashboard, or under the 'Attendance Calendar' tab on the Student Dashboard. Present days are green, absent days (May 8 and May 20) are red, and weekends are grey.": "आप अभिभावक डैशबोर्ड पर उपस्थिति कैलेंडर कार्ड देख सकते हैं, या छात्र डैशबोर्ड पर 'उपस्थिति कैलेंडर' टैब के तहत देख सकते हैं। उपस्थित दिन हरे हैं, अनुपस्थित दिन (8 मई और 20 मई) लाल हैं, और सप्ताहांत भूरे रंग के हैं।",
+    "💳 How to pay tuition fees?": "💳 ट्यूशन फीस का भुगतान कैसे करें?",
+    "Navigate to the Tuition Billing Ledger on the Parent Dashboard. Click the 'Pay Now' button next to any pending/overdue item, enter your card details in the secure payment gateway modal, and confirm the transaction.": "अभिभावक डैशबोर्ड पर ट्यूशन बिलिंग बहीखाता पर जाएं। किसी भी लंबित/बकाया आइटम के बगल में 'अभी भुगतान करें' बटन पर क्लिक करें, सुरक्षित भुगतान गेटवे पॉप-अप में अपने कार्ड का विवरण दर्ज करें और लेनदेन की पुष्टि करें।",
+    "💬 How to contact my tutor?": "💬 अपने ट्यूटर से कैसे संपर्क करें?",
+    "Use the 'Messaging Station' on the Student Dashboard or the 'Direct Messages' tab on the Parent Dashboard. You can select your tutor from the dropdown menu and type a message to receive immediate simulated responses.": "छात्र डैशबोर्ड पर 'संदेह स्टेशन' या अभिभावक डैशबोर्ड पर 'सीधे संदेश' टैब का उपयोग करें। आप ड्रॉपडाउन मेनू से अपने ट्यूटर का चयन कर सकते हैं और त्वरित प्रतिक्रिया प्राप्त करने के लिए संदेश टाइप कर सकते हैं।",
+    "📚 Where are study resources?": "📚 अध्ययन संसाधन कहाँ हैं?",
+    "Academic materials and PDFs matching your registered courses are available under the 'Student Hub Academic Resources' section at the bottom of the Student Dashboard.": "आपके पंजीकृत पाठ्यक्रमों से मेल खाने वाली शैक्षणिक सामग्री और पीडीएफ छात्र डैशबोर्ड के निचले भाग में 'छात्र केंद्र शैक्षणिक संसाधन' अनुभाग के तहत उपलब्ध हैं।",
+    "📝 How to view exam results?": "📝 परीक्षा परिणाम कैसे देखें?",
+    "Go to the Student Dashboard. Under the selector menu, check the 'Exams Timeline' tab for upcoming assessments, the 'Assessments Log' tab for instructor notes and marks, or 'Term Results' to download your final PDF report.": "छात्र डैशबोर्ड पर जाएं। चयनकर्ता मेनू के तहत, आगामी मूल्यांकन के लिए 'परीक्षा समयरेखा' टैब, प्रशिक्षक नोट्स और अंकों के लिए 'मूल्यांकन लॉग' टैब, या अपनी अंतिम पीडीएफ रिपोर्ट डाउनलोड करने के लिए 'सत्र परिणाम' की जांच करें।",
+    "I am operating in offline mode. Please click one of the quick questions below, or try searching for keywords like 'attendance', 'fees', 'message', 'materials', or 'results'.": "मैं ऑफ़लाइन मोड में काम कर रहा हूँ। कृपया नीचे दिए गए त्वरित प्रश्नों में से किसी एक पर क्लिक करें, या 'उपस्थिति', 'शुल्क', 'संदेश', 'सामग्री' या 'परिणाम' जैसे कीवर्ड खोजने का प्रयास करें।",
+    "Assistant searching FAQ files...": "सहायक अक्सर पूछे जाने वाले प्रश्नों की फ़ाइलें खोज रहा है...",
+    "EduManage AI Support": "एडुमैनेज एआई सहायता",
+    "Offline Assistant": "ऑफ़लाइन सहायक",
+    "Quick Questions": "त्वरित प्रश्न",
+    "Ask about attendance, fees, messaging...": "उपस्थिति, शुल्क, संदेश के बारे में पूछें..."
   }
 };
 
