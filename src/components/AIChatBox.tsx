@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MessageSquare, X, Send, Bot, Sparkles, HelpCircle } from 'lucide-react';
+import { useLanguage } from '../LanguageContext';
 
 interface Message {
   sender: 'user' | 'bot';
@@ -9,6 +10,7 @@ interface Message {
 }
 
 export const AIChatBox: React.FC = () => {
+  const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -124,9 +126,9 @@ export const AIChatBox: React.FC = () => {
                 </div>
                 <div>
                   <h4 className="text-xs font-bold text-white flex items-center gap-1">
-                    EduManage AI Support <Sparkles className="h-3 w-3 text-indigo-400 animate-pulse" />
+                    {t('EduManage AI Support')} <Sparkles className="h-3 w-3 text-indigo-400 animate-pulse" />
                   </h4>
-                  <span className="text-[9px] text-slate-500 font-semibold uppercase block tracking-wider">Offline Assistant</span>
+                  <span className="text-[9px] text-slate-500 font-semibold uppercase block tracking-wider">{t('Offline Assistant')}</span>
                 </div>
               </div>
               <button
@@ -151,7 +153,7 @@ export const AIChatBox: React.FC = () => {
                         : 'bg-slate-950 text-slate-350 rounded-tl-none border border-slate-850'
                     }`}
                   >
-                    {msg.text}
+                    {t(msg.text)}
                   </div>
                   <span className="text-[8px] text-slate-500 mt-1 font-mono pr-1">{msg.time}</span>
                 </div>
@@ -164,7 +166,7 @@ export const AIChatBox: React.FC = () => {
                     <span className="w-1 h-1 bg-slate-500 rounded-full animate-bounce [animation-delay:0.2s]"></span>
                     <span className="w-1 h-1 bg-slate-500 rounded-full animate-bounce [animation-delay:0.4s]"></span>
                   </div>
-                  <span>Assistant searching FAQ files...</span>
+                  <span>{t('Assistant searching FAQ files...')}</span>
                 </div>
               )}
               <div ref={messagesEndRef} />
@@ -173,7 +175,7 @@ export const AIChatBox: React.FC = () => {
             {/* Quick Questions Grid */}
             <div className="px-4 py-2 border-t border-slate-850/60 bg-slate-950/30">
               <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5 flex items-center gap-1">
-                <HelpCircle className="h-3 w-3" /> Quick Questions
+                <HelpCircle className="h-3 w-3" /> {t('Quick Questions')}
               </span>
               <div className="flex flex-wrap gap-1.5 max-h-20 overflow-y-auto">
                 {defaultQA.map((qa, index) => (
@@ -182,7 +184,7 @@ export const AIChatBox: React.FC = () => {
                     onClick={() => handleQuestionClick(qa.question)}
                     className="text-[10px] bg-slate-950 hover:bg-slate-850 text-slate-300 border border-slate-850 hover:border-slate-750 px-2 py-1 rounded-lg font-medium transition cursor-pointer"
                   >
-                    {qa.question}
+                    {t(qa.question)}
                   </button>
                 ))}
               </div>
@@ -194,7 +196,7 @@ export const AIChatBox: React.FC = () => {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask about attendance, fees, messaging..."
+                placeholder={t('Ask about attendance, fees, messaging...')}
                 className="bg-slate-900 border border-slate-800 text-xs p-2.5 rounded-xl flex-1 outline-none focus:border-indigo-500 text-slate-200"
               />
               <button
