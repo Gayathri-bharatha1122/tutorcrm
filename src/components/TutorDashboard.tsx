@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { api } from '../services/api';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Users, 
@@ -42,22 +43,7 @@ const AnimatedCounter: React.FC<{ value: number; duration?: number; prefix?: str
 };
 
 interface TutorDashboardProps {
-  students: Student[];
-  teachers: Teacher[];
   tutorName: string;
-  publishedQuizzes: Array<{
-    id: string;
-    title: string;
-    subject: string;
-    questionsCount: number;
-    questions: Array<{
-      id: number;
-      text: string;
-      options: string[];
-      correctAnswer: string;
-    }>;
-  }>;
-  onPublishQuiz: (newQuiz: { title: string; subject: string; questions: any[] }) => void;
   onLogout: () => void;
   onHome: () => void;
 }
@@ -77,14 +63,24 @@ const TIMETABLE_SLOTS: TimetableSlot[] = [
 ];
 
 export const TutorDashboard: React.FC<TutorDashboardProps> = ({
-  students,
-  teachers,
   tutorName,
-  publishedQuizzes,
-  onPublishQuiz,
   onLogout,
   onHome
 }) => {
+  const [students, setStudents] = useState<Student[]>([]);
+  const [publishedQuizzes, setPublishedQuizzes] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const studentsData = await api.getTutorStudents();
+        setStudents(studentsData);
+      } catch (err) {
+        console.error("Failed to load tutor data", err);
+      }
+    };
+    fetchData();
+  }, []);
   const { t } = useLanguage();
   
   // Date and Time Slot selectors state
@@ -210,20 +206,28 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
     setCorrectOption('A');
   };
 
-  const handleSaveQuiz = () => {
+  const handleSaveQuiz = async () => {
     if (!quizTitle.trim() || quizQuestions.length === 0) return;
 
-    onPublishQuiz({
-      title: quizTitle,
-      subject: quizSubject,
-      questions: quizQuestions
-    });
+    try {
+      await api.publishQuiz({
+        title: quizTitle,
+        subject: quizSubject,
+        questions: quizQuestions
+      });
 
-    setAssignedSuccessMsg(`Successfully published "${quizTitle}" for ${quizSubject} with ${quizQuestions.length} questions.`);
-    
-    // Reset quiz inputs
-    setQuizTitle('');
-    setQuizQuestions([]);
+      setPublishedQuizzes(prev => [
+        { id: `q-${Date.now()}`, title: quizTitle, subject: quizSubject, questionsCount: quizQuestions.length, questions: quizQuestions },
+        ...prev
+      ]);
+      setAssignedSuccessMsg(`Successfully published "${quizTitle}" for ${quizSubject} with ${quizQuestions.length} questions.`);
+      
+      // Reset quiz inputs
+      setQuizTitle('');
+      setQuizQuestions([]);
+    } catch (err: any) {
+      alert(`Error publishing quiz: ${err.message}`);
+    }
   };
 
   const handleRemoveQuestion = (id: number) => {

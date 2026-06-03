@@ -1,16 +1,7 @@
 import { useState, useEffect } from 'react';
+import { api } from './services/api';
 import { motion, AnimatePresence } from 'motion/react';
 import { LanguageProvider } from './LanguageContext';
-import { 
-  initialStudents, 
-  initialTeachers, 
-  initialActivityLogs, 
-  marcusCourses, 
-  marcusExams, 
-  upcomingExams, 
-  helenaBills, 
-  systemAnnouncements 
-} from './data';
 import { Student, Teacher, ActivityLog, Course, Bill, Announcement, Screen, Role } from './types';
 
 // Importing Views
@@ -29,6 +20,29 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>('landing');
   const [activeRole, setActiveRole] = useState<Role>('student');
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const token = localStorage.getItem('edumanage_token');
+    if (token) {
+      api.getCurrentUser().then(data => {
+        const user = data.user || data;
+        setActiveRole(user.role);
+        setCurrentProfileName(user.name || user.firstName);
+        setIsLoggedIn(true);
+        if (user.role === 'admin') setScreen('admin');
+        else if (user.role === 'tutor') setScreen('tutor');
+        else if (user.role === 'parent') setScreen('parent');
+        else setScreen('student');
+      }).catch(() => {
+        localStorage.removeItem('edumanage_token');
+      }).finally(() => {
+        setIsLoading(false);
+      });
+    } else {
+      setIsLoading(false);
+    }
+  }, []);
 
   // Global Scroll Parallax State
   const [globalScrollY, setGlobalScrollY] = useState(0);
@@ -44,22 +58,6 @@ export default function App() {
   }, []);
 
   // Persistence States synced with LocalStorage
-  const [studentsList, setStudentsList] = useState<Student[]>(() => {
-    const cached = localStorage.getItem('edumanage_students');
-    return cached ? JSON.parse(cached) : initialStudents;
-  });
-
-  const [teachersList] = useState<Teacher[]>(initialTeachers);
-  
-  const [activityLogsList, setActivityLogsList] = useState<ActivityLog[]>(() => {
-    const cached = localStorage.getItem('edumanage_activities');
-    return cached ? JSON.parse(cached) : initialActivityLogs;
-  });
-
-  const [parentBillsList, setParentBillsList] = useState<Bill[]>(() => {
-    const cached = localStorage.getItem('edumanage_bills');
-    return cached ? JSON.parse(cached) : helenaBills;
-  });
 
   const [publishedQuizzes, setPublishedQuizzes] = useState<Array<{
     id: string;
@@ -106,46 +104,7 @@ export default function App() {
   // Cached profile identity
   const [currentProfileName, setCurrentProfileName] = useState<string>('Marcus Thorne');
 
-  useEffect(() => {
-    localStorage.setItem('edumanage_students', JSON.stringify(studentsList));
-  }, [studentsList]);
 
-  useEffect(() => {
-    localStorage.setItem('edumanage_activities', JSON.stringify(activityLogsList));
-  }, [activityLogsList]);
-
-  useEffect(() => {
-    localStorage.setItem('edumanage_bills', JSON.stringify(parentBillsList));
-  }, [parentBillsList]);
-
-  // Handle Enrollment additions
-  const handleAddNewStudent = (newStudent: Omit<Student, 'id' | 'avgGrade' | 'progress' | 'initials'>) => {
-    const studentId = `ST00${studentsList.length + 1}`;
-    const initials = newStudent.name.split(' ').map(n => n[0]).join('').toUpperCase();
-    
-    const studentObj: Student = {
-      ...newStudent,
-      id: studentId,
-      initials,
-      progress: 60, // starting checklist status
-      avgGrade: 3.5
-    };
-
-    setStudentsList(prev => [studentObj, ...prev]);
-
-    // Commit to activity log registry
-    const logItem: ActivityLog = {
-      id: `ACT00${activityLogsList.length + 1}`,
-      studentName: newStudent.name,
-      initials,
-      type: 'New Enrollment',
-      detail: `Student ${newStudent.name} successfully enrolled in ${newStudent.subject} honors course by Administrator.`,
-      dateTime: 'Just now',
-      status: 'Completed'
-    };
-
-    setActivityLogsList(prev => [logItem, ...prev]);
-  };
 
   // Route screen selections
   const handleNavigate = (targetScreen: Screen, initialRole?: Role) => {
@@ -155,21 +114,21 @@ export default function App() {
     }
   };
 
-  const handleLoginSuccess = (role: Role) => {
+  const handleLoginSuccess = (role: Role, name?: string) => {
     setActiveRole(role);
     setIsLoggedIn(true);
     // Resolve personal name tags corresponding to roles for display
     if (role === 'admin') {
-      setCurrentProfileName('System Administrator');
+      setCurrentProfileName(name || 'System Administrator');
       setScreen('admin');
     } else if (role === 'tutor') {
-      setCurrentProfileName('Prof. Alistair Miller');
+      setCurrentProfileName(name || 'Prof. Alistair Miller');
       setScreen('tutor');
     } else if (role === 'parent') {
-      setCurrentProfileName('Helena Thorne');
+      setCurrentProfileName(name || 'Helena Thorne');
       setScreen('parent');
     } else {
-      setCurrentProfileName('Marcus Thorne');
+      setCurrentProfileName(name || 'Marcus Thorne');
       setScreen('student');
     }
   };
@@ -179,25 +138,15 @@ export default function App() {
     setCurrentProfileName(customName);
     setIsLoggedIn(true);
     
-    // Auto insert child student if register as parent
     if (role === 'parent') {
       setScreen('parent');
     } else {
-      // Register new student to database list
-      handleAddNewStudent({
-        name: customName,
-        grade: '11th Grade',
-        subject: 'Advanced Physics',
-        phone: '14155550000',
-        email: `${customName.toLowerCase().replace(' ', '.')}@edumail.com`,
-        parentPhone: '14155554921',
-        status: 'Active'
-      });
       setScreen('student');
     }
   };
 
   const handleLogout = () => {
+    localStorage.removeItem('edumanage_token');
     setIsLoggedIn(false);
     setScreen('landing');
   };
@@ -207,6 +156,10 @@ export default function App() {
   };
 
   const isPublicPage = ['landing', 'login', 'register'].includes(screen);
+
+  if (isLoading) {
+    return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400">Loading...</div>;
+  }
 
   return (
     <LanguageProvider>
@@ -278,6 +231,7 @@ export default function App() {
                 </motion.div>
               )}
 
+<<<<<<< HEAD
               {screen === 'register' && (
                 <motion.div
                   key="register"
@@ -374,6 +328,73 @@ export default function App() {
             </AnimatePresence>
           </div>
           <AIChatBox />
+=======
+            {screen === 'admin' && (
+              <motion.div
+                key="admin"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="w-full animate-fade-in"
+              >
+                <AdminDashboard 
+                  onLogout={handleLogout}
+                  onHome={handleHome}
+                />
+              </motion.div>
+            )}
+
+            {screen === 'student' && (
+              <motion.div
+                key="student"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="w-full"
+              >
+                <StudentDashboard 
+                  studentName={currentProfileName}
+                  publishedQuizzes={publishedQuizzes}
+                  onLogout={handleLogout}
+                  onHome={handleHome}
+                />
+              </motion.div>
+            )}
+
+            {screen === 'parent' && (
+              <motion.div
+                key="parent"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="w-full"
+              >
+                <ParentDashboard 
+                  parentName={currentProfileName}
+                  studentName="Marcus Thorne"
+                  onLogout={handleLogout}
+                  onHome={handleHome}
+                />
+              </motion.div>
+            )}
+
+            {screen === 'tutor' && (
+              <motion.div
+                key="tutor"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="w-full"
+              >
+                <TutorDashboard 
+                  tutorName={currentProfileName}
+                  onLogout={handleLogout}
+                  onHome={handleHome}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+>>>>>>> 8343f4b6bfe6ef6191d2723de4f383489efd9f1d
         </div>
       </div>
     </LanguageProvider>

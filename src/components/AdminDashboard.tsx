@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { api } from '../services/api';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Users, 
@@ -43,22 +44,35 @@ const AnimatedCounter: React.FC<{ value: number; duration?: number; prefix?: str
 };
 
 interface AdminDashboardProps {
-  students: Student[];
-  teachers: Teacher[];
-  activityLogs: ActivityLog[];
-  onAddStudent: (newStudent: Omit<Student, 'id' | 'avgGrade' | 'progress' | 'initials'>) => void;
   onLogout: () => void;
   onHome: () => void;
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ 
-  students, 
-  teachers, 
-  activityLogs, 
-  onAddStudent, 
   onLogout,
   onHome
 }) => {
+  const [students, setStudents] = useState<Student[]>([]);
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [studentsData, teachersData, logsData] = await Promise.all([
+          api.getAdminStudents(),
+          api.getTeachers(),
+          api.getActivityLogs()
+        ]);
+        setStudents(studentsData);
+        setTeachers(teachersData);
+        setActivityLogs(logsData);
+      } catch (err) {
+        console.error("Failed to load admin data", err);
+      }
+    };
+    fetchData();
+  }, []);
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'All' | 'Active' | 'Pending' | 'Inactive'>('All');
@@ -75,7 +89,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [enrollParentPhone, setEnrollParentPhone] = useState('');
 
   // Handle addition of student to local state
-  const handleEnrollSubmit = (e: React.FormEvent) => {
+  const handleEnrollSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!enrollFirstName || !enrollLastName || !enrollPhone) {
       setAdminNotification('Failed to enroll. Complete the required field validations first.');
@@ -83,26 +97,36 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       return;
     }
 
-    onAddStudent({
-      name: `${enrollFirstName} ${enrollLastName}`,
-      grade: enrollGrade,
-      subject: enrollSubject,
-      phone: enrollPhone,
-      email: enrollEmail || `${enrollFirstName.toLowerCase()}@edumanage.com`,
-      parentPhone: enrollParentPhone || '14155554921',
-      status: 'Active'
-    });
+    try {
+      await api.enrollStudent({
+        name: `${enrollFirstName} ${enrollLastName}`,
+        grade: enrollGrade,
+        subject: enrollSubject,
+        phone: enrollPhone,
+        email: enrollEmail || `${enrollFirstName.toLowerCase()}@edumanage.com`,
+        parentPhone: enrollParentPhone || '14155554921',
+        status: 'Active'
+      });
 
-    // Reset fields
-    setEnrollFirstName('');
-    setEnrollLastName('');
-    setEnrollPhone('');
-    setEnrollEmail('');
-    setEnrollParentPhone('');
-    setShowEnrollForm(false);
-    
-    setAdminNotification(`Successfully enrolled ${enrollFirstName} ! Database log initialized.`);
-    setTimeout(() => setAdminNotification(null), 4000);
+      const updatedStudents = await api.getAdminStudents();
+      setStudents(updatedStudents);
+      const updatedLogs = await api.getActivityLogs();
+      setActivityLogs(updatedLogs);
+
+      // Reset fields
+      setEnrollFirstName('');
+      setEnrollLastName('');
+      setEnrollPhone('');
+      setEnrollEmail('');
+      setEnrollParentPhone('');
+      setShowEnrollForm(false);
+      
+      setAdminNotification(`Successfully enrolled ${enrollFirstName} ! Database log initialized.`);
+      setTimeout(() => setAdminNotification(null), 4000);
+    } catch (err: any) {
+      setAdminNotification(`Error: ${err.message}`);
+      setTimeout(() => setAdminNotification(null), 4000);
+    }
   };
 
   const filteredStudents = students.filter(st => {

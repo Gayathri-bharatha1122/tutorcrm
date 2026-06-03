@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { api } from '../services/api';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   BookOpen, 
@@ -41,9 +42,6 @@ const AnimatedCounter: React.FC<{ value: number; duration?: number; prefix?: str
 };
 
 interface StudentDashboardProps {
-  courses: Course[];
-  exams: ExamResult[];
-  upcomingExams: ExamSchedule[];
   studentName: string;
   publishedQuizzes: Array<{
     id: string;
@@ -62,18 +60,30 @@ interface StudentDashboardProps {
 }
 
 export const StudentDashboard: React.FC<StudentDashboardProps> = ({
-  courses: initialCourses,
-  exams: initialExams,
-  upcomingExams,
   studentName,
   publishedQuizzes,
   onLogout,
   onHome
 }) => {
   const { t } = useLanguage();
-  const [courses, setCourses] = useState<Course[]>(initialCourses);
-  const [exams, setExams] = useState<ExamResult[]>(initialExams);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [exams, setExams] = useState<ExamResult[]>([]);
+  const [upcomingExams, setUpcomingExams] = useState<ExamSchedule[]>([]);
   const [activeTab, setActiveTab] = useState<'schedule' | 'grades' | 'results' | 'attendance' | 'quizzes'>('schedule');
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await api.getStudentDashboard();
+        setCourses(data.courses || []);
+        setExams(data.exams || []);
+        setUpcomingExams(data.upcomingExams || []);
+      } catch (err) {
+        console.error("Failed to load student data", err);
+      }
+    };
+    fetchData();
+  }, []);
   
   // Quiz taking states
   const [activeQuizId, setActiveQuizId] = useState<string | null>(null);

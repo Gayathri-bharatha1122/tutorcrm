@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { api } from '../services/api';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Lock, 
@@ -19,7 +20,7 @@ import { useLanguage } from '../LanguageContext';
 import { LanguageSelector } from './LanguageSelector';
 
 interface LoginScreenProps {
-  onLoginSuccess: (role: Role) => void;
+  onLoginSuccess: (role: Role, name?: string) => void;
   onNavigate: (screen: Screen) => void;
   initialRole?: Role;
 }
@@ -90,25 +91,20 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavi
     setTimeout(() => setTypedMessage(null), 3000);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
       setErrorStatus(t('Please provide both administrative username/email and access key.'));
       return;
     }
 
-    // Standard credential matching checklist for testing
-    const valid = 
-      (selectedRole === 'admin' && password === 'admin123') ||
-      (selectedRole === 'tutor' && password === 'tutor123') ||
-      (selectedRole === 'parent' && password === 'parent123') ||
-      (selectedRole === 'student' && password === 'student123');
-
-    if (valid) {
+    try {
+      const response = await api.login({ email, password, role: selectedRole });
+      localStorage.setItem('edumanage_token', response.token);
       setErrorStatus(null);
-      onLoginSuccess(selectedRole);
-    } else {
-      setErrorStatus('Invalid key token or database credential mismatch. Try a Demo Fast-Pass below!');
+      onLoginSuccess(selectedRole, response.user?.name || response.user?.firstName || undefined);
+    } catch (err: any) {
+      setErrorStatus(err.message || 'Invalid key token or database credential mismatch.');
     }
   };
 

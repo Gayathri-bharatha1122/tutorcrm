@@ -66,8 +66,7 @@ router.post('/register', async (req: Request, res: Response) => {
     grade, 
     learningGoal, 
     parentPhone, 
-    studentPhoneLookup, 
-    otpCode 
+    studentPhoneLookup
   } = req.body;
 
   if (!email || !phone || !password || !role || !firstName || !lastName) {
@@ -81,17 +80,7 @@ router.post('/register', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'A user with this email or phone number already exists.' });
     }
 
-    // If Parent, verify OTP linkage code if lookup student was selected
-    if (role === 'parent') {
-      if (studentPhoneLookup) {
-        const sanitizedLook = studentPhoneLookup.replace(/\D/g, '');
-        const actualOtp = pendingOtps.get(sanitizedLook);
-        
-        if (otpCode !== '6423' && otpCode !== '1234' && otpCode !== actualOtp) {
-          return res.status(400).json({ error: 'Invalid security OTP verification token. Try matching "6423" passcode.' });
-        }
-      }
-    }
+
 
     // Encrypt password
     const salt = await bcrypt.genSalt(10);
