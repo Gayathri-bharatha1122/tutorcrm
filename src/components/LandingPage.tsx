@@ -60,6 +60,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, isLoggedIn
     }
   }, []);
 
+  // Scroll Parallax State
+  const [scrollY, setScrollY] = React.useState(0);
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   // Contact Section State
   const [activeContactTab, setActiveContactTab] = React.useState<'message' | 'book'>('message');
   const [messageForm, setMessageForm] = React.useState({ name: '', email: '', message: '' });
@@ -109,7 +122,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, isLoggedIn
     const xc = x / rect.width - 0.5;
     const yc = y / rect.height - 0.5;
     card.style.transform = `perspective(1000px) rotateY(${xc * 10}deg) rotateX(${yc * -10}deg) scale3d(1.02, 1.02, 1.02)`;
-    card.style.boxShadow = `0 25px 45px -15px rgba(99, 102, 241, 0.25)`;
+    card.style.boxShadow = `0 25px 45px -15px rgba(29, 78, 216, 0.35), 0 0 25px -5px rgba(0, 240, 255, 0.2)`;
   };
 
   const handleMouseLeave3D = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -206,9 +219,47 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, isLoggedIn
 
       {/* Hero Section */}
       <section className="relative pt-20 pb-24 overflow-hidden">
-        {/* Background Gradients */}
-        <div className="absolute top-0 left-1/4 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-indigo-600/10 blur-[120px] pointer-events-none" />
-        <div className="absolute top-1/3 right-1/4 translate-y-1/2 w-[400px] h-[400px] rounded-full bg-emerald-500/5 blur-[120px] pointer-events-none" />
+        {/* Premium Animated Background Overlays */}
+        <div 
+          className="absolute inset-0 mesh-gradient-bg pointer-events-none z-0" 
+          style={{ transform: `translateY(${scrollY * 0.12}px)` }}
+        />
+        
+        {/* Light Beams */}
+        <div 
+          className="absolute top-[-10%] left-[-20%] w-[60%] h-[70%] bg-gradient-to-b from-royal-blue/10 to-transparent blur-[80px] light-beam-1 pointer-events-none z-0"
+          style={{ transform: `translateY(${scrollY * 0.22}px) rotate(${-35 + scrollY * 0.01}deg)` }}
+        />
+        <div 
+          className="absolute top-[20%] right-[-10%] w-[50%] h-[60%] bg-gradient-to-b from-electric-cyan/8 to-transparent blur-[70px] light-beam-2 pointer-events-none z-0"
+          style={{ transform: `translateY(${scrollY * 0.18}px) rotate(${40 - scrollY * 0.008}deg)` }}
+        />
+
+        {/* Floating Particles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+          {[...Array(12)].map((_, i) => {
+            const size = (i % 3 + 1) * 8; // 8px, 16px, 24px
+            const left = `${(i * 9) % 100}%`;
+            const delay = `${(i * 1.5) % 10}s`;
+            const duration = `${12 + (i * 3) % 15}s`;
+            const color = i % 3 === 0 ? 'bg-indigo-400/20' : i % 3 === 1 ? 'bg-indigo-600/15' : 'bg-emerald-500/20';
+            return (
+              <div
+                key={i}
+                className={`absolute rounded-full blur-[2px] ${color}`}
+                style={{
+                  width: `${size}px`,
+                  height: `${size}px`,
+                  left: left,
+                  bottom: '-50px',
+                  animation: `particle-float ${duration} infinite linear`,
+                  animationDelay: delay,
+                  transform: `translateY(${scrollY * -0.08}px)`,
+                }}
+              />
+            );
+          })}
+        </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
@@ -224,6 +275,47 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, isLoggedIn
                 {/* Background Glow */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-indigo-500/10 blur-[80px] rounded-full pointer-events-none animate-pulse-glow" />
 
+                {/* Floating 3D Education Icons */}
+                {/* Floating 3D Icon 1 (GraduationCap) */}
+                <motion.div
+                  animate={{ y: [-12, 12, -12], rotate: [0, 15, 0], scale: [0.95, 1.05, 0.95] }}
+                  transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute -top-12 -left-12 p-2.5 bg-gradient-to-br from-emerald-500/20 to-emerald-600/5 border border-emerald-500/35 rounded-2xl shadow-xl backdrop-blur-md hidden lg:flex items-center justify-center text-emerald-400 premium-card-3d"
+                  style={{ transform: `translateY(${scrollY * -0.04}px)` }}
+                >
+                  <GraduationCap className="h-6 w-6 filter drop-shadow-[0_4px_6px_rgba(139,92,246,0.3)]" />
+                </motion.div>
+
+                {/* Floating 3D Icon 2 (BookOpen) */}
+                <motion.div
+                  animate={{ y: [10, -10, 10], rotate: [10, -10, 10], scale: [1.02, 0.98, 1.02] }}
+                  transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute -bottom-12 -right-12 p-2.5 bg-gradient-to-br from-indigo-500/20 to-indigo-600/5 border border-indigo-500/35 rounded-2xl shadow-xl backdrop-blur-md hidden lg:flex items-center justify-center text-indigo-400 premium-card-3d"
+                  style={{ transform: `translateY(${scrollY * 0.06}px)` }}
+                >
+                  <BookOpen className="h-6 w-6 filter drop-shadow-[0_4px_6px_rgba(29,78,216,0.3)]" />
+                </motion.div>
+
+                {/* Floating 3D Icon 3 (Activity) */}
+                <motion.div
+                  animate={{ y: [-8, 8, -8], rotate: [-15, 15, -15] }}
+                  transition={{ duration: 6.5, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute top-24 -right-16 p-2.5 bg-gradient-to-br from-teal-500/20 to-teal-600/5 border border-teal-500/35 rounded-2xl shadow-xl backdrop-blur-md hidden lg:flex items-center justify-center text-teal-400 premium-card-3d"
+                  style={{ transform: `translateY(${scrollY * -0.02}px)` }}
+                >
+                  <Activity className="h-6 w-6 filter drop-shadow-[0_4px_6px_rgba(0,240,255,0.3)]" />
+                </motion.div>
+
+                {/* Floating 3D Icon 4 (Shield) */}
+                <motion.div
+                  animate={{ y: [6, -6, 6], rotate: [5, -5, 5] }}
+                  transition={{ duration: 7.5, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute bottom-20 -left-16 p-2.5 bg-gradient-to-br from-indigo-950/40 to-indigo-800/10 border border-indigo-500/25 rounded-2xl shadow-xl backdrop-blur-md hidden lg:flex items-center justify-center text-indigo-300 premium-card-3d"
+                  style={{ transform: `translateY(${scrollY * 0.03}px)` }}
+                >
+                  <Shield className="h-6 w-6 filter drop-shadow-[0_4px_6px_rgba(29,78,216,0.2)]" />
+                </motion.div>
+
                 {/* Main Interactive 3D Frame */}
                 <motion.div 
                   className="relative w-full h-auto rounded-2xl border border-slate-800 bg-slate-950/40 p-4 backdrop-blur-sm shadow-2xl overflow-visible transform-style-3d group"
@@ -237,20 +329,38 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, isLoggedIn
                       alt="Tutor CRM Dashboard Showcase"
                       className="w-full h-auto object-cover rounded-xl"
                     />
+
+                    {/* Animated Live Feed badge overlay */}
+                    <div className="absolute top-[8%] left-[45%] flex items-center gap-1 bg-slate-950/80 border border-slate-800 rounded-full px-2 py-0.5 backdrop-blur-sm shadow-lg scale-90">
+                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-ping absolute" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+                      <span className="text-[8px] font-bold text-slate-350 tracking-wider">LIVE DESK</span>
+                    </div>
+
+                    {/* Simulating active data calculation */}
+                    <div className="absolute bottom-[15%] left-[8%] max-w-[50%] p-1.5 bg-slate-950/85 border border-slate-800 rounded-lg backdrop-blur-sm hidden md:block">
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-bounce" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-bounce [animation-delay:0.2s]" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-bounce [animation-delay:0.4s]" />
+                        <span className="text-[7px] text-slate-400 font-medium">Syncing grades database...</span>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Floating Widgets */}
+                  {/* Floating Widgets with Parallax offsets */}
                   {/* Widget 1: Student Card (Top-Left) */}
                   <motion.div
                     animate={{ y: [-6, 6, -6], rotate: [-1, 1, -1] }}
                     transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
                     className="absolute -top-4 -left-4 md:-left-8 p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl shadow-xl backdrop-blur-md hidden sm:flex items-center gap-2.5 max-w-[170px]"
+                    style={{ transform: `translateY(${scrollY * -0.03}px)` }}
                   >
                     <div className="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center text-[10px] font-bold text-white">MT</div>
                     <div className="text-left">
                       <span className="text-[9px] text-slate-500 font-bold block">STUDENT</span>
                       <span className="text-[11px] font-bold text-white block">Marcus Thorne</span>
-                      <span className="text-[8px] text-emerald-400 block font-semibold">Active • 98% Attend</span>
+                      <span className="text-[8px] text-emerald-450 block font-semibold">Active • 98% Attend</span>
                     </div>
                   </motion.div>
 
@@ -259,6 +369,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, isLoggedIn
                     animate={{ y: [6, -6, 6], rotate: [1, -1, 1] }}
                     transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                     className="absolute -top-6 -right-4 md:-right-8 p-2.5 bg-indigo-950/80 border border-indigo-500/30 rounded-xl shadow-xl backdrop-blur-md hidden sm:flex items-center gap-2 max-w-[150px]"
+                    style={{ transform: `translateY(${scrollY * -0.04}px)` }}
                   >
                     <div className="w-5 h-5 rounded-full bg-indigo-600 flex items-center justify-center text-[9px] text-white">🤖</div>
                     <div className="text-left">
@@ -272,6 +383,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, isLoggedIn
                     animate={{ y: [4, -4, 4] }}
                     transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
                     className="absolute -bottom-6 -left-3 md:-left-6 p-2.5 bg-slate-900/95 border border-slate-800 rounded-xl shadow-xl backdrop-blur-md hidden sm:flex items-center gap-2.5"
+                    style={{ transform: `translateY(${scrollY * 0.03}px)` }}
                   >
                     <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-bold">$</div>
                     <div className="text-left">
@@ -285,6 +397,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, isLoggedIn
                     animate={{ y: [-4, 4, -4] }}
                     transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
                     className="absolute -bottom-4 -right-3 md:-right-6 p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl shadow-xl backdrop-blur-md hidden sm:flex items-center gap-2 max-w-[140px]"
+                    style={{ transform: `translateY(${scrollY * 0.04}px)` }}
                   >
                     <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
                     <div className="text-left">
@@ -329,8 +442,30 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, isLoggedIn
                 {t('Connecting Administrators, Tutors, Parents, and Students into a cohesive learning workspace. View reports, compile grades, clear billing invoices, and message teachers in real-time.')}
               </motion.p>
             </div>
-
           </div>
+        </div>
+
+        {/* Animated Wave Separator */}
+        <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] z-10 pointer-events-none">
+          <svg 
+            className="relative block w-[200%] h-[40px] md:h-[65px] text-slate-950" 
+            viewBox="0 0 1200 120" 
+            preserveAspectRatio="none"
+            style={{ transform: `translateX(${-scrollY * 0.04}px)` }}
+          >
+            {/* Layer 1 (Back wave) */}
+            <path 
+              d="M0,32L120,42.7C240,53,480,75,720,74.7C960,75,1200,53,1320,42.7L1440,32L1440,120L1320,120C1200,120,960,120,720,120C480,120,240,120,120,120L0,120Z" 
+              fill="rgba(3, 7, 18, 0.45)"
+              className="wave-animation-1"
+            />
+            {/* Layer 2 (Front wave) */}
+            <path 
+              d="M0,64L80,58.7C160,53,320,43,480,48C640,53,800,75,960,80C1120,85,1280,75,1360,69.3L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z" 
+              fill="#030712"
+              className="wave-animation-2"
+            />
+          </svg>
         </div>
       </section>
 

@@ -30,6 +30,19 @@ export default function App() {
   const [activeRole, setActiveRole] = useState<Role>('student');
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
+  // Global Scroll Parallax State
+  const [globalScrollY, setGlobalScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setGlobalScrollY(window.scrollY);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   // Persistence States synced with LocalStorage
   const [studentsList, setStudentsList] = useState<Student[]>(() => {
     const cached = localStorage.getItem('edumanage_students');
@@ -197,137 +210,171 @@ export default function App() {
 
   return (
     <LanguageProvider>
-      <div className="bg-slate-950 min-h-screen w-full overflow-x-hidden text-slate-100 flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+      <div className="bg-slate-950 min-h-screen w-full overflow-x-hidden text-slate-100 flex flex-col justify-between selection:bg-indigo-500 selection:text-white relative">
 
-        {isPublicPage && <PublicNavbar screen={screen} onNavigate={handleNavigate} isLoggedIn={isLoggedIn} activeRole={activeRole} />}
-
-        {/* Route Render Engine with AnimatePresence */}
-        <div className="flex-1">
-          <AnimatePresence mode="wait">
-            {screen === 'landing' && (
-              <motion.div
-                key="landing"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="w-full"
-              >
-                <LandingPage onNavigate={handleNavigate} isLoggedIn={isLoggedIn} activeRole={activeRole} />
-              </motion.div>
-            )}
-
-            {screen === 'login' && (
-              <motion.div
-                key="login"
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.98 }}
-                className="w-full"
-              >
-                <LoginScreen 
-                  onLoginSuccess={handleLoginSuccess} 
-                  onNavigate={handleNavigate} 
-                  initialRole={activeRole} 
-                />
-              </motion.div>
-            )}
-
-            {screen === 'register' && (
-              <motion.div
-                key="register"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="w-full"
-              >
-                <RegisterStepper 
-                  onNavigate={handleNavigate} 
-                  onRegisteredSuccess={handleRegisteredSuccess} 
-                />
-              </motion.div>
-            )}
-
-            {screen === 'admin' && (
-              <motion.div
-                key="admin"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="w-full animate-fade-in"
-              >
-                <AdminDashboard 
-                  students={studentsList}
-                  teachers={teachersList}
-                  activityLogs={activityLogsList}
-                  onAddStudent={handleAddNewStudent}
-                  onLogout={handleLogout}
-                  onHome={handleHome}
-                />
-              </motion.div>
-            )}
-
-            {screen === 'student' && (
-              <motion.div
-                key="student"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="w-full"
-              >
-                <StudentDashboard 
-                  courses={marcusCourses}
-                  exams={marcusExams}
-                  upcomingExams={upcomingExams}
-                  studentName={currentProfileName}
-                  publishedQuizzes={publishedQuizzes}
-                  onLogout={handleLogout}
-                  onHome={handleHome}
-                />
-              </motion.div>
-            )}
-
-            {screen === 'parent' && (
-              <motion.div
-                key="parent"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="w-full"
-              >
-                <ParentDashboard 
-                  bills={parentBillsList}
-                  announcements={systemAnnouncements}
-                  parentName={currentProfileName}
-                  studentName="Marcus Thorne"
-                  onUpdateBills={setParentBillsList}
-                  onLogout={handleLogout}
-                  onHome={handleHome}
-                />
-              </motion.div>
-            )}
-
-            {screen === 'tutor' && (
-              <motion.div
-                key="tutor"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="w-full"
-              >
-                <TutorDashboard 
-                  students={studentsList}
-                  teachers={teachersList}
-                  tutorName={currentProfileName}
-                  publishedQuizzes={publishedQuizzes}
-                  onPublishQuiz={handlePublishQuiz}
-                  onLogout={handleLogout}
-                  onHome={handleHome}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
+        {/* Global Mesh Gradient Background */}
+        <div 
+          className="fixed inset-0 mesh-gradient-bg pointer-events-none z-0" 
+          style={{ transform: `translateY(${globalScrollY * 0.05}px)` }}
+        />
+        
+        {/* Global Floating Particles */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+          {[...Array(15)].map((_, i) => {
+            const size = (i % 3 + 1) * 6; // 6px, 12px, 18px
+            const left = `${(i * 7) % 100}%`;
+            const delay = `${(i * 1.2) % 12}s`;
+            const duration = `${15 + (i * 4) % 20}s`;
+            const color = i % 3 === 0 ? 'bg-indigo-400/10' : i % 3 === 1 ? 'bg-indigo-600/8' : 'bg-emerald-500/10';
+            return (
+              <div
+                key={i}
+                className={`absolute rounded-full blur-[2px] ${color}`}
+                style={{
+                  width: `${size}px`,
+                  height: `${size}px`,
+                  left: left,
+                  bottom: '-50px',
+                  animation: `particle-float ${duration} infinite linear`,
+                  animationDelay: delay,
+                }}
+              />
+            );
+          })}
         </div>
-        <AIChatBox />
+
+        {/* Global Content Wrapper */}
+        <div className="relative z-10 flex-1 flex flex-col justify-between w-full">
+          {isPublicPage && <PublicNavbar screen={screen} onNavigate={handleNavigate} isLoggedIn={isLoggedIn} activeRole={activeRole} />}
+
+          {/* Route Render Engine with AnimatePresence */}
+          <div className="flex-1">
+            <AnimatePresence mode="wait">
+              {screen === 'landing' && (
+                <motion.div
+                  key="landing"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="w-full"
+                >
+                  <LandingPage onNavigate={handleNavigate} isLoggedIn={isLoggedIn} activeRole={activeRole} />
+                </motion.div>
+              )}
+
+              {screen === 'login' && (
+                <motion.div
+                  key="login"
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  className="w-full"
+                >
+                  <LoginScreen 
+                    onLoginSuccess={handleLoginSuccess} 
+                    onNavigate={handleNavigate} 
+                    initialRole={activeRole} 
+                  />
+                </motion.div>
+              )}
+
+              {screen === 'register' && (
+                <motion.div
+                  key="register"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="w-full"
+                >
+                  <RegisterStepper 
+                    onNavigate={handleNavigate} 
+                    onRegisteredSuccess={handleRegisteredSuccess} 
+                  />
+                </motion.div>
+              )}
+
+              {screen === 'admin' && (
+                <motion.div
+                  key="admin"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="w-full animate-fade-in"
+                >
+                  <AdminDashboard 
+                    students={studentsList}
+                    teachers={teachersList}
+                    activityLogs={activityLogsList}
+                    onAddStudent={handleAddNewStudent}
+                    onLogout={handleLogout}
+                    onHome={handleHome}
+                  />
+                </motion.div>
+              )}
+
+              {screen === 'student' && (
+                <motion.div
+                  key="student"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="w-full"
+                >
+                  <StudentDashboard 
+                    courses={marcusCourses}
+                    exams={marcusExams}
+                    upcomingExams={upcomingExams}
+                    studentName={currentProfileName}
+                    publishedQuizzes={publishedQuizzes}
+                    onLogout={handleLogout}
+                    onHome={handleHome}
+                  />
+                </motion.div>
+              )}
+
+              {screen === 'parent' && (
+                <motion.div
+                  key="parent"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="w-full"
+                >
+                  <ParentDashboard 
+                    bills={parentBillsList}
+                    announcements={systemAnnouncements}
+                    parentName={currentProfileName}
+                    studentName="Marcus Thorne"
+                    onUpdateBills={setParentBillsList}
+                    onLogout={handleLogout}
+                    onHome={handleHome}
+                  />
+                </motion.div>
+              )}
+
+              {screen === 'tutor' && (
+                <motion.div
+                  key="tutor"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="w-full"
+                >
+                  <TutorDashboard 
+                    students={studentsList}
+                    teachers={teachersList}
+                    tutorName={currentProfileName}
+                    publishedQuizzes={publishedQuizzes}
+                    onPublishQuiz={handlePublishQuiz}
+                    onLogout={handleLogout}
+                    onHome={handleHome}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+          <AIChatBox />
+        </div>
       </div>
     </LanguageProvider>
   );

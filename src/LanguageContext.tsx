@@ -37,6 +37,12 @@ const translations: Record<Language, Record<string, string>> = {
     "Connecting Administrators, Tutors, Parents, and Students into a cohesive learning workspace. View reports, compile grades, clear billing invoices, and message teachers in real-time.": "నిర్వాహకులు, ట్యూటర్లు, తల్లిదండ్రులు మరియు విద్యార్థులను ఒక సమన్వయ అభ్యాస కార్యక్షేత్రంలోకి అనుసంధానించడం. నివేదికలను వీక్షించండి, గ్రేడ్‌లను క్రోడీకరించండి, బిల్లింగ్ ఇన్‌వాయిస్‌లను క్లియర్ చేయండి మరియు నిజ సమయంలో ఉపాధ్యాయులకు సందేశం పంపండి.",
     "Start Registration Stepper": "రిజిస్ట్రేషన్ ప్రారంభించండి",
     "Access Multi-Role Dashboards": "మల్టీ-రోల్ డాష్‌బోర్డులను యాక్సెస్ చేయండి",
+    "Instant Dashboard Gateway": "తక్షణ డాష్‌బోర్డ్ గేట్‌వే",
+    "Jump straight into your authorized workspace dashboard with a single click. Select your role to proceed.": "ఒకే క్లిక్‌తో మీ అధీకృత వర్క్‌స్పేస్ డాష్‌బోర్డ్‌లోకి నేరుగా వెళ్లండి. కొనసాగడానికి మీ పాత్రను ఎంచుకోండి.",
+    "Admin": "అడ్మిన్",
+    "Tutor": "ట్యూటర్",
+    "Parent": "తల్లిదండ్రులు",
+    "Student": "విద్యార్థి",
 
     // Sub portals
     "Explore Our Live Sub-Portals": "మా లైవ్ సబ్-పోర్టల్‌లను అన్వేషించండి",
@@ -225,6 +231,12 @@ const translations: Record<Language, Record<string, string>> = {
     "Connecting Administrators, Tutors, Parents, and Students into a cohesive learning workspace. View reports, compile grades, clear billing invoices, and message teachers in real-time.": "प्रशासकों, ट्यूटर्स, अभिभावकों और छात्रों को एक सामंजस्यपूर्ण शिक्षण कार्यक्षेत्र में जोड़ना। वास्तविक समय में रिपोर्ट देखें, ग्रेड संकलित करें, बिलिंग चालान साफ़ करें और शिक्षकों को संदेश भेजें।",
     "Start Registration Stepper": "पंजीकरण शुरू करें",
     "Access Multi-Role Dashboards": "मल्टी-रोल डैशबोर्ड एक्सेस करें",
+    "Instant Dashboard Gateway": "त्वरित डैशबोर्ड गेटवे",
+    "Jump straight into your authorized workspace dashboard with a single click. Select your role to proceed.": "एक क्लिक के साथ सीधे अपने अधिकृत कार्यक्षेत्र डैशबोर्ड में जाएं। आगे बढ़ने के लिए अपनी भूमिका चुनें।",
+    "Admin": "एडमिन",
+    "Tutor": "शिक्षक",
+    "Parent": "अभिभावक",
+    "Student": "छात्र",
 
     // Sub portals
     "Explore Our Live Sub-Portals": "हमारे लाइव सब-पोर्टल देखें",
