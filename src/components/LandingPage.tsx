@@ -210,140 +210,127 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, isLoggedIn
         <div className="absolute top-0 left-1/4 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-indigo-600/10 blur-[120px] pointer-events-none" />
         <div className="absolute top-1/3 right-1/4 translate-y-1/2 w-[400px] h-[400px] rounded-full bg-emerald-500/5 blur-[120px] pointer-events-none" />
 
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-3 py-1 bg-slate-900 border border-slate-800 rounded-full text-xs text-slate-400 mb-8"
-          >
-            <Sparkles className="h-3 w-3 text-indigo-400" />
-            <span>{t('Unified Management Ecosystem v2.0 is Live')}</span>
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1, duration: 0.6 }}
-            className="text-4xl sm:text-5xl md:text-6xl font-sans font-bold tracking-tight text-white mb-6"
-          >
-            {t('Where Learning')} <br />
-            <span className="bg-gradient-to-r from-indigo-400 via-indigo-300 to-emerald-400 bg-clip-text text-transparent">
-              {t('Meets Success')}
-            </span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.6 }}
-            className="text-lg text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed font-sans"
-          >
-            {t('Connecting Administrators, Tutors, Parents, and Students into a cohesive learning workspace. View reports, compile grades, clear billing invoices, and message teachers in real-time.')}
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.6 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
-          >
-            <button
-              onClick={() => onNavigate('register')}
-              className="w-full sm:w-auto px-6 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] btn-shine-effect btn-ripple flex items-center justify-center gap-2 group cursor-pointer"
-            >
-              {t('Start Registration Stepper')}
-              <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button
-              onClick={() => onNavigate('login')}
-              className="w-full sm:w-auto px-6 py-3.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white font-semibold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] btn-shine-effect btn-ripple flex items-center justify-center gap-2 cursor-pointer"
-            >
-              {t('Access Multi-Role Dashboards')}
-              <ArrowUpRight className="h-4 w-4" />
-            </button>
-          </motion.div>
-
-          {/* Premium Animated Tutor CRM Illustration */}
-          <motion.div
-            initial={{ opacity: 0, y: 40, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ delay: 0.4, duration: 0.8, type: 'spring', stiffness: 50 }}
-            className="mt-16 relative w-full max-w-4xl mx-auto perspective-1000"
-          >
-            {/* Background Glow */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-indigo-500/10 blur-[80px] rounded-full pointer-events-none animate-pulse-glow" />
-
-            {/* Main Interactive 3D Frame */}
-            <motion.div 
-              className="relative w-full h-auto rounded-2xl border border-slate-800 bg-slate-950/40 p-4 backdrop-blur-sm shadow-2xl overflow-visible transform-style-3d group"
-              whileHover={{ rotateX: 2, rotateY: -2 }}
-              transition={{ type: "spring", stiffness: 150, damping: 15 }}
-            >
-              {/* Laptop frame holding the CRM dashboard illustration */}
-              <div className="relative overflow-hidden rounded-xl border border-slate-800 bg-slate-900 shadow-inner">
-                <img
-                  src={heroImage}
-                  alt="Tutor CRM Dashboard Showcase"
-                  className="w-full h-auto object-cover rounded-xl"
-                />
-              </div>
-
-              {/* Floating Widgets */}
-              {/* Widget 1: Student Card (Top-Left) */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+            
+            {/* Left Column: Premium Animated Tutor CRM Illustration */}
+            <div className="lg:col-span-5 order-2 lg:order-1 flex justify-center w-full">
               <motion.div
-                animate={{ y: [-6, 6, -6], rotate: [-1, 1, -1] }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -top-6 -left-6 md:-left-12 p-3 bg-slate-900/90 border border-slate-800 rounded-xl shadow-xl backdrop-blur-md hidden sm:flex items-center gap-3 max-w-[200px]"
+                initial={{ opacity: 0, x: -30, scale: 0.95 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                transition={{ delay: 0.4, duration: 0.8, type: 'spring', stiffness: 50 }}
+                className="relative w-full max-w-md perspective-1000"
               >
-                <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-bold text-white">MT</div>
-                <div className="text-left">
-                  <span className="text-[10px] text-slate-500 font-bold block">STUDENT</span>
-                  <span className="text-xs font-bold text-white block">Marcus Thorne</span>
-                  <span className="text-[9px] text-emerald-400 block font-semibold">Active • 98% Attend</span>
-                </div>
+                {/* Background Glow */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-indigo-500/10 blur-[80px] rounded-full pointer-events-none animate-pulse-glow" />
+
+                {/* Main Interactive 3D Frame */}
+                <motion.div 
+                  className="relative w-full h-auto rounded-2xl border border-slate-800 bg-slate-950/40 p-4 backdrop-blur-sm shadow-2xl overflow-visible transform-style-3d group"
+                  whileHover={{ rotateX: 2, rotateY: -2 }}
+                  transition={{ type: "spring", stiffness: 150, damping: 15 }}
+                >
+                  {/* Laptop frame holding the CRM dashboard illustration */}
+                  <div className="relative overflow-hidden rounded-xl border border-slate-800 bg-slate-900 shadow-inner">
+                    <img
+                      src={heroImage}
+                      alt="Tutor CRM Dashboard Showcase"
+                      className="w-full h-auto object-cover rounded-xl"
+                    />
+                  </div>
+
+                  {/* Floating Widgets */}
+                  {/* Widget 1: Student Card (Top-Left) */}
+                  <motion.div
+                    animate={{ y: [-6, 6, -6], rotate: [-1, 1, -1] }}
+                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute -top-4 -left-4 md:-left-8 p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl shadow-xl backdrop-blur-md hidden sm:flex items-center gap-2.5 max-w-[170px]"
+                  >
+                    <div className="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center text-[10px] font-bold text-white">MT</div>
+                    <div className="text-left">
+                      <span className="text-[9px] text-slate-500 font-bold block">STUDENT</span>
+                      <span className="text-[11px] font-bold text-white block">Marcus Thorne</span>
+                      <span className="text-[8px] text-emerald-400 block font-semibold">Active • 98% Attend</span>
+                    </div>
+                  </motion.div>
+
+                  {/* Widget 2: AI assistant bubble (Top-Right) */}
+                  <motion.div
+                    animate={{ y: [6, -6, 6], rotate: [1, -1, 1] }}
+                    transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute -top-6 -right-4 md:-right-8 p-2.5 bg-indigo-950/80 border border-indigo-500/30 rounded-xl shadow-xl backdrop-blur-md hidden sm:flex items-center gap-2 max-w-[150px]"
+                  >
+                    <div className="w-5 h-5 rounded-full bg-indigo-600 flex items-center justify-center text-[9px] text-white">🤖</div>
+                    <div className="text-left">
+                      <span className="text-[8px] text-indigo-400 font-bold block">AI CRM TUTOR</span>
+                      <span className="text-[9px] text-slate-200 block leading-tight font-medium">Drafting response...</span>
+                    </div>
+                  </motion.div>
+
+                  {/* Widget 3: Fee status indicator (Bottom-Left) */}
+                  <motion.div
+                    animate={{ y: [4, -4, 4] }}
+                    transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute -bottom-6 -left-3 md:-left-6 p-2.5 bg-slate-900/95 border border-slate-800 rounded-xl shadow-xl backdrop-blur-md hidden sm:flex items-center gap-2.5"
+                  >
+                    <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-bold">$</div>
+                    <div className="text-left">
+                      <span className="text-[8px] text-slate-500 font-bold block">FEE INVOICE</span>
+                      <span className="text-[11px] font-extrabold text-white block">$2,140 Paid</span>
+                    </div>
+                  </motion.div>
+
+                  {/* Widget 4: Real-time notification (Bottom-Right) */}
+                  <motion.div
+                    animate={{ y: [-4, 4, -4] }}
+                    transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute -bottom-4 -right-3 md:-right-6 p-2.5 bg-slate-900/90 border border-slate-800 rounded-xl shadow-xl backdrop-blur-md hidden sm:flex items-center gap-2 max-w-[140px]"
+                  >
+                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
+                    <div className="text-left">
+                      <span className="text-[8px] text-slate-500 font-bold block">PARENT INBOX</span>
+                      <span className="text-[9px] text-slate-300 block font-medium leading-tight">Miller sent message</span>
+                    </div>
+                  </motion.div>
+                </motion.div>
+              </motion.div>
+            </div>
+
+            {/* Right Column: Tagline, Details, CTA Buttons */}
+            <div className="lg:col-span-7 order-1 lg:order-2 text-center lg:text-left">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6 }}
+                className="inline-flex items-center gap-2 px-3 py-1 bg-slate-900 border border-slate-800 rounded-full text-xs text-slate-400 mb-6"
+              >
+                <Sparkles className="h-3 w-3 text-indigo-400" />
+                <span>{t('Unified Management Ecosystem v2.0 is Live')}</span>
               </motion.div>
 
-              {/* Widget 2: AI assistant bubble (Top-Right) */}
-              <motion.div
-                animate={{ y: [6, -6, 6], rotate: [1, -1, 1] }}
-                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -top-10 -right-6 md:-right-10 p-3 bg-indigo-950/80 border border-indigo-500/30 rounded-xl shadow-xl backdrop-blur-md hidden sm:flex items-center gap-2 max-w-[180px]"
+              <motion.h1
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1, duration: 0.6 }}
+                className="text-4xl sm:text-5xl md:text-6xl font-sans font-bold tracking-tight text-white mb-6 leading-tight"
               >
-                <div className="w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center text-[10px] text-white">🤖</div>
-                <div className="text-left">
-                  <span className="text-[9px] text-indigo-400 font-bold block">AI CRM TUTOR</span>
-                  <span className="text-[10px] text-slate-200 block leading-tight font-medium">Drafting response...</span>
-                </div>
-              </motion.div>
+                {t('Where Learning')} <br />
+                <span className="bg-gradient-to-r from-indigo-400 via-indigo-300 to-emerald-400 bg-clip-text text-transparent">
+                  {t('Meets Success')}
+                </span>
+              </motion.h1>
 
-              {/* Widget 3: Fee status indicator (Bottom-Left) */}
-              <motion.div
-                animate={{ y: [4, -4, 4] }}
-                transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -bottom-8 -left-4 md:-left-8 p-3 bg-slate-900/95 border border-slate-800 rounded-xl shadow-xl backdrop-blur-md hidden sm:flex items-center gap-3"
+              <motion.p
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.6 }}
+                className="text-lg text-slate-400 max-w-xl mx-auto lg:mx-0 mb-0 leading-relaxed font-sans"
               >
-                <div className="w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold">$</div>
-                <div className="text-left">
-                  <span className="text-[9px] text-slate-500 font-bold block">FEE INVOICE</span>
-                  <span className="text-xs font-extrabold text-white block">$2,140 Paid</span>
-                </div>
-              </motion.div>
+                {t('Connecting Administrators, Tutors, Parents, and Students into a cohesive learning workspace. View reports, compile grades, clear billing invoices, and message teachers in real-time.')}
+              </motion.p>
+            </div>
 
-              {/* Widget 4: Real-time notification (Bottom-Right) */}
-              <motion.div
-                animate={{ y: [-4, 4, -4] }}
-                transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -bottom-6 -right-4 md:-right-8 p-3 bg-slate-900/90 border border-slate-800 rounded-xl shadow-xl backdrop-blur-md hidden sm:flex items-center gap-2.5 max-w-[160px]"
-              >
-                <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-                <div className="text-left">
-                  <span className="text-[9px] text-slate-500 font-bold block">PARENT INBOX</span>
-                  <span className="text-[10px] text-slate-300 block font-medium leading-tight">Miller sent a message</span>
-                </div>
-              </motion.div>
-            </motion.div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
