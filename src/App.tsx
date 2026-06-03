@@ -231,7 +231,6 @@ export default function App() {
                 </motion.div>
               )}
 
-<<<<<<< HEAD
               {screen === 'register' && (
                 <motion.div
                   key="register"
@@ -256,10 +255,6 @@ export default function App() {
                   className="w-full animate-fade-in"
                 >
                   <AdminDashboard 
-                    students={studentsList}
-                    teachers={teachersList}
-                    activityLogs={activityLogsList}
-                    onAddStudent={handleAddNewStudent}
                     onLogout={handleLogout}
                     onHome={handleHome}
                   />
@@ -275,9 +270,6 @@ export default function App() {
                   className="w-full"
                 >
                   <StudentDashboard 
-                    courses={marcusCourses}
-                    exams={marcusExams}
-                    upcomingExams={upcomingExams}
                     studentName={currentProfileName}
                     publishedQuizzes={publishedQuizzes}
                     onLogout={handleLogout}
@@ -295,11 +287,8 @@ export default function App() {
                   className="w-full"
                 >
                   <ParentDashboard 
-                    bills={parentBillsList}
-                    announcements={systemAnnouncements}
                     parentName={currentProfileName}
                     studentName="Marcus Thorne"
-                    onUpdateBills={setParentBillsList}
                     onLogout={handleLogout}
                     onHome={handleHome}
                   />
@@ -315,11 +304,7 @@ export default function App() {
                   className="w-full"
                 >
                   <TutorDashboard 
-                    students={studentsList}
-                    teachers={teachersList}
                     tutorName={currentProfileName}
-                    publishedQuizzes={publishedQuizzes}
-                    onPublishQuiz={handlePublishQuiz}
                     onLogout={handleLogout}
                     onHome={handleHome}
                   />
@@ -328,73 +313,6 @@ export default function App() {
             </AnimatePresence>
           </div>
           <AIChatBox />
-=======
-            {screen === 'admin' && (
-              <motion.div
-                key="admin"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="w-full animate-fade-in"
-              >
-                <AdminDashboard 
-                  onLogout={handleLogout}
-                  onHome={handleHome}
-                />
-              </motion.div>
-            )}
-
-            {screen === 'student' && (
-              <motion.div
-                key="student"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="w-full"
-              >
-                <StudentDashboard 
-                  studentName={currentProfileName}
-                  publishedQuizzes={publishedQuizzes}
-                  onLogout={handleLogout}
-                  onHome={handleHome}
-                />
-              </motion.div>
-            )}
-
-            {screen === 'parent' && (
-              <motion.div
-                key="parent"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="w-full"
-              >
-                <ParentDashboard 
-                  parentName={currentProfileName}
-                  studentName="Marcus Thorne"
-                  onLogout={handleLogout}
-                  onHome={handleHome}
-                />
-              </motion.div>
-            )}
-
-            {screen === 'tutor' && (
-              <motion.div
-                key="tutor"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="w-full"
-              >
-                <TutorDashboard 
-                  tutorName={currentProfileName}
-                  onLogout={handleLogout}
-                  onHome={handleHome}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
->>>>>>> 8343f4b6bfe6ef6191d2723de4f383489efd9f1d
         </div>
       </div>
     </LanguageProvider>
