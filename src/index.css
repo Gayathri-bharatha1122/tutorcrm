@@ -4,7 +4,161 @@
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Space Grotesk", sans-serif;
+
+  /* Main Color Themes */
+  --color-royal-blue: #1d4ed8;
+  --color-dark-navy: #030712;
+  --color-electric-cyan: #00f0ff;
+  --color-soft-purple: #8b5cf6;
+
+  /* Map existing Tailwind classes to our color system */
+  --color-slate-900: #0a0f1d;
+  --color-slate-950: #030712; /* Dark Navy Deep */
+  
+  --color-indigo-400: #00f0ff; /* Electric Cyan */
+  --color-indigo-500: #06b6d4; /* Electric Cyan Dim */
+  --color-indigo-600: #1d4ed8; /* Royal Blue */
+  --color-indigo-750: #1e3a8a; /* Deep Royal Blue */
+  --color-indigo-950: #060814; /* Dark Navy Slate */
+  
+  --color-teal-400: #00f0ff; /* Electric Cyan */
+  --color-teal-500: #00d8f6;
+  
+  --color-emerald-400: #a78bfa; /* Soft Purple */
+  --color-emerald-500: #8b5cf6; /* Soft Purple */
+  --color-emerald-600: #7c3aed; /* Deep Purple */
+  
+  --color-amber-500: #ec4899; /* Purple accent */
 }
+
+/* Custom premium backgrounds and animated components */
+.mesh-gradient-bg {
+  background-color: #030712;
+  background-image: 
+    radial-gradient(at 15% 15%, rgba(29, 78, 216, 0.18) 0px, transparent 55%),
+    radial-gradient(at 85% 10%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+    radial-gradient(at 45% 75%, rgba(0, 240, 255, 0.12) 0px, transparent 55%),
+    radial-gradient(at 80% 85%, rgba(217, 70, 239, 0.08) 0px, transparent 45%);
+  background-size: 200% 200%;
+  animation: mesh-move 20s ease infinite alternate;
+}
+
+@keyframes mesh-move {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+/* Light beams styling and animations */
+.light-beam-1 {
+  transform: rotate(-35deg) skewX(-10deg);
+  animation: beam-pulse-1 15s ease-in-out infinite alternate;
+}
+
+.light-beam-2 {
+  transform: rotate(40deg) skewX(15deg);
+  animation: beam-pulse-2 20s ease-in-out infinite alternate;
+}
+
+@keyframes beam-pulse-1 {
+  0% {
+    opacity: 0.03;
+    transform: rotate(-35deg) skewX(-10deg) scale(0.9);
+  }
+  50% {
+    opacity: 0.09;
+    transform: rotate(-32deg) skewX(-8deg) scale(1.08);
+  }
+  100% {
+    opacity: 0.03;
+    transform: rotate(-35deg) skewX(-10deg) scale(0.9);
+  }
+}
+
+@keyframes beam-pulse-2 {
+  0% {
+    opacity: 0.02;
+    transform: rotate(40deg) skewX(15deg) scale(0.95);
+  }
+  50% {
+    opacity: 0.07;
+    transform: rotate(43deg) skewX(12deg) scale(1.12);
+  }
+  100% {
+    opacity: 0.02;
+    transform: rotate(40deg) skewX(15deg) scale(0.95);
+  }
+}
+
+/* Particles float keyframes */
+@keyframes particle-float {
+  0% {
+    transform: translateY(100vh) translateX(0) scale(0.8);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-20vh) translateX(50px) scale(1.2);
+    opacity: 0;
+  }
+}
+
+.wave-animation-1 {
+  animation: wave-move-1 25s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
+}
+
+.wave-animation-2 {
+  animation: wave-move-2 18s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
+}
+
+@keyframes wave-move-1 {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-25%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes wave-move-2 {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(25%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* 3D Premium Hover Tilt */
+.premium-card-3d {
+  transition: transform 0.4s cubic-bezier(0.1, 0.8, 0.2, 1), box-shadow 0.4s cubic-bezier(0.1, 0.8, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.premium-card-3d:hover {
+  transform: perspective(1000px) rotateY(4deg) rotateX(-4deg) translateY(-6px) scale3d(1.02, 1.02, 1.02);
+  box-shadow: 
+    0 20px 40px -15px rgba(29, 78, 216, 0.25), 
+    0 0 30px -5px rgba(0, 240, 255, 0.15);
+}
+
 
 html, body, #root {
   margin: 0;
