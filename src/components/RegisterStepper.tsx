@@ -47,21 +47,6 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
   const [studentLookupPhone, setStudentLookupPhone] = useState('14155550218'); // Defaults to Marcus' phone for testing ease
   const [linkedStudent, setLinkedStudent] = useState<Student | null>(null);
   const [lookupFeedback, setLookupFeedback] = useState<string | null>(null);
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpCode, setOtpCode] = useState('');
-  const [otpVerified, setOtpVerified] = useState(false);
-  const [otpTimer, setOtpTimer] = useState(59);
-
-  // OTP Timer side effects
-  useEffect(() => {
-    let interval: any;
-    if (otpSent && otpTimer > 0) {
-      interval = setInterval(() => {
-        setOtpTimer((prev) => prev - 1);
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [otpSent, otpTimer]);
 
   const handleSearchStudent = () => {
     if (!studentLookupPhone) {
@@ -75,20 +60,9 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
     if (found) {
       setLinkedStudent(found);
       setLookupFeedback(null);
-      setOtpSent(true);
-      setOtpTimer(59);
     } else {
       setLinkedStudent(null);
       setLookupFeedback('No active student found with that register phone ID in the campus database. Try "14155550218" for demonstration!');
-    }
-  };
-
-  const handleVerifyOtp = () => {
-    if (otpCode === '6423' || otpCode === '1234') {
-      setOtpVerified(true);
-      setLookupFeedback(null);
-    } else {
-      setLookupFeedback('Invalid security OTP verification token. Try matching "6423" passcode.');
     }
   };
 
@@ -104,8 +78,7 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
         grade: roleType === 'student' ? grade : undefined,
         learningGoal: roleType === 'student' ? learningGoal : undefined,
         parentPhone: roleType === 'student' ? parentPhoneInput : undefined,
-        studentPhoneLookup: roleType === 'parent' ? studentLookupPhone : undefined,
-        otpCode: roleType === 'parent' ? otpCode : undefined
+        studentPhoneLookup: roleType === 'parent' ? studentLookupPhone : undefined
       });
       localStorage.setItem('edumanage_token', response.token);
       onRegisteredSuccess(roleType, response.user.name);
@@ -478,46 +451,17 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                           </div>
                         </div>
 
-                        {/* OTP Verification simulated box */}
-                        {otpSent && !otpVerified && (
-                          <div className="border-t border-emerald-500/20 pt-3 space-y-3">
-                            <span className="text-[11px] font-semibold text-slate-400 block">🔐 Sent validation One-Time Password to student's mobile</span>
-                            <div className="flex gap-2">
-                              <input
-                                type="text"
-                                placeholder="Enter Verification Code"
-                                value={otpCode}
-                                onChange={(e) => setOtpCode(e.target.value)}
-                                className="bg-slate-950 border border-slate-800 text-white font-mono text-center tracking-widest text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 w-36 transition input-focus-glow"
-                              />
-                              <button
-                                type="button"
-                                onClick={handleVerifyOtp}
-                                className="px-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98] btn-shine-effect btn-ripple"
-                              >
-                                Link Profile
-                              </button>
-                            </div>
-                            <div className="flex items-center justify-between text-[10px] text-slate-500">
-                              <span>Default OTP code: <strong className="font-medium text-slate-300">6423</strong></span>
-                              <span>Resend in {otpTimer}s</span>
-                            </div>
-                          </div>
-                        )}
-
-                        {otpVerified && (
-                          <motion.div 
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ type: "spring", stiffness: 150, damping: 15 }}
-                            className="bg-indigo-500/10 border border-indigo-400/30 p-2.5 rounded-lg flex items-center gap-2"
-                          >
-                            <Award className="h-4 w-4 text-indigo-400 shrink-0" />
-                            <span className="text-[11px] text-indigo-200 font-semibold leading-normal">
-                              Linkage established! Parent database linkage authorized for {linkedStudent.name}.
-                            </span>
-                          </motion.div>
-                        )}
+                        <motion.div 
+                          initial={{ scale: 0.9, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ type: "spring", stiffness: 150, damping: 15 }}
+                          className="bg-indigo-500/10 border border-indigo-400/30 p-2.5 rounded-lg flex items-center gap-2 mt-3"
+                        >
+                          <Award className="h-4 w-4 text-indigo-400 shrink-0" />
+                          <span className="text-[11px] text-indigo-200 font-semibold leading-normal">
+                            Linkage established! Parent database linkage authorized for {linkedStudent.name}.
+                          </span>
+                        </motion.div>
                       </motion.div>
                     )}
 
@@ -538,10 +482,10 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                 </button>
                 <button
                   type="button"
-                  disabled={roleType === 'parent' && !otpVerified}
+                  disabled={roleType === 'parent' && !linkedStudent}
                   onClick={executeCompleteRegistration}
                   className={`px-5 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
-                    roleType === 'parent' && !otpVerified
+                    roleType === 'parent' && !linkedStudent
                       ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
                       : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/10 hover:scale-[1.02] active:scale-[0.98] btn-shine-effect btn-ripple'
                   }`}
