@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { api } from '../services/api';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   User, 
@@ -91,10 +92,26 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
     }
   };
 
-  const executeCompleteRegistration = () => {
-    // Collect Name, persist custom registration output and trigger redirect
-    const finalName = `${firstName || (roleType === 'parent' ? 'Helena' : 'Marcus')} ${lastName || (roleType === 'parent' ? 'Thorne' : 'Thorne')}`;
-    onRegisteredSuccess(roleType, finalName);
+  const executeCompleteRegistration = async () => {
+    try {
+      const response = await api.register({
+        firstName,
+        lastName,
+        email,
+        phone,
+        password,
+        role: roleType,
+        grade: roleType === 'student' ? grade : undefined,
+        learningGoal: roleType === 'student' ? learningGoal : undefined,
+        parentPhone: roleType === 'student' ? parentPhoneInput : undefined,
+        studentPhoneLookup: roleType === 'parent' ? studentLookupPhone : undefined,
+        otpCode: roleType === 'parent' ? otpCode : undefined
+      });
+      localStorage.setItem('edumanage_token', response.token);
+      onRegisteredSuccess(roleType, response.user.name);
+    } catch (err: any) {
+      alert(err.message || 'Registration failed. Please check your details.');
+    }
   };
 
   return (

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { api } from '../services/api';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   User, 
@@ -41,25 +42,41 @@ const AnimatedCounter: React.FC<{ value: number; duration?: number; prefix?: str
 };
 
 interface ParentDashboardProps {
-  bills: Bill[];
-  announcements: Announcement[];
   parentName: string;
   studentName: string;
-  onUpdateBills: (updatedBills: Bill[]) => void;
   onLogout: () => void;
   onHome: () => void;
 }
 
 export const ParentDashboard: React.FC<ParentDashboardProps> = ({
-  bills,
-  announcements,
   parentName,
   studentName,
-  onUpdateBills,
   onLogout,
   onHome
 }) => {
   const { t } = useLanguage();
+  const [bills, setBills] = useState<Bill[]>([]);
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [linkedStudentName, setLinkedStudentName] = useState<string>(studentName);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [dashboardData, billsData] = await Promise.all([
+          api.getParentDashboard(),
+          api.getParentBills()
+        ]);
+        setAnnouncements(dashboardData.announcements || []);
+        setBills(billsData || []);
+        if (dashboardData.student?.name) {
+          setLinkedStudentName(dashboardData.student.name);
+        }
+      } catch (err) {
+        console.error("Failed to load parent data", err);
+      }
+    };
+    fetchData();
+  }, []);
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentSuccessMessage, setPaymentSuccessMessage] = useState<string | null>(null);
@@ -76,29 +93,26 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
     setPaymentSuccessMessage(null);
   };
 
-  const handleConfirmMockPayment = (e: React.FormEvent) => {
+  const handleConfirmMockPayment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedBill) return;
 
     setIsProcessingPayment(true);
 
-    // Simulate merchant bank network delays
-    setTimeout(() => {
-      // Find and match billing item, flip status to Paid
-      const nextBills = bills.map((b) => {
-        if (b.id === selectedBill.id) {
-          return { ...b, status: 'Paid' as const, paidDate: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit' }) };
-        }
-        return b;
-      });
+    try {
+      await api.payBill(selectedBill.id);
+      const updatedBills = await api.getParentBills();
+      setBills(updatedBills);
 
-      onUpdateBills(nextBills);
       setIsProcessingPayment(false);
       setSelectedBill(null);
       
       setPaymentSuccessMessage(`Payment for "${selectedBill.itemName}" processed successfully. Invoiced balance cleared.`);
       setTimeout(() => setPaymentSuccessMessage(null), 4000);
-    }, 2000);
+    } catch (err: any) {
+      setIsProcessingPayment(false);
+      alert(`Payment failed: ${err.message}`);
+    }
   };
 
   // Compute Outstanding Dues Surcharge
@@ -148,7 +162,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
             <div className="flex items-center gap-3">
               <div className="text-right hidden sm:block">
                 <span className="text-xs font-bold text-slate-200 block">{parentName}</span>
-                <span className="text-[10px] text-amber-400 font-bold uppercase font-mono">Linked Child • {studentName}</span>
+                <span className="text-[10px] text-amber-400 font-bold uppercase font-mono">Linked Child • {linkedStudentName}</span>
               </div>
               <LanguageSelector />
               <button 
@@ -198,7 +212,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
               <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest block bg-amber-500/10 w-max px-2.5 py-0.5 rounded-md">
                 Active Student Linkage
               </span>
-              <h2 className="text-xl font-bold text-white">{studentName === 'Marcus Thorne' ? t('Student Progress Directory: Marcus Thorne') : `${t('Student Progress Directory')}: ${studentName}`}</h2>
+              <h2 className="text-xl font-bold text-white">{linkedStudentName === 'Marcus Thorne' ? t('Student Progress Directory: Marcus Thorne') : `${t('Student Progress Directory')}: ${linkedStudentName}`}</h2>
               <p className="text-slate-400 text-xs">Educational metrics synchronized directly with Prof. Alistair Miller's study journals.</p>
             </div>
 
@@ -394,7 +408,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                   </div>
                   <div className="space-y-0.5">
                     <span className="text-xs font-bold text-white block">Attendance Percentage</span>
-                    <p className="text-[10px] text-slate-400 leading-snug">Attended 19 out of 21 sessions. Marcus Thorne's attendance is above the 90% threshold.</p>
+                    <p className="text-[10px] text-slate-400 leading-snug">Attended 19 out of 21 sessions. {linkedStudentName}'s attendance is above the 90% threshold.</p>
                   </div>
                 </div>
               </div>
