@@ -88,3 +88,11 @@ export interface Announcement {
   timeAgo: string;
   iconType: 'event' | 'celebration' | 'info';
 }
+
+export interface UserProfile {
+  id?: string;
+  name: string;
+  email?: string;
+  role: Role;
+  profilePhoto?: string;
+}

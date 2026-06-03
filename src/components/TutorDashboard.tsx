@@ -62,6 +62,20 @@ interface TutorDashboardProps {
   onHome: () => void;
 }
 
+interface TimetableSlot {
+  id: string;
+  title: string;
+  schedule: string;
+  room: string;
+  isSpecial?: boolean;
+}
+
+const TIMETABLE_SLOTS: TimetableSlot[] = [
+  { id: 'slot-1', title: 'Kinematic Vectors theory', schedule: 'Tuesdays at 3:00 PM', room: 'Room B1' },
+  { id: 'slot-2', title: 'Quantum mechanics fundamentals', schedule: 'Thursdays at 3:00 PM', room: 'Lab Hall 1' },
+  { id: 'slot-3', title: 'General electromagnetic finals prep', schedule: 'Fridays at 2:30 PM', room: 'Seminar Studio', isSpecial: true }
+];
+
 export const TutorDashboard: React.FC<TutorDashboardProps> = ({
   students,
   teachers,
@@ -72,11 +86,47 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
   onHome
 }) => {
   const { t } = useLanguage();
-  const [markedAttendance, setMarkedAttendance] = useState<Record<string, 'Present' | 'Absent' | 'Excused'>>({
-    ST001: 'Present',
-    ST002: 'Present',
-    ST003: 'Present'
+  
+  // Date and Time Slot selectors state
+  const [selectedDate, setSelectedDate] = useState<string>('2026-06-03');
+  const [selectedSlotId, setSelectedSlotId] = useState<string>('slot-1');
+
+  // Structured attendance: Record<date, Record<slotId, Record<studentId, status>>>
+  const [attendanceRecords, setAttendanceRecords] = useState<Record<string, Record<string, Record<string, 'Present' | 'Absent' | 'Excused'>>>>({
+    '2026-06-03': {
+      'slot-1': { ST001: 'Present', ST002: 'Present', ST003: 'Present', ST004: 'Present' },
+      'slot-2': { ST001: 'Present', ST002: 'Absent', ST003: 'Present', ST004: 'Present' },
+      'slot-3': { ST001: 'Present', ST002: 'Present', ST003: 'Excused', ST004: 'Present' }
+    }
   });
+
+  const getStudentStatus = (studentId: string): 'Present' | 'Absent' | 'Excused' => {
+    return attendanceRecords[selectedDate]?.[selectedSlotId]?.[studentId] || 'Present';
+  };
+
+  const handleAttendanceChange = (studentId: string, status: 'Present' | 'Absent' | 'Excused') => {
+    setAttendanceRecords(prev => {
+      const dateRecords = prev[selectedDate] || {};
+      const slotRecords = dateRecords[selectedSlotId] || {};
+      return {
+        ...prev,
+        [selectedDate]: {
+          ...dateRecords,
+          [selectedSlotId]: {
+            ...slotRecords,
+            [studentId]: status
+          }
+        }
+      };
+    });
+  };
+
+  const handleSubmitAttendance = () => {
+    const slot = TIMETABLE_SLOTS.find(s => s.id === selectedSlotId);
+    if (!slot) return;
+    setAssignedSuccessMsg(`Attendance roll for "${slot.title}" on ${selectedDate} submitted successfully. Parent notifications dispatched.`);
+    setTimeout(() => setAssignedSuccessMsg(null), 5000);
+  };
   
   // Custom grading states
   const [selectedStudentId, setSelectedStudentId] = useState('ST001');
@@ -92,11 +142,6 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
   const [lectureDate, setLectureDate] = useState('June 10, 2026');
   const [lectureTime, setLectureTime] = useState('03:00 PM');
   const [lectureLocation, setLectureLocation] = useState('Studio Hall 3');
-
-  // Handle student attendance updates
-  const handleAttendanceChange = (studentId: string, status: 'Present' | 'Absent' | 'Excused') => {
-    setMarkedAttendance(prev => ({ ...prev, [studentId]: status }));
-  };
 
   const handleGradeAssignmentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -274,10 +319,41 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
             <div className="space-y-4">
               <div className="border-b border-slate-850 pb-4 flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-bold text-white">{t('Mark Today\'s Classroom Attendance Roll')}</h3>
+                  <h3 className="text-sm font-bold text-white">{t('Mark Classroom Attendance Roll')}</h3>
                   <span className="text-[10px] text-slate-500">Record classroom absences instantly for automatic parent sync</span>
                 </div>
                 <span className="text-[10px] font-bold text-teal-400 bg-teal-500/10 px-2.5 py-1 rounded">Daily Standard Journal</span>
+              </div>
+
+              {/* Date and Time Slot selectors with premium styling */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-950/60 p-4 border border-slate-850/60 rounded-2xl">
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                    {t('Select Date')}
+                  </label>
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className="w-full bg-slate-900 border border-slate-800 text-xs px-3 py-2 rounded-xl outline-none focus:border-teal-500 text-slate-200 transition-all font-medium"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                    {t('Lecture Slot')}
+                  </label>
+                  <select
+                    value={selectedSlotId}
+                    onChange={(e) => setSelectedSlotId(e.target.value)}
+                    className="w-full bg-slate-900 border border-slate-800 text-xs px-3 py-2 rounded-xl outline-none focus:border-teal-500 text-slate-300 transition-all font-medium"
+                  >
+                    {TIMETABLE_SLOTS.map(slot => (
+                      <option key={slot.id} value={slot.id}>
+                        {slot.title} ({slot.schedule.replace(' at ', ' @ ')})
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <div className="divide-y divide-slate-850">
@@ -306,9 +382,9 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
                           key={status}
                           onClick={() => handleAttendanceChange(student.id, status)}
                           className={`px-2.5 py-1 rounded-md cursor-pointer transition ${
-                            markedAttendance[student.id] === status 
+                            getStudentStatus(student.id) === status 
                               ? 'bg-teal-600 text-white' 
-                              : 'text-slate-500 hover:text-slate-355'
+                              : 'text-slate-500 hover:text-slate-300'
                           }`}
                         >
                           {status}
@@ -320,11 +396,21 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
               </div>
             </div>
             
-            <div className="mt-6 pt-5 border-t border-slate-850 flex items-center justify-between text-[11px] text-slate-500">
-              <span>Automatic notification dispatched to parents upon attendance submissions.</span>
-              <span className="text-teal-400 hover:underline cursor-pointer font-bold flex items-center gap-0.5">
-                Review Historical Attendance Ledger <ChevronRight className="h-3.5 w-3.5" />
-              </span>
+            <div className="mt-6 pt-4 border-t border-slate-850 space-y-4">
+              <div className="flex justify-end">
+                <button
+                  onClick={handleSubmitAttendance}
+                  className="px-4 py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-teal-600/15 hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer flex items-center gap-1.5"
+                >
+                  <Check className="h-4 w-4" /> {t('Submit Attendance Roll')}
+                </button>
+              </div>
+              <div className="flex items-center justify-between text-[11px] text-slate-500">
+                <span>Automatic notification dispatched to parents upon attendance submissions.</span>
+                <span className="text-teal-400 hover:underline cursor-pointer font-bold flex items-center gap-0.5">
+                  Review Historical Attendance Ledger <ChevronRight className="h-3.5 w-3.5" />
+                </span>
+              </div>
             </div>
           </div>
 
@@ -634,56 +720,44 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.05 }}
-              whileHover={{ y: -4, scale: 1.02 }}
-              className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 hover:shadow-[0_10px_20px_-10px_rgba(20,184,166,0.1)] transition rounded-2xl flex items-center gap-4 cursor-pointer"
-            >
-              <div className="w-10 h-10 rounded-lg bg-teal-500/10 border border-teal-500/20 text-teal-400 flex items-center justify-center shrink-0">
-                <Clock className="h-5 w-5" />
-              </div>
-              <div>
-                <span className="text-xs font-bold text-white block">Kinematic Vectors theory</span>
-                <span className="text-[10px] text-slate-500">Tuesdays at 3:00 PM • Room B1</span>
-              </div>
-            </motion.div>
-
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              whileHover={{ y: -4, scale: 1.02 }}
-              className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 hover:shadow-[0_10px_20px_-10px_rgba(20,184,166,0.1)] transition rounded-2xl flex items-center gap-4 cursor-pointer"
-            >
-              <div className="w-10 h-10 rounded-lg bg-teal-500/10 border border-teal-500/20 text-teal-400 flex items-center justify-center shrink-0">
-                <Clock className="h-5 w-5" />
-              </div>
-              <div>
-                <span className="text-xs font-bold text-white block">Quantum mechanics fundamentals</span>
-                <span className="text-[10px] text-slate-500">Thursdays at 3:00 PM • Lab Hall 1</span>
-              </div>
-            </motion.div>
-
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.15 }}
-              whileHover={{ y: -4, scale: 1.02 }}
-              className="p-4 bg-slate-950 border border-teal-500/30 bg-teal-500/5 hover:shadow-[0_10px_20px_-10px_rgba(20,184,166,0.15)] transition rounded-2xl flex items-center gap-4 cursor-pointer"
-            >
-              <div className="w-10 h-10 rounded-lg bg-teal-500/15 text-teal-400 flex items-center justify-center shrink-0 animate-pulse">
-                <Sparkles className="h-5 w-5 animate-spin [animation-duration:8s]" />
-              </div>
-              <div>
-                <span className="text-xs font-bold text-teal-400 block">General electromagnetic finals prep</span>
-                <span className="text-[10px] text-slate-400">Fridays at 2:30 PM • Seminar Studio</span>
-              </div>
-            </motion.div>
+            {TIMETABLE_SLOTS.map((slot, index) => {
+              const isSpecial = slot.isSpecial;
+              return (
+                <motion.div 
+                  key={slot.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.05 * (index + 1) }}
+                  whileHover={{ y: -4, scale: 1.02 }}
+                  className={`p-4 bg-slate-950 border ${
+                    isSpecial 
+                      ? 'border-teal-500/30 bg-teal-500/5 hover:shadow-[0_10px_20px_-10px_rgba(20,184,166,0.15)]' 
+                      : 'border-slate-850 hover:border-slate-800 hover:shadow-[0_10px_20px_-10px_rgba(20,184,166,0.1)]'
+                  } transition rounded-2xl flex items-center gap-4 cursor-pointer`}
+                >
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
+                    isSpecial 
+                      ? 'bg-teal-500/15 text-teal-400 animate-pulse' 
+                      : 'bg-teal-500/10 border border-teal-500/20 text-teal-400'
+                  }`}>
+                    {isSpecial ? (
+                      <Sparkles className="h-5 w-5 animate-spin [animation-duration:8s]" />
+                    ) : (
+                      <Clock className="h-5 w-5" />
+                    )}
+                  </div>
+                  <div>
+                    <span className={`text-xs font-bold block ${isSpecial ? 'text-teal-400' : 'text-white'}`}>
+                      {t(slot.title)}
+                    </span>
+                    <span className={`text-[10px] ${isSpecial ? 'text-slate-400' : 'text-slate-500'}`}>
+                      {t(slot.schedule)} • {t(slot.room)}
+                    </span>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
 
