@@ -12,7 +12,11 @@ import {
   Sparkles,
   CheckCircle,
   Menu,
-  ArrowUpRight
+  ArrowUpRight,
+  Mail,
+  Phone,
+  Clock,
+  Loader2
 } from 'lucide-react';
 import { Screen, Role } from '../types';
 import { useLanguage } from '../LanguageContext';
@@ -27,6 +31,75 @@ interface LandingPageProps {
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, isLoggedIn, activeRole }) => {
   const { t } = useLanguage();
+
+  React.useEffect(() => {
+    const targetSection = sessionStorage.getItem('scrollTarget');
+    if (targetSection) {
+      sessionStorage.removeItem('scrollTarget');
+      
+      const scrollToElement = () => {
+        const element = document.getElementById(targetSection);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          let retries = 0;
+          const interval = setInterval(() => {
+            const el = document.getElementById(targetSection);
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth' });
+              clearInterval(interval);
+            }
+            retries++;
+            if (retries >= 15) {
+              clearInterval(interval);
+            }
+          }, 100);
+        }
+      };
+      scrollToElement();
+    }
+  }, []);
+
+  // Contact Section State
+  const [activeContactTab, setActiveContactTab] = React.useState<'message' | 'book'>('message');
+  const [messageForm, setMessageForm] = React.useState({ name: '', email: '', message: '' });
+  const [bookingForm, setBookingForm] = React.useState({ name: '', email: '', phoneCode: '+1', phoneNumber: '', date: '', time: '', topic: 'general' });
+  const [isSubmittingContact, setIsSubmittingContact] = React.useState(false);
+  const [contactSuccessMessage, setContactSuccessMessage] = React.useState<string | null>(null);
+
+  const handleMessageChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setMessageForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleBookingChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setBookingForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleMessageSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!messageForm.name || !messageForm.email || !messageForm.message) return;
+    setIsSubmittingContact(true);
+    setContactSuccessMessage(null);
+    setTimeout(() => {
+      setIsSubmittingContact(false);
+      setContactSuccessMessage(t('Your message has been sent successfully! Our team will contact you shortly.'));
+      setMessageForm({ name: '', email: '', message: '' });
+    }, 1500);
+  };
+
+  const handleBookingSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!bookingForm.name || !bookingForm.email || !bookingForm.phoneNumber || !bookingForm.date || !bookingForm.time) return;
+    setIsSubmittingContact(true);
+    setContactSuccessMessage(null);
+    setTimeout(() => {
+      setIsSubmittingContact(false);
+      setContactSuccessMessage(t('Your call appointment is booked! Confirmation email has been sent.'));
+      setBookingForm({ name: '', email: '', phoneCode: '+1', phoneNumber: '', date: '', time: '', topic: 'general' });
+    }, 1500);
+  };
 
   const handleMouseMove3D = (e: React.MouseEvent<HTMLDivElement>) => {
     const card = e.currentTarget;
@@ -562,6 +635,330 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, isLoggedIn
             <div>
               <span className="block text-4xl font-extrabold text-white tracking-tight">12 sec</span>
               <span className="mt-1.5 block text-sm text-slate-500">{t('Parent Link Verification')}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact & Appointment Section */}
+      <section className="relative py-24 border-b border-slate-900 overflow-hidden" id="contact">
+        {/* Decorative background glows */}
+        <div className="absolute bottom-0 right-1/4 translate-y-1/2 w-[400px] h-[400px] rounded-full bg-indigo-600/5 blur-[120px] pointer-events-none" />
+        <div className="absolute top-1/4 left-1/4 -translate-y-1/2 w-[350px] h-[350px] rounded-full bg-teal-500/5 blur-[120px] pointer-events-none" />
+
+        <div className="w-full px-4 sm:px-8 lg:px-12 relative z-10">
+          <div className="text-center mb-16">
+            <span className="text-xs font-semibold text-indigo-400 uppercase tracking-widest block mb-2 animate-pulse">
+              {t('Get in Touch')}
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4">
+              {t('Connect with Admissions & Support')}
+            </h2>
+            <p className="text-slate-400 max-w-lg mx-auto text-sm">
+              {t('Have questions about enrollment, billing, or features? Book a call appointment or send us a message directly.')}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch max-w-6xl mx-auto">
+            {/* Left Column: Direct Call Showcase & Info */}
+            <div className="lg:col-span-5 flex flex-col justify-between space-y-8">
+              <div className="space-y-6">
+                <h3 className="text-2xl font-bold text-white tracking-tight">
+                  {t('Admissions Office')}
+                </h3>
+                <p className="text-slate-400 text-sm leading-relaxed">
+                  {t('Our team is here to assist with multi-role configurations, school system integrations, and quick demonstration clearance.')}
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                {/* Phone Card */}
+                <a 
+                  href="tel:+18005558886"
+                  className="group block bg-slate-900/60 p-5 rounded-2xl border border-slate-800 hover:border-indigo-500/40 transition-all duration-305"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-indigo-600/10 text-indigo-400 rounded-xl flex items-center justify-center border border-indigo-500/20 group-hover:scale-[1.05] transition-transform">
+                      <Phone className="h-5.5 w-5.5" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-500 font-bold block uppercase tracking-wider">{t('Direct Phone Line')}</span>
+                      <span className="text-sm font-bold text-white block mt-0.5 group-hover:text-indigo-300 transition-colors">+1 (800) 555-TUTOR</span>
+                      <span className="text-[11px] text-emerald-400 block mt-0.5 font-medium">{t('Click to Call Now')}</span>
+                    </div>
+                  </div>
+                </a>
+
+                {/* Email Card */}
+                <a 
+                  href="mailto:admissions@edumanage.com"
+                  className="group block bg-slate-900/60 p-5 rounded-2xl border border-slate-800 hover:border-teal-500/40 transition-all duration-305"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-teal-500/10 text-teal-400 rounded-xl flex items-center justify-center border border-teal-500/20 group-hover:scale-[1.05] transition-transform">
+                      <Mail className="h-5.5 w-5.5" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-500 font-bold block uppercase tracking-wider">{t('Admissions Email')}</span>
+                      <span className="text-sm font-bold text-white block mt-0.5 group-hover:text-teal-300 transition-colors">admissions@edumanage.com</span>
+                      <span className="text-[11px] text-teal-400 block mt-0.5 font-medium">{t('Send direct inquiry')}</span>
+                    </div>
+                  </div>
+                </a>
+
+                {/* Hours Card */}
+                <div className="bg-slate-900/40 p-5 rounded-2xl border border-slate-850 flex items-center gap-4">
+                  <div className="w-12 h-12 bg-slate-850 text-slate-400 rounded-xl flex items-center justify-center border border-slate-800">
+                    <Clock className="h-5.5 w-5.5" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-500 font-bold block uppercase tracking-wider">{t('Office Hours')}</span>
+                    <span className="text-xs text-slate-355 block mt-0.5 font-medium">Mon - Fri: 8:00 AM - 6:00 PM EST</span>
+                    <span className="text-[10px] text-slate-500 block">Weekend appointment booking available online.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Tabbed Interactive Form Panel */}
+            <div className="lg:col-span-7">
+              <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 md:p-8 backdrop-blur-sm shadow-2xl flex flex-col h-full justify-between">
+                <div>
+                  {/* Tab Selector */}
+                  <div className="flex bg-slate-950 p-1.5 rounded-xl border border-slate-850 mb-8">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveContactTab('message');
+                        setContactSuccessMessage(null);
+                      }}
+                      className={`flex-1 py-2.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                        activeContactTab === 'message'
+                          ? 'bg-indigo-600 text-white shadow-md'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      {t('Send a Message')}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveContactTab('book');
+                        setContactSuccessMessage(null);
+                      }}
+                      className={`flex-1 py-2.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                        activeContactTab === 'book'
+                          ? 'bg-indigo-600 text-white shadow-md'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      {t('Book Call Appointment')}
+                    </button>
+                  </div>
+
+                  {/* Status Banner */}
+                  {contactSuccessMessage && (
+                    <div className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl text-xs flex items-center gap-2.5 animate-fade-in">
+                      <CheckCircle className="h-5 w-5 shrink-0" />
+                      <span>{contactSuccessMessage}</span>
+                    </div>
+                  )}
+
+                  {/* Tab 1: Send Message Form */}
+                  {activeContactTab === 'message' && (
+                    <form onSubmit={handleMessageSubmit} className="space-y-5">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">{t('Full Name')}</label>
+                          <input
+                            type="text"
+                            name="name"
+                            required
+                            value={messageForm.name}
+                            onChange={handleMessageChange}
+                            placeholder={t('eg. Sarah Jenkins')}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/30 transition-all font-medium"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">{t('Email Address')}</label>
+                          <input
+                            type="email"
+                            name="email"
+                            required
+                            value={messageForm.email}
+                            onChange={handleMessageChange}
+                            placeholder="sarah@example.com"
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/30 transition-all font-medium"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">{t('Message')}</label>
+                        <textarea
+                          name="message"
+                          required
+                          rows={4}
+                          value={messageForm.message}
+                          onChange={handleMessageChange}
+                          placeholder={t('How can we help your learning systems?')}
+                          className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/30 transition-all font-medium resize-none"
+                        />
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={isSubmittingContact}
+                        className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-750 text-white font-bold text-xs rounded-xl shadow-lg hover:shadow-indigo-650/30 transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer btn-ripple disabled:cursor-not-allowed"
+                      >
+                        {isSubmittingContact ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            {t('Sending Message...')}
+                          </>
+                        ) : (
+                          <>
+                            <Mail className="h-4 w-4" />
+                            {t('Send Message')}
+                          </>
+                        )}
+                      </button>
+                    </form>
+                  )}
+
+                  {/* Tab 2: Book Appointment Scheduler */}
+                  {activeContactTab === 'book' && (
+                    <form onSubmit={handleBookingSubmit} className="space-y-5">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">{t('Full Name')}</label>
+                          <input
+                            type="text"
+                            name="name"
+                            required
+                            value={bookingForm.name}
+                            onChange={handleBookingChange}
+                            placeholder={t('eg. Sarah Jenkins')}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/30 transition-all font-medium"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">{t('Email Address')}</label>
+                          <input
+                            type="email"
+                            name="email"
+                            required
+                            value={bookingForm.email}
+                            onChange={handleBookingChange}
+                            placeholder="sarah@example.com"
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/30 transition-all font-medium"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Phone Input with Country Code Selector */}
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+                          {t('Phone Number')}
+                        </label>
+                        <div className="flex gap-3">
+                          {/* Country Code Dropdown */}
+                          <select
+                            name="phoneCode"
+                            required
+                            value={bookingForm.phoneCode}
+                            onChange={handleBookingChange}
+                            className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-3 text-xs text-white focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/30 transition-all font-medium w-28 [color-scheme:dark]"
+                          >
+                            <option value="+1">🇺🇸 +1</option>
+                            <option value="+91">🇮🇳 +91</option>
+                            <option value="+44">🇬🇧 +44</option>
+                            <option value="+61">🇦🇺 +61</option>
+                            <option value="+81">🇯🇵 +81</option>
+                            <option value="+49">🇩🇪 +49</option>
+                            <option value="+33">🇫🇷 +33</option>
+                            <option value="+86">🇨🇳 +86</option>
+                          </select>
+                          {/* Phone Number Text Input */}
+                          <input
+                            type="tel"
+                            name="phoneNumber"
+                            required
+                            value={bookingForm.phoneNumber}
+                            onChange={handleBookingChange}
+                            placeholder={t('Enter your mobile number')}
+                            pattern="[0-9]{5,15}"
+                            className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/30 transition-all font-medium"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">{t('Select Date')}</label>
+                          <input
+                            type="date"
+                            name="date"
+                            required
+                            value={bookingForm.date}
+                            onChange={handleBookingChange}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/30 transition-all font-medium [color-scheme:dark]"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">{t('Select Time Window')}</label>
+                          <select
+                            name="time"
+                            required
+                            value={bookingForm.time}
+                            onChange={handleBookingChange}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/30 transition-all font-medium [color-scheme:dark]"
+                          >
+                            <option value="">-- {t('Select Time')} --</option>
+                            <option value="09:00">09:00 AM - 10:00 AM</option>
+                            <option value="11:00">11:00 AM - 12:00 PM</option>
+                            <option value="14:00">02:00 PM - 03:00 PM</option>
+                            <option value="16:00">04:00 PM - 05:00 PM</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">{t('Inquiry Topic')}</label>
+                        <select
+                          name="topic"
+                          value={bookingForm.topic}
+                          onChange={handleBookingChange}
+                          className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/30 transition-all font-medium [color-scheme:dark]"
+                        >
+                          <option value="general">{t('General School CRM Setup')}</option>
+                          <option value="billing">{t('Billing & Payments Systems')}</option>
+                          <option value="teachers">{t('Tutor Portal Training')}</option>
+                          <option value="students">{t('Parent-Student Portal Linkage')}</option>
+                        </select>
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={isSubmittingContact}
+                        className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-750 text-white font-bold text-xs rounded-xl shadow-lg hover:shadow-indigo-650/30 transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer btn-ripple disabled:cursor-not-allowed"
+                      >
+                        {isSubmittingContact ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            {t('Booking Appointment...')}
+                          </>
+                        ) : (
+                          <>
+                            <Calendar className="h-4 w-4" />
+                            {t('Book Appointment')}
+                          </>
+                        )}
+                      </button>
+                    </form>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>

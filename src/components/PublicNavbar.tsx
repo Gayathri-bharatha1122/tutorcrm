@@ -24,15 +24,24 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({ screen, onNavigate, 
   }, []);
 
   const handleNavLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, anchorId: string) => {
+    e.preventDefault();
     if (screen !== 'landing') {
-      e.preventDefault();
+      sessionStorage.setItem('scrollTarget', anchorId);
       onNavigate('landing');
-      setTimeout(() => {
-        const element = document.getElementById(anchorId);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
+    } else {
+      const element = document.getElementById(anchorId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+
+  const handleHomeClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    if (screen !== 'landing') {
+      onNavigate('landing');
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -62,6 +71,13 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({ screen, onNavigate, 
         {/* Navigation Links */}
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-400">
           <a 
+            href="#" 
+            onClick={(e) => handleHomeClick(e)}
+            className="hover:text-slate-100 nav-link-hover py-1 transition-colors"
+          >
+            {t('Home')}
+          </a>
+          <a 
             href="#features" 
             onClick={(e) => handleNavLinkClick(e, 'features')}
             className="hover:text-slate-100 nav-link-hover py-1 transition-colors"
@@ -88,6 +104,13 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({ screen, onNavigate, 
             className="hover:text-slate-100 nav-link-hover py-1 transition-colors"
           >
             {t('Metrics')}
+          </a>
+          <a 
+            href="#contact" 
+            onClick={(e) => handleNavLinkClick(e, 'contact')}
+            className="hover:text-slate-100 nav-link-hover py-1 transition-colors"
+          >
+            {t('Contact')}
           </a>
         </nav>
 
