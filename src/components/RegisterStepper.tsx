@@ -108,7 +108,7 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.4 }}
-        className="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-8 relative z-10 shadow-2xl text-slate-100"
+        className="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 relative z-10 shadow-2xl text-slate-100"
       >
         {/* Progress Bar Track */}
         <div className="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden mb-6 border border-slate-850">

@@ -129,7 +129,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavi
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-8 relative z-10 shadow-2xl"
+        className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 relative z-10 shadow-2xl"
       >
         {/* Dynamic header colored based on current selected role */}
         <div className="mb-6">
@@ -145,7 +145,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavi
         </div>
 
         {/* Role Select Buttons */}
-        <div className="grid grid-cols-4 gap-2 mb-6 p-1 bg-slate-950/60 rounded-xl border border-slate-800">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6 p-1 bg-slate-950/60 rounded-xl border border-slate-800">
           {(['student', 'parent', 'tutor', 'admin'] as Role[]).map((role) => (
             <button
               key={role}
