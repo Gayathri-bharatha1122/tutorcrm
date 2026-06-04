@@ -185,6 +185,10 @@ router.get('/teachers', async (req: AuthRequest, res: Response) => {
       return {
         id: t._id,
         name: `Prof. ${t.firstName} ${t.lastName}`,
+        firstName: t.firstName,
+        lastName: t.lastName,
+        email: t.email,
+        phone: t.phone,
         subject: p?.subject || 'Advanced Physics & Calculus',
         experience: p?.experience || '12 years',
         status: p?.status || 'Active',
@@ -256,6 +260,250 @@ router.post('/students/:id/approve', async (req: AuthRequest, res: Response) => 
     }
   } catch (error) {
     console.error('Error approving student registration:', error);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
+// 7. GET DETAILED STUDENT BY ID
+router.get('/students/:id', async (req: AuthRequest, res: Response) => {
+  const { id } = req.params;
+  try {
+    const studentUser = await User.findById(id).lean();
+    if (!studentUser) {
+      return res.status(404).json({ error: 'Student not found.' });
+    }
+    const profile = await StudentProfile.findOne({ userId: id }).lean();
+    
+    // Fetch related bills and activity logs
+    const bills = await Bill.find({ studentId: id }).sort({ _id: -1 }).lean();
+    const studentName = `${studentUser.firstName} ${studentUser.lastName}`;
+    const activityLogs = await ActivityLog.find({ studentName }).sort({ _id: -1 }).lean();
+
+    return res.json({
+      id: studentUser._id,
+      firstName: studentUser.firstName,
+      lastName: studentUser.lastName,
+      name: studentName,
+      email: studentUser.email,
+      phone: studentUser.phone,
+      initials: getInitials(studentName),
+      grade: profile?.grade || '11th Grade',
+      subject: profile?.learningGoal || 'Advanced Physics',
+      parentPhone: profile?.parentPhone || '',
+      status: profile?.status || 'Active',
+      progress: profile?.progress || 60,
+      avgGrade: profile?.avgGrade || 3.5,
+      bills,
+      activityLogs
+    });
+  } catch (error) {
+    console.error('Error fetching student details:', error);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
+// 8. PUT (EDIT) STUDENT
+router.put('/students/:id', async (req: AuthRequest, res: Response) => {
+  const { id } = req.params;
+  const { firstName, lastName, email, phone, grade, subject, parentPhone, status } = req.body;
+
+  if (!firstName || !lastName || !phone) {
+    return res.status(400).json({ error: 'First name, last name, and phone are required.' });
+  }
+
+  try {
+    const studentUser = await User.findById(id);
+    if (!studentUser) {
+      return res.status(404).json({ error: 'Student not found.' });
+    }
+
+    // Uniqueness check for email/phone if changed
+    if (email && email !== studentUser.email) {
+      const emailDup = await User.findOne({ email });
+      if (emailDup) return res.status(400).json({ error: 'Already user exist with email.' });
+    }
+    if (phone && phone !== studentUser.phone) {
+      const phoneDup = await User.findOne({ phone });
+      if (phoneDup) return res.status(400).json({ error: 'Already user exist with phone number.' });
+    }
+
+    // Update User
+    studentUser.firstName = firstName;
+    studentUser.lastName = lastName;
+    studentUser.email = email || studentUser.email;
+    studentUser.phone = phone;
+    await studentUser.save();
+
+    // Update Profile
+    const profile = await StudentProfile.findOne({ userId: id });
+    if (profile) {
+      profile.grade = grade || profile.grade;
+      profile.learningGoal = subject || profile.learningGoal;
+      profile.parentPhone = parentPhone || profile.parentPhone;
+      profile.status = status || profile.status;
+      await profile.save();
+    }
+
+    return res.json({ msg: 'Student profile updated successfully.' });
+  } catch (error) {
+    console.error('Error updating student:', error);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
+// 9. DELETE STUDENT
+router.delete('/students/:id', async (req: AuthRequest, res: Response) => {
+  const { id } = req.params;
+  try {
+    const studentUser = await User.findById(id);
+    if (!studentUser) {
+      return res.status(404).json({ error: 'Student not found.' });
+    }
+    await StudentProfile.deleteOne({ userId: id });
+    await User.deleteOne({ _id: id });
+    await Bill.deleteMany({ studentId: id });
+    
+    return res.json({ msg: 'Student account and profile deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting student:', error);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
+// 10. POST (ADD) TUTOR
+router.post('/tutors', async (req: AuthRequest, res: Response) => {
+  const { firstName, lastName, email, phone, subject, experience, courses, status } = req.body;
+
+  if (!firstName || !lastName || !email || !phone) {
+    return res.status(400).json({ error: 'First name, last name, email, and phone are required.' });
+  }
+
+  try {
+    const existing = await User.findOne({ $or: [{ email }, { phone }] });
+    if (existing) {
+      return res.status(400).json({ error: 'Already user exist with phone number or email.' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash('tutor123', salt);
+
+    const newUser = await User.create({
+      firstName,
+      lastName,
+      email,
+      phone,
+      passwordHash,
+      role: 'tutor'
+    });
+
+    const coursesArray = typeof courses === 'string' 
+      ? courses.split(',').map((c: string) => c.trim()).filter(Boolean)
+      : Array.isArray(courses) ? courses : [];
+
+    await TutorProfile.create({
+      userId: newUser._id,
+      subject: subject || 'General Tutoring',
+      experience: experience || '1 year',
+      status: status || 'Active',
+      courses: coursesArray
+    });
+
+    return res.status(201).json({ msg: 'Tutor profile created successfully.' });
+  } catch (error) {
+    console.error('Error creating tutor:', error);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
+// 11. GET DETAILED TUTOR BY ID
+router.get('/tutors/:id', async (req: AuthRequest, res: Response) => {
+  const { id } = req.params;
+  try {
+    const tutorUser = await User.findById(id).lean();
+    if (!tutorUser) {
+      return res.status(404).json({ error: 'Tutor not found.' });
+    }
+    const profile = await TutorProfile.findOne({ userId: id }).lean();
+    return res.json({
+      id: tutorUser._id,
+      firstName: tutorUser.firstName,
+      lastName: tutorUser.lastName,
+      name: `Prof. ${tutorUser.firstName} ${tutorUser.lastName}`,
+      email: tutorUser.email,
+      phone: tutorUser.phone,
+      subject: profile?.subject || '',
+      experience: profile?.experience || '',
+      status: profile?.status || 'Active',
+      courses: profile?.courses || []
+    });
+  } catch (error) {
+    console.error('Error fetching tutor details:', error);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
+// 12. PUT (EDIT) TUTOR
+router.put('/tutors/:id', async (req: AuthRequest, res: Response) => {
+  const { id } = req.params;
+  const { firstName, lastName, email, phone, subject, experience, courses, status } = req.body;
+
+  if (!firstName || !lastName || !email || !phone) {
+    return res.status(400).json({ error: 'First name, last name, email, and phone are required.' });
+  }
+
+  try {
+    const tutorUser = await User.findById(id);
+    if (!tutorUser) {
+      return res.status(404).json({ error: 'Tutor not found.' });
+    }
+
+    if (email && email !== tutorUser.email) {
+      const emailDup = await User.findOne({ email });
+      if (emailDup) return res.status(400).json({ error: 'Already user exist with email.' });
+    }
+    if (phone && phone !== tutorUser.phone) {
+      const phoneDup = await User.findOne({ phone });
+      if (phoneDup) return res.status(400).json({ error: 'Already user exist with phone number.' });
+    }
+
+    tutorUser.firstName = firstName;
+    tutorUser.lastName = lastName;
+    tutorUser.email = email;
+    tutorUser.phone = phone;
+    await tutorUser.save();
+
+    const profile = await TutorProfile.findOne({ userId: id });
+    if (profile) {
+      profile.subject = subject || profile.subject;
+      profile.experience = experience || profile.experience;
+      profile.status = status || profile.status;
+      profile.courses = typeof courses === 'string'
+        ? courses.split(',').map((c: string) => c.trim()).filter(Boolean)
+        : Array.isArray(courses) ? courses : profile.courses;
+      await profile.save();
+    }
+
+    return res.json({ msg: 'Tutor profile updated successfully.' });
+  } catch (error) {
+    console.error('Error updating tutor:', error);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
+// 13. DELETE TUTOR
+router.delete('/tutors/:id', async (req: AuthRequest, res: Response) => {
+  const { id } = req.params;
+  try {
+    const tutorUser = await User.findById(id);
+    if (!tutorUser) {
+      return res.status(404).json({ error: 'Tutor not found.' });
+    }
+    await TutorProfile.deleteOne({ userId: id });
+    await User.deleteOne({ _id: id });
+    
+    return res.json({ msg: 'Tutor account and profile deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting tutor:', error);
     return res.status(500).json({ error: 'Internal server error.' });
   }
 });

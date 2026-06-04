@@ -31,6 +31,10 @@ export interface Teacher {
   experience: string;
   status: 'Active' | 'On Leave';
   courses: string[];
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  email?: string;
 }
 
 export interface ActivityLog {

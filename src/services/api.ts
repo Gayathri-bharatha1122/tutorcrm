@@ -171,5 +171,46 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ action })
     });
+  },
+
+  getStudentById: (studentId: string) => {
+    return request(`/admin/students/${studentId}`);
+  },
+
+  getTutorById: (tutorId: string) => {
+    return request(`/admin/tutors/${tutorId}`);
+  },
+
+  editStudent: (studentId: string, studentData: any) => {
+    return request(`/admin/students/${studentId}`, {
+      method: 'PUT',
+      body: JSON.stringify(studentData)
+    });
+  },
+
+  deleteStudent: (studentId: string) => {
+    return request(`/admin/students/${studentId}`, {
+      method: 'DELETE'
+    });
+  },
+
+  addTutor: (tutorData: any) => {
+    return request('/admin/tutors', {
+      method: 'POST',
+      body: JSON.stringify(tutorData)
+    });
+  },
+
+  editTutor: (tutorId: string, tutorData: any) => {
+    return request(`/admin/tutors/${tutorId}`, {
+      method: 'PUT',
+      body: JSON.stringify(tutorData)
+    });
+  },
+
+  deleteTutor: (tutorId: string) => {
+    return request(`/admin/tutors/${tutorId}`, {
+      method: 'DELETE'
+    });
   }
 };
