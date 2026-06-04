@@ -55,6 +55,7 @@ interface StudentDashboardProps {
       correctAnswer: string;
     }>;
   }>;
+  currentPath?: string;
   onLogout: () => void;
   onHome: () => void;
 }
@@ -62,6 +63,7 @@ interface StudentDashboardProps {
 export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   studentName,
   publishedQuizzes,
+  currentPath,
   onLogout,
   onHome
 }) => {
@@ -70,6 +72,16 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   const [exams, setExams] = useState<ExamResult[]>([]);
   const [upcomingExams, setUpcomingExams] = useState<ExamSchedule[]>([]);
   const [activeTab, setActiveTab] = useState<'schedule' | 'grades' | 'results' | 'attendance' | 'quizzes'>('schedule');
+
+  useEffect(() => {
+    if (currentPath) {
+      if (currentPath.includes('/grades') || currentPath.includes('/assessments')) setActiveTab('grades');
+      else if (currentPath.includes('/results')) setActiveTab('results');
+      else if (currentPath.includes('/attendance')) setActiveTab('attendance');
+      else if (currentPath.includes('/quizzes') || currentPath.includes('/tasks')) setActiveTab('quizzes');
+      else setActiveTab('schedule');
+    }
+  }, [currentPath]);
 
   useEffect(() => {
     const fetchData = async () => {

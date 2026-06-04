@@ -212,5 +212,29 @@ export const api = {
     return request(`/admin/tutors/${tutorId}`, {
       method: 'DELETE'
     });
+  },
+
+  getAdminParents: () => {
+    return request('/admin/parents');
+  },
+
+  addParent: (data: { firstName: string; lastName: string; email?: string; phone: string; password: string }) => {
+    return request('/admin/parents', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+
+  updateParent: (id: string, data: { firstName: string; lastName: string; email?: string; phone: string }) => {
+    return request(`/admin/parents/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
+  },
+
+  deleteParent: (id: string) => {
+    return request(`/admin/parents/${id}`, {
+      method: 'DELETE'
+    });
   }
 };

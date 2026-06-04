@@ -507,4 +507,215 @@ router.delete('/tutors/:id', async (req: AuthRequest, res: Response) => {
   }
 });
 
+// 14. GET ALL PARENTS WITH LINKED STUDENTS
+router.get('/parents', async (req: AuthRequest, res: Response) => {
+  try {
+    // Get all parent users
+    const parentUsers = await User.find({ role: 'parent' }).lean();
+    // Get all student profiles (which carry parentPhone linking)
+    const studentProfiles = await StudentProfile.find({}).lean();
+    // Get all student users
+    const studentUsers = await User.find({ role: 'student' }).lean();
+    // Get all bills to calculate outstanding dues per student
+    const allBills = await Bill.find({}).lean();
+
+    const parentsData = parentUsers.map(parent => {
+      // Match by phone: student's parentPhone === parent's phone
+      const linkedProfiles = studentProfiles.filter(sp => sp.parentPhone === parent.phone);
+
+      const linkedStudents = linkedProfiles.map(sp => {
+        const stuUser = studentUsers.find(u => u._id.toString() === sp.userId.toString());
+        const stuBills = allBills.filter(b => b.studentId === sp.userId.toString());
+        const outstandingDues = stuBills
+          .filter(b => b.status === 'Pending' || b.status === 'Overdue')
+          .reduce((sum: number, b: any) => sum + b.amount, 0);
+
+        return {
+          studentId: sp.userId,
+          name: stuUser ? `${stuUser.firstName} ${stuUser.lastName}` : 'Unknown',
+          email: stuUser?.email || '',
+          grade: sp.grade || '',
+          status: sp.status || 'Active',
+          progress: sp.progress || 0,
+          avgGrade: sp.avgGrade || 0,
+          outstandingDues
+        };
+      });
+
+      return {
+        id: parent._id,
+        name: `${parent.firstName} ${parent.lastName}`,
+        email: parent.email,
+        phone: parent.phone,
+        createdAt: parent.createdAt,
+        linkedStudents,
+        totalStudents: linkedStudents.length,
+        totalOutstanding: linkedStudents.reduce((s, st) => s + st.outstandingDues, 0)
+      };
+    });
+
+    // Also include "unregistered parents" (students have a parentPhone but no parent account)
+    const registeredParentPhones = new Set(parentUsers.map(p => p.phone));
+    const unregisteredGroups: Record<string, any[]> = {};
+
+    studentProfiles.forEach(sp => {
+      if (sp.parentPhone && !registeredParentPhones.has(sp.parentPhone)) {
+        if (!unregisteredGroups[sp.parentPhone]) unregisteredGroups[sp.parentPhone] = [];
+        const stuUser = studentUsers.find(u => u._id.toString() === sp.userId.toString());
+        const stuBills = allBills.filter(b => b.studentId === sp.userId.toString());
+        const outstandingDues = stuBills
+          .filter(b => b.status === 'Pending' || b.status === 'Overdue')
+          .reduce((sum: number, b: any) => sum + b.amount, 0);
+        unregisteredGroups[sp.parentPhone].push({
+          studentId: sp.userId,
+          name: stuUser ? `${stuUser.firstName} ${stuUser.lastName}` : 'Unknown',
+          email: stuUser?.email || '',
+          grade: sp.grade || '',
+          status: sp.status || 'Active',
+          progress: sp.progress || 0,
+          avgGrade: sp.avgGrade || 0,
+          outstandingDues
+        });
+      }
+    });
+
+    const unregisteredParents = Object.entries(unregisteredGroups).map(([phone, students]) => ({
+      id: null,
+      name: 'Unregistered Parent',
+      email: null,
+      phone,
+      createdAt: null,
+      linkedStudents: students,
+      totalStudents: students.length,
+      totalOutstanding: students.reduce((s: number, st: any) => s + st.outstandingDues, 0),
+      unregistered: true
+    }));
+
+    return res.json([...parentsData, ...unregisteredParents]);
+  } catch (error) {
+    console.error('Error fetching parents:', error);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
+// 15. CREATE (ADD) PARENT
+router.post('/parents', async (req: AuthRequest, res: Response) => {
+  const { firstName, lastName, email, phone, password } = req.body;
+
+  if (!firstName || !lastName || !phone || !password) {
+    return res.status(400).json({ error: 'First name, last name, phone, and password are required.' });
+  }
+
+  try {
+    const sanitizedPhone = phone.replace(/\D/g, '');
+    if (sanitizedPhone.length < 10) {
+      return res.status(400).json({ error: 'Phone number must be at least 10 digits.' });
+    }
+
+    // Check duplicates
+    const existingPhone = await User.findOne({ phone: sanitizedPhone });
+    if (existingPhone) {
+      return res.status(400).json({ error: 'A user with this phone number already exists.' });
+    }
+    if (email) {
+      const existingEmail = await User.findOne({ email });
+      if (existingEmail) {
+        return res.status(400).json({ error: 'A user with this email already exists.' });
+      }
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
+
+    const newUser = await User.create({
+      email: email || `${firstName.toLowerCase()}.${lastName.toLowerCase()}@edumanage.com`,
+      phone: sanitizedPhone,
+      passwordHash,
+      role: 'parent',
+      firstName,
+      lastName
+    });
+
+    // Find students linked to this parent's phone
+    const studentProfiles = await StudentProfile.find({ parentPhone: sanitizedPhone }).lean();
+    const studentUsers = await User.find({ role: 'student' }).lean();
+    const linkedStudents = studentProfiles.map(sp => {
+      const su = studentUsers.find(u => u._id.toString() === sp.userId.toString());
+      return { studentId: sp.userId, name: su ? `${su.firstName} ${su.lastName}` : 'Unknown', grade: sp.grade };
+    });
+
+    return res.status(201).json({
+      msg: 'Parent account created successfully.',
+      parent: {
+        id: newUser._id,
+        name: `${newUser.firstName} ${newUser.lastName}`,
+        email: newUser.email,
+        phone: newUser.phone,
+        linkedStudents,
+        totalStudents: linkedStudents.length
+      }
+    });
+  } catch (error) {
+    console.error('Error creating parent:', error);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
+// 16. UPDATE PARENT
+router.put('/parents/:id', async (req: AuthRequest, res: Response) => {
+  const { id } = req.params;
+  const { firstName, lastName, email, phone } = req.body;
+
+  if (!firstName || !lastName || !phone) {
+    return res.status(400).json({ error: 'First name, last name, and phone are required.' });
+  }
+
+  try {
+    const parentUser = await User.findById(id);
+    if (!parentUser || parentUser.role !== 'parent') {
+      return res.status(404).json({ error: 'Parent not found.' });
+    }
+
+    const sanitizedPhone = phone.replace(/\D/g, '');
+
+    // Check phone uniqueness (skip if unchanged)
+    if (sanitizedPhone !== parentUser.phone) {
+      const dup = await User.findOne({ phone: sanitizedPhone });
+      if (dup) return res.status(400).json({ error: 'This phone number is already used by another account.' });
+    }
+    // Check email uniqueness
+    if (email && email !== parentUser.email) {
+      const dupEmail = await User.findOne({ email });
+      if (dupEmail) return res.status(400).json({ error: 'This email is already registered.' });
+    }
+
+    parentUser.firstName = firstName;
+    parentUser.lastName = lastName;
+    parentUser.email = email || parentUser.email;
+    parentUser.phone = sanitizedPhone;
+    await parentUser.save();
+
+    return res.json({ msg: 'Parent account updated successfully.' });
+  } catch (error) {
+    console.error('Error updating parent:', error);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
+// 17. DELETE PARENT
+router.delete('/parents/:id', async (req: AuthRequest, res: Response) => {
+  const { id } = req.params;
+  try {
+    const parentUser = await User.findById(id);
+    if (!parentUser || parentUser.role !== 'parent') {
+      return res.status(404).json({ error: 'Parent not found.' });
+    }
+    await User.deleteOne({ _id: id });
+    return res.json({ msg: 'Parent account deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting parent:', error);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
 export default router;

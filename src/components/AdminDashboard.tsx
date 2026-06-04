@@ -61,11 +61,13 @@ const AnimatedCounter: React.FC<{ value: number; duration?: number; prefix?: str
 };
 
 interface AdminDashboardProps {
+  currentPath?: string;
   onLogout: () => void;
   onHome: () => void;
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ 
+  currentPath,
   onLogout,
   onHome
 }) => {
@@ -73,7 +75,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'students' | 'tutors'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'students' | 'tutors' | 'parents' | 'courses' | 'fees' | 'reports' | 'settings'>('overview');
+  
+  useEffect(() => {
+    if (currentPath) {
+      if (currentPath.includes('/students')) setActiveTab('students');
+      else if (currentPath.includes('/tutors')) setActiveTab('tutors');
+      else if (currentPath.includes('/users')) setActiveTab('users');
+      else if (currentPath.includes('/parents')) setActiveTab('parents');
+      else if (currentPath.includes('/courses')) setActiveTab('courses');
+      else if (currentPath.includes('/fees')) setActiveTab('fees');
+      else if (currentPath.includes('/reports')) setActiveTab('reports');
+      else if (currentPath.includes('/settings')) setActiveTab('settings');
+      else setActiveTab('overview');
+      
+      // Clear detail views when navigating
+      setSelectedStudentDetail(null);
+      setSelectedTutorDetail(null);
+    }
+  }, [currentPath]);
   
   // Detail Views
   const [selectedStudentDetail, setSelectedStudentDetail] = useState<any>(null);
@@ -1421,6 +1441,83 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </tbody>
               </table>
             </div>
+          </motion.div>
+        )}
+
+        {/* VIEW 4 - PARENTS */}
+        {!selectedStudentDetail && !selectedTutorDetail && activeTab === 'parents' && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center shadow-xl"
+          >
+            <Users className="h-12 w-12 text-slate-500 mx-auto mb-4 opacity-50" />
+            <h3 className="text-xl font-bold text-white mb-2">Parent Directory</h3>
+            <p className="text-slate-400">Manage parent accounts linked to enrolled students here. (Module under construction)</p>
+          </motion.div>
+        )}
+
+        {/* VIEW 5 - USERS */}
+        {!selectedStudentDetail && !selectedTutorDetail && activeTab === 'users' && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center shadow-xl"
+          >
+            <Users className="h-12 w-12 text-slate-500 mx-auto mb-4 opacity-50" />
+            <h3 className="text-xl font-bold text-white mb-2">User Management</h3>
+            <p className="text-slate-400">Manage all registered users (Admin, Faculty, Parent, Student) across the platform. (Module under construction)</p>
+          </motion.div>
+        )}
+
+        {/* VIEW 6 - COURSES */}
+        {!selectedStudentDetail && !selectedTutorDetail && activeTab === 'courses' && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center shadow-xl"
+          >
+            <BookOpen className="h-12 w-12 text-slate-500 mx-auto mb-4 opacity-50" />
+            <h3 className="text-xl font-bold text-white mb-2">Course Management</h3>
+            <p className="text-slate-400">Create, edit, and organize academic courses and syllabi. (Module under construction)</p>
+          </motion.div>
+        )}
+
+        {/* VIEW 7 - FEES */}
+        {!selectedStudentDetail && !selectedTutorDetail && activeTab === 'fees' && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center shadow-xl"
+          >
+            <DollarSign className="h-12 w-12 text-slate-500 mx-auto mb-4 opacity-50" />
+            <h3 className="text-xl font-bold text-white mb-2">Fees & Billing</h3>
+            <p className="text-slate-400">Track tuition payments, overdue invoices, and financial reports. (Module under construction)</p>
+          </motion.div>
+        )}
+
+        {/* VIEW 8 - REPORTS */}
+        {!selectedStudentDetail && !selectedTutorDetail && activeTab === 'reports' && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center shadow-xl"
+          >
+            <Activity className="h-12 w-12 text-slate-500 mx-auto mb-4 opacity-50" />
+            <h3 className="text-xl font-bold text-white mb-2">Analytics & Reports</h3>
+            <p className="text-slate-400">Generate academic and financial performance reports for the current term. (Module under construction)</p>
+          </motion.div>
+        )}
+
+        {/* VIEW 9 - SETTINGS */}
+        {!selectedStudentDetail && !selectedTutorDetail && activeTab === 'settings' && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center shadow-xl"
+          >
+            <h3 className="text-xl font-bold text-white mb-2">Platform Settings</h3>
+            <p className="text-slate-400">Configure global platform options, security policies, and integrations. (Module under construction)</p>
           </motion.div>
         )}
 

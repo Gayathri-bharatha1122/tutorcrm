@@ -44,6 +44,7 @@ const AnimatedCounter: React.FC<{ value: number; duration?: number; prefix?: str
 interface ParentDashboardProps {
   parentName: string;
   studentName: string;
+  currentPath?: string;
   onLogout: () => void;
   onHome: () => void;
 }
@@ -51,6 +52,7 @@ interface ParentDashboardProps {
 export const ParentDashboard: React.FC<ParentDashboardProps> = ({
   parentName,
   studentName,
+  currentPath,
   onLogout,
   onHome
 }) => {
@@ -81,6 +83,13 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentSuccessMessage, setPaymentSuccessMessage] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'announcements' | 'messages'>('announcements');
+  
+  useEffect(() => {
+    if (currentPath) {
+      if (currentPath.includes('/messages') || currentPath.includes('/teachers')) setActiveTab('messages');
+      else setActiveTab('announcements');
+    }
+  }, [currentPath]);
   
   // Card details mock states
   const [cardNumber, setCardNumber] = useState('•••• •••• •••• 4921');

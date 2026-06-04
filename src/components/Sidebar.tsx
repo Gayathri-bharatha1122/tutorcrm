@@ -85,7 +85,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const menuOptions: Record<Role, MenuItem[]> = {
     admin: [
       { name: t('Dashboard'), path: '/admin/dashboard', icon: <LayoutDashboard className="h-4.5 w-4.5" /> },
-      { name: t('User Management'), path: '/admin/users', icon: <Users className="h-4.5 w-4.5" /> },
       { name: t('Student Management'), path: '/admin/students', icon: <GraduationCap className="h-4.5 w-4.5" /> },
       { name: t('Tutor Management'), path: '/admin/tutors', icon: <Shield className="h-4.5 w-4.5" /> },
       { name: t('Parent Management'), path: '/admin/parents', icon: <User className="h-4.5 w-4.5" /> },

@@ -45,6 +45,7 @@ const AnimatedCounter: React.FC<{ value: number; duration?: number; prefix?: str
 
 interface TutorDashboardProps {
   tutorName: string;
+  currentPath?: string;
   onLogout: () => void;
   onHome: () => void;
 }
@@ -66,6 +67,7 @@ const TIMETABLE_SLOTS: TimetableSlot[] = [
 
 export const TutorDashboard: React.FC<TutorDashboardProps> = ({
   tutorName,
+  currentPath,
   onLogout,
   onHome
 }) => {
@@ -108,22 +110,23 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
 
   // Update filtered slots when courses or slots list change
   useEffect(() => {
-    if (tutorCourses.length === 0) {
-      setFilteredSlots(TIMETABLE_SLOTS);
-      setSelectedSlotId(TIMETABLE_SLOTS[0].id);
-      setAllSameSubject(false);
-    } else {
-      // Determine if all courses share the same base subject (first word)
+    let slotsToUse = TIMETABLE_SLOTS;
+    
+    if (tutorCourses.length > 0) {
       const baseSubject = tutorCourses[0].split(' ')[0].toLowerCase();
-      const sameSubject = tutorCourses.every(c => c.toLowerCase().startsWith(baseSubject));
-      setAllSameSubject(sameSubject);
       const matched = TIMETABLE_SLOTS.filter(slot =>
         slot.subject && slot.subject.toLowerCase() === baseSubject
       );
-      const slotsToUse = matched.length > 0 ? matched : TIMETABLE_SLOTS;
-      setFilteredSlots(slotsToUse);
-      setSelectedSlotId(slotsToUse[0].id);
+      if (matched.length > 0) {
+        slotsToUse = matched;
+      }
     }
+
+    setFilteredSlots(slotsToUse);
+    setSelectedSlotId(slotsToUse[0]?.id || '');
+    
+    const subjects = new Set(slotsToUse.map(s => s.subject?.toLowerCase()).filter(Boolean));
+    setAllSameSubject(subjects.size === 1);
   }, [tutorCourses]);
 
   // Structured attendance: Record<date, Record<slotId, Record<studentId, status>>>

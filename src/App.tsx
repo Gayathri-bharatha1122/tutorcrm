@@ -3,6 +3,7 @@ import { api } from './services/api';
 import { motion, AnimatePresence } from 'motion/react';
 import { LanguageProvider } from './LanguageContext';
 import { Student, Teacher, ActivityLog, Course, Bill, Announcement, Screen, Role } from './types';
+import { Sidebar } from './components/Sidebar';
 
 // Importing Views
 import { PublicNavbar } from './components/PublicNavbar';
@@ -15,12 +16,19 @@ import { ParentDashboard } from './components/ParentDashboard';
 import { TutorDashboard } from './components/TutorDashboard';
 import { AIChatBox } from './components/AIChatBox';
 
+// Role-based page components
+import { AdminPage } from './components/pages/AdminPages';
+import { TutorPage } from './components/pages/TutorPages';
+import { StudentPage } from './components/pages/StudentPages';
+import { ParentPage } from './components/pages/ParentPages';
+
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('landing');
   const [activeRole, setActiveRole] = useState<Role>('student');
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [currentPath, setCurrentPath] = useState<string>('');
 
   useEffect(() => {
     const token = localStorage.getItem('edumanage_token');
@@ -112,6 +120,41 @@ export default function App() {
     if (initialRole) {
       setActiveRole(initialRole);
     }
+    // Reset path when navigating via top-level pages
+    setCurrentPath('');
+  };
+
+  // Sidebar navigation handler (path based) with RBAC
+  const handleSidebarNavigate = (path: string) => {
+    // Check RBAC permission
+    if (
+      (path.startsWith('/admin') && activeRole !== 'admin') ||
+      (path.startsWith('/tutor') && activeRole !== 'tutor') ||
+      (path.startsWith('/parent') && activeRole !== 'parent') ||
+      (path.startsWith('/student') && activeRole !== 'student')
+    ) {
+      alert("Access Denied: You do not have permission to access this portal.");
+      
+      // Redirect to their own dashboard
+      const dashboardPath = `/${activeRole}/dashboard`;
+      setCurrentPath(dashboardPath);
+      setScreen(activeRole);
+      return;
+    }
+
+    setCurrentPath(path);
+    if (path.startsWith('/admin')) {
+      setScreen('admin');
+    } else if (path.startsWith('/tutor')) {
+      setScreen('tutor');
+    } else if (path.startsWith('/parent')) {
+      setScreen('parent');
+    } else if (path.startsWith('/student')) {
+      setScreen('student');
+    } else {
+      // fallback to landing for unknown paths
+      setScreen('landing');
+    }
   };
 
   const handleLoginSuccess = (role: Role, name?: string) => {
@@ -197,10 +240,135 @@ export default function App() {
         </div>
 
         {/* Global Content Wrapper */}
-        <div className="relative z-10 flex-1 flex flex-col justify-between w-full">
-          {isPublicPage && <PublicNavbar screen={screen} onNavigate={handleNavigate} isLoggedIn={isLoggedIn} activeRole={activeRole} />}
+      <div className="relative z-10 flex-1 flex flex-col justify-between w-full">
+        {isPublicPage && <PublicNavbar screen={screen} onNavigate={handleNavigate} isLoggedIn={isLoggedIn} activeRole={activeRole} />}
 
-          {/* Route Render Engine with AnimatePresence */}
+        {/* Authenticated Layout with Sidebar */}
+        {!isPublicPage && (
+          <div className="flex h-full">
+            <Sidebar
+              activeRole={activeRole}
+              userName={currentProfileName}
+              currentPath={currentPath}
+              onNavigate={handleSidebarNavigate}
+              onLogout={handleLogout}
+            />
+            <div className="flex-1 overflow-auto">
+              <AnimatePresence mode="wait">
+
+                {/* ===== ADMIN ROUTES ===== */}
+                {screen === 'admin' && (() => {
+                  const segment = currentPath.replace('/admin/', '').replace('/admin', '');
+                  // Sub-pages with back button
+                  if (segment && segment !== 'dashboard' && ['students','tutors','parents','courses','fees','reports','settings'].includes(segment)) {
+                    if (segment === 'students' || segment === 'tutors') {
+                      return (
+                        <motion.div key={`admin-${segment}`} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="w-full">
+                          <AdminPage
+                            pageKey={segment}
+                            onBack={() => handleSidebarNavigate('/admin/dashboard')}
+                            adminDashboardElement={
+                              <AdminDashboard
+                                currentPath={currentPath}
+                                onLogout={handleLogout}
+                                onHome={handleHome}
+                              />
+                            }
+                          />
+                        </motion.div>
+                      );
+                    }
+                    return (
+                      <motion.div key={`admin-${segment}`} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="w-full">
+                        <AdminPage
+                          pageKey={segment}
+                          onBack={() => handleSidebarNavigate('/admin/dashboard')}
+                        />
+                      </motion.div>
+                    );
+                  }
+                  // Main dashboard
+                  return (
+                    <motion.div key="admin-dashboard" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="w-full">
+                      <AdminDashboard currentPath={currentPath} onLogout={handleLogout} onHome={handleHome} />
+                    </motion.div>
+                  );
+                })()}
+
+                {/* ===== TUTOR ROUTES ===== */}
+                {screen === 'tutor' && (() => {
+                  const segment = currentPath.replace('/tutor/', '').replace('/tutor', '');
+                  const subPages = ['classes','attendance','assignments','performance','profile'];
+                  if (segment && segment !== 'dashboard' && subPages.includes(segment)) {
+                    return (
+                      <motion.div key={`tutor-${segment}`} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="w-full">
+                        <TutorPage
+                          pageKey={segment}
+                          tutorName={currentProfileName}
+                          onBack={() => handleSidebarNavigate('/tutor/dashboard')}
+                        />
+                      </motion.div>
+                    );
+                  }
+                  return (
+                    <motion.div key="tutor-dashboard" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="w-full">
+                      <TutorDashboard tutorName={currentProfileName} currentPath={currentPath} onLogout={handleLogout} onHome={handleHome} />
+                    </motion.div>
+                  );
+                })()}
+
+                {/* ===== STUDENT ROUTES ===== */}
+                {screen === 'student' && (() => {
+                  const segment = currentPath.replace('/student/', '').replace('/student', '');
+                  const subPages = ['courses','assignments','attendance','results','profile'];
+                  if (segment && segment !== 'dashboard' && subPages.includes(segment)) {
+                    return (
+                      <motion.div key={`student-${segment}`} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="w-full">
+                        <StudentPage
+                          pageKey={segment}
+                          studentName={currentProfileName}
+                          onBack={() => handleSidebarNavigate('/student/dashboard')}
+                        />
+                      </motion.div>
+                    );
+                  }
+                  return (
+                    <motion.div key="student-dashboard" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="w-full">
+                      <StudentDashboard studentName={currentProfileName} publishedQuizzes={publishedQuizzes} currentPath={currentPath} onLogout={handleLogout} onHome={handleHome} />
+                    </motion.div>
+                  );
+                })()}
+
+                {/* ===== PARENT ROUTES ===== */}
+                {screen === 'parent' && (() => {
+                  const segment = currentPath.replace('/parent/', '').replace('/parent', '');
+                  const subPages = ['progress','attendance','fees','notifications','profile'];
+                  if (segment && segment !== 'dashboard' && subPages.includes(segment)) {
+                    return (
+                      <motion.div key={`parent-${segment}`} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="w-full">
+                        <ParentPage
+                          pageKey={segment}
+                          parentName={currentProfileName}
+                          studentName="Marcus Thorne"
+                          onBack={() => handleSidebarNavigate('/parent/dashboard')}
+                        />
+                      </motion.div>
+                    );
+                  }
+                  return (
+                    <motion.div key="parent-dashboard" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="w-full">
+                      <ParentDashboard parentName={currentProfileName} studentName="Marcus Thorne" currentPath={currentPath} onLogout={handleLogout} onHome={handleHome} />
+                    </motion.div>
+                  );
+                })()}
+
+              </AnimatePresence>
+            </div>
+          </div>
+        )}
+
+        {/* Public pages fallback (landing / login / register) */}
+        {isPublicPage && (
           <div className="flex-1">
             <AnimatePresence mode="wait">
               {screen === 'landing' && (
@@ -214,7 +382,6 @@ export default function App() {
                   <LandingPage onNavigate={handleNavigate} isLoggedIn={isLoggedIn} activeRole={activeRole} />
                 </motion.div>
               )}
-
               {screen === 'login' && (
                 <motion.div
                   key="login"
@@ -246,72 +413,9 @@ export default function App() {
                 </motion.div>
               )}
 
-              {screen === 'admin' && (
-                <motion.div
-                  key="admin"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="w-full animate-fade-in"
-                >
-                  <AdminDashboard 
-                    onLogout={handleLogout}
-                    onHome={handleHome}
-                  />
-                </motion.div>
-              )}
-
-              {screen === 'student' && (
-                <motion.div
-                  key="student"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="w-full"
-                >
-                  <StudentDashboard 
-                    studentName={currentProfileName}
-                    publishedQuizzes={publishedQuizzes}
-                    onLogout={handleLogout}
-                    onHome={handleHome}
-                  />
-                </motion.div>
-              )}
-
-              {screen === 'parent' && (
-                <motion.div
-                  key="parent"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="w-full"
-                >
-                  <ParentDashboard 
-                    parentName={currentProfileName}
-                    studentName="Marcus Thorne"
-                    onLogout={handleLogout}
-                    onHome={handleHome}
-                  />
-                </motion.div>
-              )}
-
-              {screen === 'tutor' && (
-                <motion.div
-                  key="tutor"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="w-full"
-                >
-                  <TutorDashboard 
-                    tutorName={currentProfileName}
-                    onLogout={handleLogout}
-                    onHome={handleHome}
-                  />
-                </motion.div>
-              )}
             </AnimatePresence>
           </div>
+        )}
           <AIChatBox />
         </div>
       </div>
