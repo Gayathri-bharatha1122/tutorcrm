@@ -48,6 +48,34 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
   const [linkedStudent, setLinkedStudent] = useState<Student | null>(null);
   const [lookupFeedback, setLookupFeedback] = useState<string | null>(null);
 
+  const [parentLinkedStudents, setParentLinkedStudents] = useState<any[]>([]);
+  const [loadingLinkage, setLoadingLinkage] = useState(false);
+
+  useEffect(() => {
+    if (currentStep === 3 && roleType === 'parent') {
+      const fetchLinkedStudents = async () => {
+        setLoadingLinkage(true);
+        setLookupFeedback(null);
+        try {
+          const res = await api.verifyLinkage(phone);
+          if (res.students && res.students.length > 0) {
+            setParentLinkedStudents(res.students);
+            setLookupFeedback(null);
+          } else {
+            setParentLinkedStudents([]);
+            setLookupFeedback('No registered student found with this parent phone number. Please ensure the student registers first.');
+          }
+        } catch (err: any) {
+          setParentLinkedStudents([]);
+          setLookupFeedback(err.message || 'No registered student found with this parent phone number. Please ensure the student registers first.');
+        } finally {
+          setLoadingLinkage(false);
+        }
+      };
+      fetchLinkedStudents();
+    }
+  }, [currentStep, roleType, phone]);
+
   const handleSearchStudent = () => {
     if (!studentLookupPhone) {
       setLookupFeedback('Please fill in a valid student phone query.');
@@ -77,11 +105,16 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
         role: roleType,
         grade: roleType === 'student' ? grade : undefined,
         learningGoal: roleType === 'student' ? learningGoal : undefined,
-        parentPhone: roleType === 'student' ? parentPhoneInput : undefined,
-        studentPhoneLookup: roleType === 'parent' ? studentLookupPhone : undefined
+        parentPhone: roleType === 'student' ? parentPhoneInput : undefined
       });
-      localStorage.setItem('edumanage_token', response.token);
-      onRegisteredSuccess(roleType, response.user.name);
+      
+      if (roleType === 'student') {
+        alert('Registration submitted successfully! Your account is pending administrator approval. You will be redirected to the login page.');
+        onNavigate('login');
+      } else {
+        localStorage.setItem('edumanage_token', response.token);
+        onRegisteredSuccess(roleType, response.user.name);
+      }
     } catch (err: any) {
       alert(err.message || 'Registration failed. Please check your details.');
     }
@@ -282,7 +315,7 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       className="w-full bg-slate-950/40 border border-slate-850 text-slate-200 text-xs pl-10 pr-4 py-2.5 rounded-xl focus:border-indigo-500 outline-none transition input-focus-glow"
-                      placeholder="14155554921"
+                      placeholder="e.g., 9876543210 (10 digits)"
                     />
                   </div>
                 </div>
@@ -306,13 +339,14 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[11px] font-medium text-slate-400 mb-1">{t('Parent Mobile Contact (Optional)')}</label>
+                      <label className="block text-[11px] font-medium text-indigo-400 mb-1 font-bold">{t('Parent Mobile Contact (Required) *')}</label>
                       <input
                         type="tel"
+                        required
                         value={parentPhoneInput}
                         onChange={(e) => setParentPhoneInput(e.target.value)}
-                        className="w-full bg-slate-950/40 border border-slate-850 text-slate-200 text-xs p-2.5 rounded-xl focus:border-indigo-500 outline-none transition input-focus-glow"
-                        placeholder="14155554921"
+                        className="w-full bg-slate-950/40 border border-indigo-500/30 text-slate-200 text-xs p-2.5 rounded-xl focus:border-indigo-500 outline-none transition input-focus-glow"
+                        placeholder="e.g., 9876543210 (10 digits)"
                       />
                     </div>
                   </div>
@@ -329,7 +363,7 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
               ) : (
                 <div className="p-3 bg-slate-950 rounded-xl border border-slate-850 text-[11px] text-slate-500">
                   <span className="font-bold text-slate-400 block mb-1">🛡️ {t('Linkage Policy Acknowledgement')}</span>
-                  As a registered Parent / Guardian, completing Step 3 requires entering your child's mobile number. EduManage CRM's automatic lookup matches files instantly for security audits.
+                  As a registered Parent / Guardian, completing Step 3 will automatically scan the database to connect with any registered student accounts using your parent mobile number.
                 </div>
               )}
 
@@ -357,7 +391,25 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                 </button>
                 <button
                   type="button"
-                  onClick={() => setCurrentStep(3)}
+                  onClick={() => {
+                    const cleanPhone = phone.replace(/\D/g, '');
+                    if (cleanPhone.length !== 10) {
+                      alert('Your phone number must be exactly 10 digits.');
+                      return;
+                    }
+                    if (roleType === 'student') {
+                      if (!parentPhoneInput) {
+                        alert('Parent mobile contact is required.');
+                        return;
+                      }
+                      const cleanParent = parentPhoneInput.replace(/\D/g, '');
+                      if (cleanParent.length !== 10) {
+                        alert('Parent phone number must be exactly 10 digits.');
+                        return;
+                      }
+                    }
+                    setCurrentStep(3);
+                  }}
                   className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] btn-shine-effect btn-ripple"
                 >
                   {t('Next: Validation Links')} <ArrowRight className="h-4 w-4" />
@@ -381,12 +433,12 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                       initial={{ scale: 0, rotate: -45 }}
                       animate={{ scale: 1, rotate: 0 }}
                       transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
-                      className="w-16 h-16 bg-indigo-500/10 text-indigo-400 rounded-full flex items-center justify-center mx-auto mb-4 border border-indigo-500/20"
+                      className="w-16 h-16 bg-amber-500/10 text-amber-400 rounded-full flex items-center justify-center mx-auto mb-4 border border-amber-500/20"
                     >
-                      <GraduationCap className="h-8 w-8 text-indigo-400" />
+                      <GraduationCap className="h-8 w-8 text-amber-400 animate-pulse" />
                     </motion.div>
-                    <h3 className="text-lg font-bold text-white">Student Pre-Approval Complete!</h3>
-                    <p className="text-xs text-slate-400 max-w-sm mx-auto">No cellular linkages required. Student registration uses parent backup contacts to bypass SMS wait queues.</p>
+                    <h3 className="text-lg font-bold text-white">Student Registration Pending</h3>
+                    <p className="text-xs text-slate-400 max-w-sm mx-auto">Your account will be created in a pending state. An administrator will review your enrollment details to accept or decline your registry.</p>
                   </div>
 
                   <motion.div 
@@ -397,10 +449,12 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                   >
                     <span className="text-[11px] font-bold text-slate-500 uppercase block">Registry Summary</span>
                     <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div><span className="text-slate-400">FullName:</span> <span className="text-slate-200 font-semibold">{firstName || 'Marcus'} {lastName || 'Thorne'}</span></div>
+                      <div><span className="text-slate-400">FullName:</span> <span className="text-slate-200 font-semibold">{firstName} {lastName}</span></div>
                       <div><span className="text-slate-400">Standard:</span> <span className="text-slate-200 font-semibold">{grade}</span></div>
+                      <div><span className="text-slate-400">Phone:</span> <span className="text-slate-200 font-semibold">{phone}</span></div>
+                      <div><span className="text-slate-400">Parent Phone:</span> <span className="text-slate-200 font-semibold">{parentPhoneInput}</span></div>
                       <div className="col-span-2 text-[11px] border-t border-slate-900 pt-2 text-slate-500">
-                        <span className="font-bold text-slate-400">Target Curriculum:</span> Applied general science vectors & Advanced BC Calculus assessments.
+                        <span className="font-bold text-slate-400">Learning Goal:</span> {learningGoal}
                       </div>
                     </div>
                   </motion.div>
@@ -409,64 +463,53 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                 <div className="space-y-4">
                   <div>
                     <h3 className="text-lg font-bold text-white">Database Linkage Verification Lookup</h3>
-                    <p className="text-xs text-slate-400">Provide your child's mobile number registered with academic records to bind accounting metrics.</p>
+                    <p className="text-xs text-slate-400">EduManage automatically binds student accounts matching your parent contact mobile key.</p>
                   </div>
 
                   {/* lookup interface */}
                   <div className="bg-slate-950 p-4 rounded-2xl border border-slate-850 space-y-3">
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Registered Student Mobile Key</label>
-                      <div className="flex gap-2">
-                        <input
-                          type="tel"
-                          value={studentLookupPhone}
-                          onChange={(e) => setStudentLookupPhone(e.target.value)}
-                          className="bg-slate-900 border border-slate-800 text-slate-200 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 flex-1 transition input-focus-glow"
-                          placeholder="e.g., 14155550218"
-                        />
-                        <button
-                          type="button"
-                          onClick={handleSearchStudent}
-                          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 transition-all text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer hover:scale-[1.02] active:scale-[0.98] btn-shine-effect btn-ripple"
-                        >
-                          <RefreshCw className="h-3 w-3 animate-spin" /> Search Directory
-                        </button>
+                      <span className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Your Parent Mobile Key</span>
+                      <div className="text-sm font-semibold text-slate-200 bg-slate-900 border border-slate-800 p-2.5 rounded-xl">
+                        {phone}
                       </div>
                     </div>
 
-                    {/* Lookup matches */}
-                    {linkedStudent && (
+                    {loadingLinkage ? (
+                      <div className="flex items-center gap-2 text-xs text-slate-400 py-3 justify-center">
+                        <RefreshCw className="h-4 w-4 animate-spin text-indigo-400" />
+                        <span>Scanning database for child records...</span>
+                      </div>
+                    ) : parentLinkedStudents.length > 0 ? (
                       <motion.div 
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
-                        transition={{ duration: 0.3 }}
                         className="bg-emerald-950/20 border border-emerald-500/30 rounded-xl p-4 space-y-3 overflow-hidden"
                       >
                         <div className="flex items-start gap-3">
                           <CheckCircle className="h-5 w-5 text-emerald-400 shrink-0" />
-                          <div>
-                            <span className="text-xs text-slate-400">Student Profile Found in Database</span>
-                            <span className="font-bold text-emerald-300 block text-sm">{linkedStudent.name} ({linkedStudent.grade})</span>
-                            <span className="text-[11px] text-slate-500 block">Enrolled in: {linkedStudent.subject} • Tutor: Prof. Miller</span>
+                          <div className="flex-1">
+                            <span className="text-xs text-slate-400">Student Profile(s) Found in Database</span>
+                            {parentLinkedStudents.map(student => (
+                              <div key={student.id} className="mt-2 pt-2 border-t border-slate-900 first:border-0 first:mt-0 first:pt-0">
+                                <span className="font-bold text-emerald-300 block text-sm">{student.name} ({student.grade})</span>
+                                <span className="text-[11px] text-slate-500 block">Enrolled in: {student.subject}</span>
+                              </div>
+                            ))}
                           </div>
                         </div>
 
-                        <motion.div 
-                          initial={{ scale: 0.9, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          transition={{ type: "spring", stiffness: 150, damping: 15 }}
-                          className="bg-indigo-500/10 border border-indigo-400/30 p-2.5 rounded-lg flex items-center gap-2 mt-3"
-                        >
+                        <div className="bg-indigo-500/10 border border-indigo-400/30 p-2.5 rounded-lg flex items-center gap-2 mt-3">
                           <Award className="h-4 w-4 text-indigo-400 shrink-0" />
                           <span className="text-[11px] text-indigo-200 font-semibold leading-normal">
-                            Linkage established! Parent database linkage authorized for {linkedStudent.name}.
+                            Linkage established! Parent database linkage authorized for {parentLinkedStudents.length} student(s).
                           </span>
-                        </motion.div>
+                        </div>
                       </motion.div>
-                    )}
-
-                    {lookupFeedback && (
-                      <p className="text-[11px] text-red-400 font-medium font-sans leading-relaxed text-center px-2">{lookupFeedback}</p>
+                    ) : (
+                      lookupFeedback && (
+                        <p className="text-[11px] text-red-400 font-medium font-sans leading-relaxed text-center px-2 py-3 border border-red-500/20 bg-red-950/10 rounded-xl">{lookupFeedback}</p>
+                      )
                     )}
                   </div>
                 </div>
@@ -482,15 +525,15 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                 </button>
                 <button
                   type="button"
-                  disabled={roleType === 'parent' && !linkedStudent}
+                  disabled={roleType === 'parent' && parentLinkedStudents.length === 0}
                   onClick={executeCompleteRegistration}
                   className={`px-5 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
-                    roleType === 'parent' && !linkedStudent
+                    roleType === 'parent' && parentLinkedStudents.length === 0
                       ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
                       : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/10 hover:scale-[1.02] active:scale-[0.98] btn-shine-effect btn-ripple'
                   }`}
                 >
-                  {t('Finalize Enrollment')} <CheckCircle className="h-4 w-4" />
+                  {roleType === 'student' ? t('Submit Registry Request') : t('Finalize Enrollment')} <CheckCircle className="h-4 w-4" />
                 </button>
               </div>
             </motion.div>

@@ -164,5 +164,12 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ message, history })
     });
+  },
+
+  approveStudent: (studentId: string, action: 'accept' | 'decline') => {
+    return request(`/admin/students/${studentId}/approve`, {
+      method: 'POST',
+      body: JSON.stringify({ action })
+    });
   }
 };

@@ -76,58 +76,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'All' | 'Active' | 'Pending' | 'Inactive'>('All');
-  const [showEnrollForm, setShowEnrollForm] = useState(false);
   const [adminNotification, setAdminNotification] = useState<string | null>(null);
-
-  // Quick enroll input state variables
-  const [enrollFirstName, setEnrollFirstName] = useState('');
-  const [enrollLastName, setEnrollLastName] = useState('');
-  const [enrollGrade, setEnrollGrade] = useState('11th Grade');
-  const [enrollSubject, setEnrollSubject] = useState('Advanced Physics');
-  const [enrollPhone, setEnrollPhone] = useState('');
-  const [enrollEmail, setEnrollEmail] = useState('');
-  const [enrollParentPhone, setEnrollParentPhone] = useState('');
-
-  // Handle addition of student to local state
-  const handleEnrollSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!enrollFirstName || !enrollLastName || !enrollPhone) {
-      setAdminNotification('Failed to enroll. Complete the required field validations first.');
-      setTimeout(() => setAdminNotification(null), 3000);
-      return;
-    }
-
-    try {
-      await api.enrollStudent({
-        name: `${enrollFirstName} ${enrollLastName}`,
-        grade: enrollGrade,
-        subject: enrollSubject,
-        phone: enrollPhone,
-        email: enrollEmail || `${enrollFirstName.toLowerCase()}@edumanage.com`,
-        parentPhone: enrollParentPhone || '14155554921',
-        status: 'Active'
-      });
-
-      const updatedStudents = await api.getAdminStudents();
-      setStudents(updatedStudents);
-      const updatedLogs = await api.getActivityLogs();
-      setActivityLogs(updatedLogs);
-
-      // Reset fields
-      setEnrollFirstName('');
-      setEnrollLastName('');
-      setEnrollPhone('');
-      setEnrollEmail('');
-      setEnrollParentPhone('');
-      setShowEnrollForm(false);
-      
-      setAdminNotification(`Successfully enrolled ${enrollFirstName} ! Database log initialized.`);
-      setTimeout(() => setAdminNotification(null), 4000);
-    } catch (err: any) {
-      setAdminNotification(`Error: ${err.message}`);
-      setTimeout(() => setAdminNotification(null), 4000);
-    }
-  };
 
   const filteredStudents = students.filter(st => {
     const matchesSearch = st.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -209,6 +158,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </motion.div>
           )}
         </AnimatePresence>
+
+        {pendingStudentsCount > 0 && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 text-amber-400 text-xs font-semibold flex items-center justify-between shadow-lg"
+          >
+            <div className="flex items-center gap-2">
+              <Bell className="h-4.5 w-4.5 text-amber-400 animate-bounce" />
+              <span>{pendingStudentsCount} new student registration(s) pending administrative review. Check the New Enrollments table below to Accept or Decline.</span>
+            </div>
+          </motion.div>
+        )}
 
         {/* Highlight Metrics Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -384,6 +346,108 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </div>
         </div>
 
+        {/* Pending Enrollment Messages Section */}
+        {students.filter(s => s.status === 'Pending').length > 0 && (
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
+            <div className="flex items-center gap-2">
+              <Bell className="h-4.5 w-4.5 text-amber-400 animate-bounce" />
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider">New Enrollment Messages</h3>
+            </div>
+            <div className="overflow-x-auto bg-slate-950 border border-slate-850 rounded-2xl overflow-hidden shadow-inner">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead className="bg-slate-950 border-b border-slate-850 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
+                  <tr>
+                    <th className="p-4">Student Profile</th>
+                    <th className="p-4">Applied Course / Subject</th>
+                    <th className="p-4">Student Phone</th>
+                    <th className="p-4">Parent Phone</th>
+                    <th className="p-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-850 bg-slate-950">
+                  {students.filter(s => s.status === 'Pending').map((student) => (
+                    <tr key={student.id} className="hover:bg-slate-900/40 transition">
+                      <td className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-indigo-900/45 text-indigo-400 border border-indigo-500/20 font-bold flex items-center justify-center">
+                            {student.initials || student.name[0]}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2 mb-0.5">
+                              <span className="font-bold text-white block">{student.name}</span>
+                              <span className="text-[9px] text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded font-bold uppercase whitespace-nowrap">Awaiting Review</span>
+                            </div>
+                            <span className="text-[10px] text-slate-500 block">{student.grade} • {student.email}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-4 text-slate-300 font-medium">
+                        {student.subject || 'N/A'}
+                      </td>
+                      <td className="p-4 text-slate-400 font-mono text-[11px]">
+                        {student.phone}
+                      </td>
+                      <td className="p-4 text-indigo-300 font-mono font-semibold text-[11px]">
+                        {student.parentPhone || 'N/A'}
+                      </td>
+                      <td className="p-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={async () => {
+                              try {
+                                const res = await api.approveStudent(student.id, 'accept');
+                                setAdminNotification(res.msg || `Accepted ${student.name}`);
+                                setTimeout(() => setAdminNotification(null), 4000);
+                                
+                                // Refresh data
+                                const [updatedStudents, updatedLogs] = await Promise.all([
+                                  api.getAdminStudents(),
+                                  api.getActivityLogs()
+                                ]);
+                                setStudents(updatedStudents);
+                                setActivityLogs(updatedLogs);
+                              } catch (err: any) {
+                                alert(err.message || 'Approval failed.');
+                              }
+                            }}
+                            className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all cursor-pointer hover:scale-105 active:scale-95 shadow-md shadow-emerald-600/10"
+                          >
+                            Accept
+                          </button>
+                          <button
+                            onClick={async () => {
+                              if (confirm(`Are you sure you want to decline and delete ${student.name}'s registry?`)) {
+                                try {
+                                  const res = await api.approveStudent(student.id, 'decline');
+                                  setAdminNotification(res.msg || `Declined ${student.name}`);
+                                  setTimeout(() => setAdminNotification(null), 4000);
+                                  
+                                  // Refresh data
+                                  const [updatedStudents, updatedLogs] = await Promise.all([
+                                    api.getAdminStudents(),
+                                    api.getActivityLogs()
+                                  ]);
+                                  setStudents(updatedStudents);
+                                  setActivityLogs(updatedLogs);
+                                } catch (err: any) {
+                                  alert(err.message || 'Decline failed.');
+                                }
+                              }
+                            }}
+                            className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold transition-all cursor-pointer hover:scale-105 active:scale-95 shadow-md shadow-rose-600/10"
+                          >
+                            Decline
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
         {/* Directory Controls and Lists */}
         <div className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden">
           
@@ -424,14 +488,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 ))}
               </div>
 
-              {/* Toggle new enroll drawer btn */}
-              <button
-                type="button"
-                onClick={() => setShowEnrollForm(true)}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 cursor-pointer"
-              >
-                <PlusCircle className="h-4.5 w-4.5" /> {t('Enroll Student')}
-              </button>
             </div>
           </div>
 
@@ -473,13 +529,63 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <td className="p-4 text-slate-400 font-mono text-[11px]">{student.phone}</td>
                       <td className="p-4 text-slate-500 font-mono text-[11px]">{student.parentPhone || 'Unlinked'}</td>
                       <td className="p-4">
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                          student.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' :
-                          student.status === 'Pending' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' :
-                          'bg-slate-950 text-slate-500'
-                        }`}>
-                          {student.status}
-                        </span>
+                        {student.status === 'Pending' ? (
+                          <div className="flex gap-1.5">
+                            <button
+                              onClick={async () => {
+                                try {
+                                  const res = await api.approveStudent(student.id, 'accept');
+                                  setAdminNotification(res.msg || `Accepted ${student.name}`);
+                                  setTimeout(() => setAdminNotification(null), 4000);
+                                  
+                                  // Refresh data
+                                  const [updatedStudents, updatedLogs] = await Promise.all([
+                                    api.getAdminStudents(),
+                                    api.getActivityLogs()
+                                  ]);
+                                  setStudents(updatedStudents);
+                                  setActivityLogs(updatedLogs);
+                                } catch (err: any) {
+                                  alert(err.message || 'Approval failed.');
+                                }
+                              }}
+                              className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-bold transition-all cursor-pointer hover:scale-105 active:scale-95 shadow-md shadow-emerald-600/20"
+                            >
+                              Accept
+                            </button>
+                            <button
+                              onClick={async () => {
+                                if (confirm(`Are you sure you want to decline and delete ${student.name}'s registry?`)) {
+                                  try {
+                                    const res = await api.approveStudent(student.id, 'decline');
+                                    setAdminNotification(res.msg || `Declined ${student.name}`);
+                                    setTimeout(() => setAdminNotification(null), 4000);
+                                    
+                                    // Refresh data
+                                    const [updatedStudents, updatedLogs] = await Promise.all([
+                                      api.getAdminStudents(),
+                                      api.getActivityLogs()
+                                    ]);
+                                    setStudents(updatedStudents);
+                                    setActivityLogs(updatedLogs);
+                                  } catch (err: any) {
+                                    alert(err.message || 'Decline failed.');
+                                  }
+                                }
+                              }}
+                              className="px-2.5 py-1 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-[10px] font-bold transition-all cursor-pointer hover:scale-105 active:scale-95 shadow-md shadow-rose-600/20"
+                            >
+                              Decline
+                            </button>
+                          </div>
+                        ) : (
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                            student.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' :
+                            'bg-slate-950 text-slate-500'
+                          }`}>
+                            {student.status}
+                          </span>
+                        )}
                       </td>
                       <td className="p-4 text-right">
                         <div className="flex items-center justify-end gap-2">
@@ -510,46 +616,60 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         {/* Audit Logs panel & Team listings and details */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          
-          {/* Active Logs tracking table list */}
+                    {/* Audit Logs Table (Actions Ledger) */}
           <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
             <div className="mb-4">
               <h3 className="text-sm font-bold text-white">{t('System Security Activity Audits')}</h3>
-              <span className="text-[11px] text-slate-550 block">Live database enrollment and transaction transcripts</span>
+              <span className="text-[11px] text-slate-550 block font-semibold text-slate-400">Live database enrollment and transaction transcripts</span>
             </div>
 
-            <div className="space-y-3.5 max-h-80 overflow-y-auto pr-1">
-              {activityLogs.map((log, lIdx) => (
-                <motion.div 
-                  key={log.id}
-                  initial={{ opacity: 0, x: -15 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: Math.min(lIdx * 0.04, 0.4), duration: 0.3 }}
-                  whileHover={{ scale: 1.01, x: 2 }}
-                  className="p-3 bg-slate-950 border border-slate-850 hover:border-slate-800 transition rounded-xl flex items-start gap-3.5"
-                >
-                  <div className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center ${
-                    log.type === 'New Enrollment' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' :
-                    log.type === 'Fee Payment' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
-                    log.type === 'Payment Failed' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
-                    'bg-slate-900 text-slate-400'
-                  }`}>
-                    {log.type === 'New Enrollment' ? <Plus className="h-4 w-4" /> :
-                     log.type === 'Fee Payment' ? <DollarSign className="h-4 w-4" /> :
-                     <Activity className="h-4 w-4" />}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-slate-200 block truncate">{log.type}</span>
-                      <span className="text-[9px] text-slate-500 font-mono whitespace-nowrap">{log.dateTime}</span>
-                    </div>
-                    <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed font-sans">{log.detail}</p>
-                    {log.amount && (
-                      <span className="inline-block mt-1 text-[10px] font-bold text-indigo-400">Ledger balance: -${log.amount}</span>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
+            <div className="overflow-x-auto max-h-80 overflow-y-auto pr-1">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead className="bg-slate-950 border-b border-slate-850 text-slate-400 font-bold uppercase tracking-wider text-[9px]">
+                  <tr>
+                    <th className="p-3">Student Name</th>
+                    <th className="p-3">Action Type</th>
+                    <th className="p-3">Detail</th>
+                    <th className="p-3">Date & Time</th>
+                    <th className="p-3 text-right">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-850">
+                  {activityLogs.map((log) => (
+                    <tr key={log.id} className="hover:bg-slate-950/40 transition">
+                      <td className="p-3 font-semibold text-slate-200">
+                        {log.studentName}
+                      </td>
+                      <td className="p-3">
+                        <span className={`px-2 py-0.5 rounded-lg text-[9px] font-bold ${
+                          log.type === 'New Enrollment' ? 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/30' :
+                          log.type === 'Fee Payment' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' :
+                          log.type === 'Payment Failed' ? 'bg-red-500/15 text-red-400 border border-red-500/30' :
+                          'bg-slate-800 text-slate-400'
+                        }`}>
+                          {log.type}
+                        </span>
+                      </td>
+                      <td className="p-3 text-slate-400 max-w-[200px] truncate" title={log.detail}>
+                        {log.detail}
+                        {log.amount && <span className="block mt-0.5 text-[10px] text-indigo-400 font-semibold">Ledger balance: -${log.amount}</span>}
+                      </td>
+                      <td className="p-3 text-slate-550 font-mono text-[10px]">
+                        {log.dateTime}
+                      </td>
+                      <td className="p-3 text-right">
+                        <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
+                          log.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-400 font-semibold' :
+                          log.status === 'Failed' ? 'bg-rose-500/10 text-rose-400 font-semibold' :
+                          'bg-slate-800 text-slate-405'
+                        }`}>
+                          {log.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
 
@@ -592,142 +712,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </div>
         </div>
       </main>
-
-      {/* Slide-out quick enrollment drawer form component */}
-      <AnimatePresence>
-        {showEnrollForm && (
-          <>
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.5 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black z-40 cursor-ew-resize"
-              onClick={() => setShowEnrollForm(false)}
-            />
-            
-            <motion.div 
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25 }}
-              className="fixed right-0 top-0 bottom-0 w-full sm:w-md bg-slate-900 border-l border-slate-800 shadow-2xl z-50 p-6 overflow-y-auto"
-            >
-              <div className="flex justify-between items-center mb-6">
-                <div>
-                  <h3 className="text-base font-bold text-white flex items-center gap-2">
-                    <PlusCircle className="text-indigo-400 h-5 w-5" /> Quick Student Enrollment
-                  </h3>
-                  <span className="text-xs text-slate-500">Insert new academic file entries instantly</span>
-                </div>
-                <button 
-                  onClick={() => setShowEnrollForm(false)}
-                  className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-
-              <form onSubmit={handleEnrollSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">First Name *</label>
-                    <input
-                      type="text"
-                      required
-                      value={enrollFirstName}
-                      onChange={(e) => setEnrollFirstName(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500"
-                      placeholder="Penelope"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Last Name *</label>
-                    <input
-                      type="text"
-                      required
-                      value={enrollLastName}
-                      onChange={(e) => setEnrollLastName(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500"
-                      placeholder="Chen"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Primary Grade Standard *</label>
-                  <select
-                    value={enrollGrade}
-                    onChange={(e) => setEnrollGrade(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 text-slate-300"
-                  >
-                    <option>9th Grade</option>
-                    <option>10th Grade</option>
-                    <option>11th Grade</option>
-                    <option>12th Grade</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Target Subject Honors Course</label>
-                  <select
-                    value={enrollSubject}
-                    onChange={(e) => setEnrollSubject(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 text-slate-300"
-                  >
-                    <option>Advanced Physics</option>
-                    <option>Calculus BC</option>
-                    <option>Chemistry Honors</option>
-                    <option>AP Literature</option>
-                    <option>Organic Chemistry</option>
-                  </select>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Student Contact Mobile *</label>
-                    <input
-                      type="tel"
-                      required
-                      value={enrollPhone}
-                      onChange={(e) => setEnrollPhone(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500"
-                      placeholder="14155559812"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Parent Mobile Contact</label>
-                    <input
-                      type="tel"
-                      value={enrollParentPhone}
-                      onChange={(e) => setEnrollParentPhone(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500"
-                      placeholder="14155550239"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Email Address</label>
-                  <input
-                    type="email"
-                    value={enrollEmail}
-                    onChange={(e) => setEnrollEmail(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500"
-                    placeholder="penelope.chen@edumail.com"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs rounded-xl transition cursor-pointer flex justify-center items-center gap-1.5"
-                >
-                  Create Academic Profile <ArrowRight className="h-4 w-4" />
-                </button>
-              </form>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
 
     </div>
   );

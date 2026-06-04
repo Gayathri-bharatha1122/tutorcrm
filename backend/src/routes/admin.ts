@@ -199,4 +199,65 @@ router.get('/teachers', async (req: AuthRequest, res: Response) => {
   }
 });
 
+// 6. APPROVE OR DECLINE STUDENT ENROLLMENT
+router.post('/students/:id/approve', async (req: AuthRequest, res: Response) => {
+  const { id } = req.params;
+  const { action } = req.body; // 'accept' | 'decline'
+
+  if (!action || !['accept', 'decline'].includes(action)) {
+    return res.status(400).json({ error: 'Valid action (accept or decline) is required.' });
+  }
+
+  try {
+    const studentUser = await User.findById(id);
+    if (!studentUser) {
+      return res.status(404).json({ error: 'Student user not found.' });
+    }
+
+    const studentProfile = await StudentProfile.findOne({ userId: id });
+    if (!studentProfile) {
+      return res.status(404).json({ error: 'Student profile not found.' });
+    }
+
+    const studentName = `${studentUser.firstName} ${studentUser.lastName}`;
+    const initials = getInitials(studentName);
+
+    if (action === 'accept') {
+      studentProfile.status = 'Active';
+      await studentProfile.save();
+
+      // Log activity
+      await ActivityLog.create({
+        studentName,
+        initials,
+        type: 'New Enrollment',
+        detail: `Student ${studentName} self-registration accepted and enrolled by Administrator.`,
+        dateTime: 'Just now',
+        status: 'Completed'
+      });
+
+      return res.json({ msg: `Student ${studentName} enrollment accepted successfully.` });
+    } else {
+      // action === 'decline'
+      await StudentProfile.deleteOne({ userId: id });
+      await User.deleteOne({ _id: id });
+
+      // Log activity
+      await ActivityLog.create({
+        studentName,
+        initials,
+        type: 'New Enrollment',
+        detail: `Student ${studentName} self-registration was declined by Administrator.`,
+        dateTime: 'Just now',
+        status: 'Failed'
+      });
+
+      return res.json({ msg: `Student ${studentName} enrollment declined and account removed.` });
+    }
+  } catch (error) {
+    console.error('Error approving student registration:', error);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
 export default router;

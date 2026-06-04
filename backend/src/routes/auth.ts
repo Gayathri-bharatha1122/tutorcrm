@@ -14,38 +14,38 @@ router.get('/verify-linkage', async (req: Request, res: Response) => {
   const { phone } = req.query;
 
   if (!phone) {
-    return res.status(400).json({ error: 'Student phone number is required.' });
+    return res.status(400).json({ error: 'Phone number is required.' });
   }
 
   try {
     const sanitized = (phone as string).replace(/\D/g, '');
     
-    // Find a student user that matches this phone
-    const studentUser = await User.findOne({ 
-      role: 'student', 
-      phone: { $regex: sanitized } 
-    });
+    // Find all student profiles where parentPhone matches this sanitized parent phone
+    const studentProfiles = await StudentProfile.find({ parentPhone: sanitized }).populate('userId');
 
-    if (!studentUser) {
+    if (studentProfiles.length === 0) {
       return res.status(404).json({ 
-        error: 'No active student found with that register phone ID in the campus database. Try "14155550218" for demonstration!' 
+        error: 'No registered student found with this parent phone number. Please ensure the student registers first and lists this parent number.' 
       });
     }
 
-    const studentProfile = await StudentProfile.findOne({ userId: studentUser._id });
+    const students = studentProfiles.map(p => {
+      const studentUser = p.userId as any;
+      return {
+        id: studentUser?._id,
+        name: studentUser ? `${studentUser.firstName} ${studentUser.lastName}` : 'Unknown Student',
+        grade: p.grade || '11th Grade',
+        subject: p.learningGoal || 'Advanced Physics'
+      };
+    });
 
     // Generate a simulated OTP (always '6423' for ease of testing as per frontend spec)
     const code = '6423';
     pendingOtps.set(sanitized, code);
 
     return res.json({
-      status: 'OTP_SENT',
-      student: {
-        id: studentUser._id,
-        name: `${studentUser.firstName} ${studentUser.lastName}`,
-        grade: studentProfile?.grade || '11th Grade',
-        subject: studentProfile?.learningGoal || 'Advanced Physics'
-      },
+      status: 'LINKED_STUDENTS_FOUND',
+      students,
       msg: 'Simulated OTP code sent: 6423'
     });
   } catch (error) {
@@ -65,8 +65,7 @@ router.post('/register', async (req: Request, res: Response) => {
     role, 
     grade, 
     learningGoal, 
-    parentPhone, 
-    studentPhoneLookup
+    parentPhone
   } = req.body;
 
   if (!email || !phone || !password || !role || !firstName || !lastName) {
@@ -74,13 +73,35 @@ router.post('/register', async (req: Request, res: Response) => {
   }
 
   try {
-    // Check if user already exists
-    const existingUser = await User.findOne({ $or: [{ email }, { phone }] });
-    if (existingUser) {
-      return res.status(400).json({ error: 'A user with this email or phone number already exists.' });
+    // Validate phone length
+    const sanitizedPhone = phone.replace(/\D/g, '');
+    if (sanitizedPhone.length !== 10) {
+      return res.status(400).json({ error: 'Phone number must be exactly 10 digits.' });
     }
 
+    // Validate parent phone if registering as student
+    let sanitizedParentPhone = '';
+    if (role === 'student') {
+      if (!parentPhone) {
+        return res.status(400).json({ error: 'Parent phone number is required.' });
+      }
+      sanitizedParentPhone = parentPhone.replace(/\D/g, '');
+      if (sanitizedParentPhone.length !== 10) {
+        return res.status(400).json({ error: 'Parent phone number must be exactly 10 digits.' });
+      }
+    }
 
+    // Check if phone number already exists
+    const existingPhone = await User.findOne({ phone: sanitizedPhone });
+    if (existingPhone) {
+      return res.status(400).json({ error: 'Already user exist with phone number' });
+    }
+
+    // Check if email already exists
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
+      return res.status(400).json({ error: 'A user with this email already exists.' });
+    }
 
     // Encrypt password
     const salt = await bcrypt.genSalt(10);
@@ -89,23 +110,23 @@ router.post('/register', async (req: Request, res: Response) => {
     // Create Base User
     const newUser = await User.create({
       email,
-      phone,
+      phone: sanitizedPhone,
       passwordHash,
       role,
       firstName,
       lastName
     });
 
-    // Create Profile context if student
+    // Create Profile context if student - Default to Pending
     if (role === 'student') {
       await StudentProfile.create({
         userId: newUser._id,
         grade: grade || '11th Grade',
         learningGoal: learningGoal || '',
-        parentPhone: parentPhone || '',
+        parentPhone: sanitizedParentPhone,
         avgGrade: 3.5,
         progress: 60,
-        status: 'Active'
+        status: 'Pending'
       });
     }
 
@@ -151,6 +172,14 @@ router.post('/login', async (req: Request, res: Response) => {
     const user = await User.findOne({ email, role });
     if (!user) {
       return res.status(400).json({ error: 'Invalid credentials or role selection mismatch.' });
+    }
+
+    // If student, check if pending approval
+    if (role === 'student') {
+      const studentProfile = await StudentProfile.findOne({ userId: user._id });
+      if (studentProfile && studentProfile.status === 'Pending') {
+        return res.status(403).json({ error: 'Your account is pending administrator approval. Please check back later.' });
+      }
     }
 
     // Match Password
