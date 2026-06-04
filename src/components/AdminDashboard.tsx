@@ -31,6 +31,14 @@ import { Student, Teacher, ActivityLog } from '../types';
 import { useLanguage } from '../LanguageContext';
 import { LanguageSelector } from './LanguageSelector';
 
+const AVAILABLE_COURSES = [
+  'Advanced Physics',
+  'Calculus BC',
+  'Chemistry Honors',
+  'AP Literature',
+  'Organic Chemistry'
+];
+
 const AnimatedCounter: React.FC<{ value: number; duration?: number; prefix?: string; suffix?: string; decimals?: number }> = ({ value, duration = 1000, prefix = '', suffix = '', decimals = 0 }) => {
   const [count, setCount] = useState(0);
 
@@ -86,6 +94,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [studentFormGrade, setStudentFormGrade] = useState('11th Grade');
   const [studentFormSubject, setStudentFormSubject] = useState('Advanced Physics');
   const [studentFormStatus, setStudentFormStatus] = useState<'Active' | 'Pending' | 'Inactive'>('Active');
+  const [studentFormPassword, setStudentFormPassword] = useState('');
 
   // Modal form fields - Tutor
   const [tutorFormFirstName, setTutorFormFirstName] = useState('');
@@ -94,8 +103,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [tutorFormPhone, setTutorFormPhone] = useState('');
   const [tutorFormSubject, setTutorFormSubject] = useState('');
   const [tutorFormExperience, setTutorFormExperience] = useState('1 year');
-  const [tutorFormCourses, setTutorFormCourses] = useState('');
+  const [tutorFormCourses, setTutorFormCourses] = useState<string[]>([]);
   const [tutorFormStatus, setTutorFormStatus] = useState<'Active' | 'On Leave'>('Active');
+  const [tutorFormPassword, setTutorFormPassword] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -131,6 +141,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setStudentFormGrade('11th Grade');
     setStudentFormSubject('Advanced Physics');
     setStudentFormStatus('Active');
+    setStudentFormPassword('');
     setStudentModalOpen(true);
   };
 
@@ -145,6 +156,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setStudentFormGrade(student.grade || '11th Grade');
     setStudentFormSubject(student.subject || 'Advanced Physics');
     setStudentFormStatus(student.status || 'Active');
+    setStudentFormPassword('');
     setStudentModalOpen(true);
   };
 
@@ -156,8 +168,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setTutorFormPhone('');
     setTutorFormSubject('');
     setTutorFormExperience('1 year');
-    setTutorFormCourses('');
+    setTutorFormCourses([]);
     setTutorFormStatus('Active');
+    setTutorFormPassword('');
     setTutorModalOpen(true);
   };
 
@@ -169,8 +182,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setTutorFormPhone(tutor.phone || '');
     setTutorFormSubject(tutor.subject || '');
     setTutorFormExperience(tutor.experience || '1 year');
-    setTutorFormCourses(tutor.courses ? tutor.courses.join(', ') : '');
+    setTutorFormCourses(tutor.courses || []);
     setTutorFormStatus(tutor.status || 'Active');
+    setTutorFormPassword('');
     setTutorModalOpen(true);
   };
 
@@ -189,6 +203,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       alert('Parent phone number must be exactly 10 digits.');
       return;
     }
+    if (!editingStudent && !studentFormPassword) {
+      alert('Password is required.');
+      return;
+    }
 
     const payload = {
       name: `${studentFormFirstName} ${studentFormLastName}`,
@@ -199,7 +217,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       parentPhone: studentFormParentPhone,
       grade: studentFormGrade,
       subject: studentFormSubject,
-      status: studentFormStatus
+      status: studentFormStatus,
+      password: studentFormPassword
     };
 
     try {
@@ -237,6 +256,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       alert('Tutor phone number must be exactly 10 digits.');
       return;
     }
+    if (!editingTutor && !tutorFormPassword) {
+      alert('Password is required.');
+      return;
+    }
 
     const payload = {
       firstName: tutorFormFirstName,
@@ -246,7 +269,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       subject: tutorFormSubject,
       experience: tutorFormExperience,
       courses: tutorFormCourses,
-      status: tutorFormStatus
+      status: tutorFormStatus,
+      password: tutorFormPassword
     };
 
     try {
@@ -1541,6 +1565,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </select>
                 </div>
 
+                {!editingStudent && (
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Password *</label>
+                    <input
+                      type="password"
+                      required
+                      value={studentFormPassword}
+                      onChange={(e) => setStudentFormPassword(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 text-white"
+                      placeholder="student123"
+                    />
+                  </div>
+                )}
+
                 <button
                   type="submit"
                   className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs rounded-xl transition cursor-pointer flex justify-center items-center gap-1.5 mt-2"
@@ -1663,14 +1701,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Assigned Courses (Comma Separated)</label>
-                  <input
-                    type="text"
-                    value={tutorFormCourses}
-                    onChange={(e) => setTutorFormCourses(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 text-white"
-                    placeholder="Cosmology, Quantum Mechanics"
-                  />
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1.5">Assigned Courses</label>
+                  <div className="grid grid-cols-2 gap-2 bg-slate-950 border border-slate-800 p-3 rounded-xl">
+                    {AVAILABLE_COURSES.map((course) => {
+                      const isChecked = tutorFormCourses.includes(course);
+                      return (
+                        <label key={course} className="flex items-center gap-2 text-[11px] text-slate-350 cursor-pointer hover:text-white">
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={() => {
+                              if (isChecked) {
+                                setTutorFormCourses(tutorFormCourses.filter(c => c !== course));
+                              } else {
+                                setTutorFormCourses([...tutorFormCourses, course]);
+                              }
+                            }}
+                            className="accent-indigo-500 rounded border-slate-800"
+                          />
+                          {course}
+                        </label>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 <div>
@@ -1684,6 +1737,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <option value="On Leave">On Leave</option>
                   </select>
                 </div>
+
+                {!editingTutor && (
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Password *</label>
+                    <input
+                      type="password"
+                      required
+                      value={tutorFormPassword}
+                      onChange={(e) => setTutorFormPassword(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 text-white"
+                      placeholder="tutor123"
+                    />
+                  </div>
+                )}
 
                 <button
                   type="submit"

@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User, StudentProfile, IStudentProfile } from '../models';
+import { authenticateToken, AuthRequest } from '../middlewares/auth';
 
 const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_tutor_crm_jwt_token_key_123!';
@@ -213,6 +214,32 @@ router.post('/login', async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Error during login:', error);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
+// 4. GET CURRENT USER PROFILE
+router.get('/me', authenticateToken, async (req: AuthRequest, res: Response) => {
+  if (!req.user) {
+    return res.status(401).json({ error: 'User context not found.' });
+  }
+
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User profile not found.' });
+    }
+
+    return res.json({
+      user: {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+        name: `${user.firstName} ${user.lastName}`
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching current user:', error);
     return res.status(500).json({ error: 'Internal server error.' });
   }
 });

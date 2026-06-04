@@ -1,6 +1,6 @@
 import { Router, Response } from 'express';
 import { authenticateToken, AuthRequest } from '../middlewares/auth';
-import { User, StudentProfile, Attendance, ExamResult, Quiz, ExamSchedule, ActivityLog } from '../models';
+import { User, StudentProfile, TutorProfile, Attendance, ExamResult, Quiz, ExamSchedule, ActivityLog } from '../models';
 
 const router = Router();
 
@@ -9,18 +9,40 @@ router.use(authenticateToken);
 // 1. FETCH TUTOR'S ASSIGNED STUDENTS
 router.get('/students', async (req: AuthRequest, res: Response) => {
   try {
+    const tutorId = req.user?.id;
+    const tutorProfile = await TutorProfile.findOne({ userId: tutorId }).lean();
+
+    if (!tutorProfile) {
+      return res.json([]);
+    }
+
+    const tutorSubjectLower = (tutorProfile.subject || '').toLowerCase();
+    const tutorCoursesLower = (tutorProfile.courses || []).map((c: string) => c.toLowerCase());
+
+    const isMatch = (studentSubject: string) => {
+      const subLower = (studentSubject || '').toLowerCase();
+      if (tutorSubjectLower.includes(subLower) || subLower.includes(tutorSubjectLower)) {
+        return true;
+      }
+      return tutorCoursesLower.some((course: string) => 
+        course.includes(subLower) || subLower.includes(course)
+      );
+    };
+
     const students = await User.find({ role: 'student' }).lean();
     const profiles = await StudentProfile.find({}).lean();
 
-    const studentData = students.map(s => {
-      const p = profiles.find(profile => profile.userId.toString() === s._id.toString());
-      return {
-        id: s._id,
-        name: `${s.firstName} ${s.lastName}`,
-        grade: p?.grade || '11th Grade',
-        subject: p?.learningGoal || 'Advanced Physics'
-      };
-    });
+    const studentData = students
+      .map(s => {
+        const p = profiles.find(profile => profile.userId.toString() === s._id.toString());
+        return {
+          id: s._id,
+          name: `${s.firstName} ${s.lastName}`,
+          grade: p?.grade || '11th Grade',
+          subject: p?.learningGoal || 'Advanced Physics'
+        };
+      })
+      .filter(s => isMatch(s.subject));
 
     return res.json(studentData);
   } catch (error) {
@@ -39,6 +61,33 @@ router.post('/attendance', async (req: AuthRequest, res: Response) => {
   }
 
   try {
+    const studentProfile = await StudentProfile.findOne({ userId: studentId });
+    if (!studentProfile) {
+      return res.status(404).json({ error: 'Student profile not found.' });
+    }
+
+    const tutorProfile = await TutorProfile.findOne({ userId: tutorId }).lean();
+    if (!tutorProfile) {
+      return res.status(403).json({ error: 'Tutor profile not found.' });
+    }
+
+    const tutorSubjectLower = (tutorProfile.subject || '').toLowerCase();
+    const tutorCoursesLower = (tutorProfile.courses || []).map((c: string) => c.toLowerCase());
+
+    const isMatch = (studentSubject: string) => {
+      const subLower = (studentSubject || '').toLowerCase();
+      if (tutorSubjectLower.includes(subLower) || subLower.includes(tutorSubjectLower)) {
+        return true;
+      }
+      return tutorCoursesLower.some((course: string) => 
+        course.includes(subLower) || subLower.includes(course)
+      );
+    };
+
+    if (!isMatch(studentProfile.learningGoal)) {
+      return res.status(403).json({ error: 'You can only mark attendance for students registered in your courses.' });
+    }
+
     const todayStr = new Date().toISOString().split('T')[0];
 
     // Perform upsert for attendance status on student for today
