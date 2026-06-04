@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { Student, Teacher } from '../types';
 import { useLanguage } from '../LanguageContext';
+
 import { LanguageSelector } from './LanguageSelector';
 
 const AnimatedCounter: React.FC<{ value: number; duration?: number; prefix?: string; suffix?: string; decimals?: number }> = ({ value, duration = 1000, prefix = '', suffix = '', decimals = 0 }) => {
@@ -54,12 +55,13 @@ interface TimetableSlot {
   schedule: string;
   room: string;
   isSpecial?: boolean;
+  subject?: string;
 }
 
 const TIMETABLE_SLOTS: TimetableSlot[] = [
-  { id: 'slot-1', title: 'Kinematic Vectors theory', schedule: 'Tuesdays at 3:00 PM', room: 'Room B1' },
-  { id: 'slot-2', title: 'Quantum mechanics fundamentals', schedule: 'Thursdays at 3:00 PM', room: 'Lab Hall 1' },
-  { id: 'slot-3', title: 'General electromagnetic finals prep', schedule: 'Fridays at 2:30 PM', room: 'Seminar Studio', isSpecial: true }
+  { id: 'slot-1', title: 'Kinematic Vectors theory', schedule: 'Tuesdays at 3:00 PM', room: 'Room B1', subject: 'Physics' },
+  { id: 'slot-2', title: 'Quantum mechanics fundamentals', schedule: 'Thursdays at 3:00 PM', room: 'Lab Hall 1', subject: 'Physics' },
+  { id: 'slot-3', title: 'General electromagnetic finals prep', schedule: 'Fridays at 2:30 PM', room: 'Seminar Studio', isSpecial: true, subject: 'Physics' }
 ];
 
 export const TutorDashboard: React.FC<TutorDashboardProps> = ({
@@ -85,7 +87,44 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
   
   // Date and Time Slot selectors state
   const [selectedDate, setSelectedDate] = useState<string>('2026-06-03');
-  const [selectedSlotId, setSelectedSlotId] = useState<string>('slot-1');
+  const [selectedSlotId, setSelectedSlotId] = useState<string>('');
+  const [tutorCourses, setTutorCourses] = useState<string[]>([]);
+  const [filteredSlots, setFilteredSlots] = useState<TimetableSlot[]>([]);
+  const [allSameSubject, setAllSameSubject] = useState<boolean>(false);
+
+  // Fetch tutor profile to determine courses
+  useEffect(() => {
+    const fetchTutorProfile = async () => {
+      try {
+        const profile = await api.getCurrentUser();
+        // Assuming profile.courses is an array of course titles strings
+        setTutorCourses(profile.courses || []);
+      } catch (err) {
+        console.error('Failed to load tutor profile', err);
+      }
+    };
+    fetchTutorProfile();
+  }, []);
+
+  // Update filtered slots when courses or slots list change
+  useEffect(() => {
+    if (tutorCourses.length === 0) {
+      setFilteredSlots(TIMETABLE_SLOTS);
+      setSelectedSlotId(TIMETABLE_SLOTS[0].id);
+      setAllSameSubject(false);
+    } else {
+      // Determine if all courses share the same base subject (first word)
+      const baseSubject = tutorCourses[0].split(' ')[0].toLowerCase();
+      const sameSubject = tutorCourses.every(c => c.toLowerCase().startsWith(baseSubject));
+      setAllSameSubject(sameSubject);
+      const matched = TIMETABLE_SLOTS.filter(slot =>
+        slot.subject && slot.subject.toLowerCase() === baseSubject
+      );
+      const slotsToUse = matched.length > 0 ? matched : TIMETABLE_SLOTS;
+      setFilteredSlots(slotsToUse);
+      setSelectedSlotId(slotsToUse[0].id);
+    }
+  }, [tutorCourses]);
 
   // Structured attendance: Record<date, Record<slotId, Record<studentId, status>>>
   const [attendanceRecords, setAttendanceRecords] = useState<Record<string, Record<string, Record<string, 'Present' | 'Absent' | 'Excused'>>>>({
@@ -118,7 +157,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
   };
 
   const handleSubmitAttendance = () => {
-    const slot = TIMETABLE_SLOTS.find(s => s.id === selectedSlotId);
+    const slot = filteredSlots.find(s => s.id === selectedSlotId);
     if (!slot) return;
     setAssignedSuccessMsg(`Attendance roll for "${slot.title}" on ${selectedDate} submitted successfully. Parent notifications dispatched.`);
     setTimeout(() => setAssignedSuccessMsg(null), 5000);
@@ -346,17 +385,25 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
                   <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
                     {t('Lecture Slot')}
                   </label>
-                  <select
-                    value={selectedSlotId}
-                    onChange={(e) => setSelectedSlotId(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-800 text-xs px-3 py-2 rounded-xl outline-none focus:border-teal-500 text-slate-300 transition-all font-medium"
-                  >
-                    {TIMETABLE_SLOTS.map(slot => (
-                      <option key={slot.id} value={slot.id}>
-                        {slot.title} ({slot.schedule.replace(' at ', ' @ ')})
-                      </option>
-                    ))}
-                  </select>
+                  {allSameSubject ? (
+                      <div className="py-2 text-slate-200 font-medium">{filteredSlots[0].subject?.toUpperCase() ?? 'Course'} Attendance</div>
+                    ) : (
+                      filteredSlots.length === 1 ? (
+                        <div className="py-2 text-slate-200 font-medium">{filteredSlots[0].title} ({filteredSlots[0].schedule.replace(' at ', ' @ ')})</div>
+                      ) : (
+                        <select
+                          value={selectedSlotId}
+                          onChange={(e) => setSelectedSlotId(e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-800 text-xs px-3 py-2 rounded-xl outline-none focus:border-teal-500 text-slate-300 transition-all font-medium"
+                        >
+                          {filteredSlots.map(slot => (
+                            <option key={slot.id} value={slot.id}>
+                              {slot.title} ({slot.schedule.replace(' at ', ' @ ')})
+                            </option>
+                          ))}
+                        </select>
+                      )
+                    )}
                 </div>
               </div>
 

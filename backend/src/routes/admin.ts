@@ -91,10 +91,10 @@ router.get('/students', async (req: AuthRequest, res: Response) => {
 
 // 3. ENROLL NEW STUDENT
 router.post('/students/enroll', async (req: AuthRequest, res: Response) => {
-  const { name, grade, subject, phone, email, parentPhone } = req.body;
+  const { name, grade, subject, phone, email, parentPhone, password } = req.body;
 
-  if (!name || !phone) {
-    return res.status(400).json({ error: 'Student name and contact phone are required.' });
+  if (!name || !phone || !password) {
+    return res.status(400).json({ error: 'Student name, contact phone, and password are required.' });
   }
 
   try {
@@ -108,9 +108,8 @@ router.post('/students/enroll', async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'A student with this phone or email already exists.' });
     }
 
-    // Default password student123
     const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash('student123', salt);
+    const passwordHash = await bcrypt.hash(password, salt);
 
     // Create Base User
     const newUser = await User.create({
@@ -372,10 +371,10 @@ router.delete('/students/:id', async (req: AuthRequest, res: Response) => {
 
 // 10. POST (ADD) TUTOR
 router.post('/tutors', async (req: AuthRequest, res: Response) => {
-  const { firstName, lastName, email, phone, subject, experience, courses, status } = req.body;
+  const { firstName, lastName, email, phone, subject, experience, courses, status, password } = req.body;
 
-  if (!firstName || !lastName || !email || !phone) {
-    return res.status(400).json({ error: 'First name, last name, email, and phone are required.' });
+  if (!firstName || !lastName || !email || !phone || !password) {
+    return res.status(400).json({ error: 'First name, last name, email, phone, and password are required.' });
   }
 
   try {
@@ -385,7 +384,7 @@ router.post('/tutors', async (req: AuthRequest, res: Response) => {
     }
 
     const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash('tutor123', salt);
+    const passwordHash = await bcrypt.hash(password, salt);
 
     const newUser = await User.create({
       firstName,

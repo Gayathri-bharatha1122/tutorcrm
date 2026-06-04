@@ -89,6 +89,32 @@ export const collections: Record<string, any[]> = {
 const createMockModel = (collectionName: string) => {
   const getItems = () => collections[collectionName];
 
+  // Helper function to attach save and populate methods to objects
+  const attachSave = (item: any) => {
+    if (!item) return item;
+    const result = { ...item };
+    result.save = async function() {
+      const list = getItems();
+      const idx = list.findIndex(x => x._id === this._id);
+      if (idx !== -1) {
+        // Strip save and populate functions so they don't persist in the raw array
+        const savedItem = { ...this };
+        delete (savedItem as any).save;
+        delete (savedItem as any).populate;
+        list[idx] = savedItem;
+      }
+      return this;
+    };
+    result.populate = async (path: string) => {
+      if (path === 'userId') {
+        const mappedUser = collections.User.find(u => u._id.toString() === item.userId.toString());
+        result.userId = mappedUser ? attachSave({ ...mappedUser }) : item.userId;
+      }
+      return result;
+    };
+    return result;
+  };
+
   return {
     find(filter: any = {}) {
       let items = [...getItems()];
@@ -122,7 +148,7 @@ const createMockModel = (collectionName: string) => {
       }
 
       // Chainable return helpers
-      const result: any = [...items];
+      const result: any = items.map(attachSave);
       result.sort = () => result;
       result.limit = () => result;
       result.lean = () => result;
@@ -132,20 +158,7 @@ const createMockModel = (collectionName: string) => {
 
     findOne(filter: any = {}) {
       const items = this.find(filter);
-      const match = items[0] || null;
-      if (match) {
-        // Return object with populate mapping helper
-        const result = { ...match };
-        result.populate = async (path: string) => {
-          if (path === 'userId') {
-            const mappedUser = collections.User.find(u => u._id.toString() === match.userId.toString());
-            result.userId = mappedUser ? { ...mappedUser } : match.userId;
-          }
-          return result;
-        };
-        return result;
-      }
-      return null;
+      return items[0] || null;
     },
 
     findById(id: any) {
@@ -161,17 +174,8 @@ const createMockModel = (collectionName: string) => {
         ...data
       };
 
-      // Add instance methods for things like .save()
-      newObj.save = async function() {
-        const idx = list.findIndex(x => x._id === this._id);
-        if (idx !== -1) {
-          list[idx] = { ...this };
-        }
-        return this;
-      };
-
       list.push(newObj);
-      return newObj;
+      return attachSave(newObj);
     },
 
     async findOneAndUpdate(filter: any, update: any, options: any = {}) {
@@ -195,10 +199,48 @@ const createMockModel = (collectionName: string) => {
       
       const idx = list.findIndex(x => x._id === match._id);
       if (idx !== -1) {
-        list[idx] = { ...match };
+        const savedItem = { ...match };
+        delete (savedItem as any).save;
+        delete (savedItem as any).populate;
+        list[idx] = savedItem;
       }
       
       return match;
+    },
+
+    async deleteOne(filter: any = {}) {
+      const list = getItems();
+      const matchIdx = list.findIndex(item => {
+        for (const key in filter) {
+          if (item[key] !== filter[key]) return false;
+        }
+        return true;
+      });
+      if (matchIdx !== -1) {
+        list.splice(matchIdx, 1);
+        return { deletedCount: 1 };
+      }
+      return { deletedCount: 0 };
+    },
+
+    async deleteMany(filter: any = {}) {
+      const list = getItems();
+      let deletedCount = 0;
+      for (let i = list.length - 1; i >= 0; i--) {
+        const item = list[i];
+        let matches = true;
+        for (const key in filter) {
+          if (item[key] !== filter[key]) {
+            matches = false;
+            break;
+          }
+        }
+        if (matches) {
+          list.splice(i, 1);
+          deletedCount++;
+        }
+      }
+      return { deletedCount };
     },
 
     async countDocuments(filter: any = {}) {
