@@ -206,7 +206,7 @@ export default function App() {
 
   return (
     <LanguageProvider>
-      <div className="bg-slate-950 min-h-screen w-full overflow-x-hidden text-slate-100 flex flex-col justify-between selection:bg-indigo-500 selection:text-white relative">
+      <div className="bg-slate-800 min-h-screen w-full overflow-x-hidden text-slate-100 flex flex-col justify-between selection:bg-indigo-500 selection:text-white relative">
 
         {/* Global Mesh Gradient Background */}
         <div 
