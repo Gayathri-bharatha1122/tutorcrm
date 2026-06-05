@@ -14,7 +14,15 @@ import {
   ArrowRight,
   GraduationCap,
   Sparkles,
-  Award
+  Award,
+  BookOpen,
+  FlaskConical,
+  Calculator,
+  Atom,
+  Mail,
+  Phone,
+  Clock,
+  MapPin
 } from 'lucide-react';
 import { Bill, Announcement } from '../types';
 import { useLanguage } from '../LanguageContext';
@@ -60,6 +68,28 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
   const [bills, setBills] = useState<Bill[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [linkedStudentName, setLinkedStudentName] = useState<string>(studentName);
+  const [courses, setCourses] = useState<any[]>([]);
+  const [contactingTutor, setContactingTutor] = useState<string | null>(null);
+
+  // Scroll to section when navigated via sidebar
+  React.useEffect(() => {
+    if (currentPath?.includes('/courses')) {
+      setTimeout(() => {
+        const el = document.getElementById('courses');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    } else if (currentPath?.includes('/attendance')) {
+      setTimeout(() => {
+        const el = document.getElementById('attendance');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    } else if (currentPath?.includes('/fees')) {
+      setTimeout(() => {
+        const el = document.getElementById('billing');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, [currentPath]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -70,6 +100,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
         ]);
         setAnnouncements(dashboardData.announcements || []);
         setBills(billsData || []);
+        setCourses(dashboardData.courses || []);
         if (dashboardData.student?.name) {
           setLinkedStudentName(dashboardData.student.name);
         }
@@ -193,7 +224,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
 
       {/* Main Content Area */}
       <main className="w-full px-4 sm:px-8 lg:px-12 py-8 space-y-8 relative z-10">
-        
+
         {/* Payments Status Notification alerts */}
         <AnimatePresence>
           {paymentSuccessMessage && (
@@ -215,7 +246,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
         </AnimatePresence>
 
         {/* Highlight Child Metrics Header with tracking gauges */}
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
+        <div id="overview" className="bg-slate-900 border border-slate-800 rounded-3xl p-6 scroll-mt-20">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-slate-850 pb-6 mb-6 gap-4">
             <div className="space-y-1">
               <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest block bg-amber-500/10 w-max px-2.5 py-0.5 rounded-md">
@@ -312,7 +343,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
         </div>
 
         {/* Attendance Calendar Card */}
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
+        <div id="attendance" className="bg-slate-900 border border-slate-800 rounded-3xl p-6 scroll-mt-20">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
             <div className="space-y-1">
               <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest block bg-emerald-500/10 w-max px-2.5 py-0.5 rounded-md">
@@ -427,7 +458,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
         </div>
 
         {/* Split layouts: billing list left, announcements logs right */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <div id="billing" className="grid grid-cols-1 lg:grid-cols-5 gap-6 scroll-mt-20">
           
           {/* Itemized ledger outstanding tuition bills list */}
           <div className="lg:col-span-3 bg-slate-900 border border-slate-800 rounded-3xl p-6">
@@ -555,6 +586,182 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
             </div>
           </div>
 
+        </div>
+
+        {/* Messages anchor */}
+        <div id="messages" className="hidden scroll-mt-20" />
+
+        {/* Enrolled Courses & Tutors Section */}
+        <div id="courses" className="bg-slate-900 border border-slate-800 rounded-3xl p-6 scroll-mt-20">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+            <div className="space-y-1">
+              <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest block bg-indigo-500/10 w-max px-2.5 py-0.5 rounded-md">
+                Enrolled Courses
+              </span>
+              <h3 className="text-lg font-bold text-white flex items-center gap-1.5">
+                <GraduationCap className="h-5 w-5 text-indigo-400" /> Courses & Assigned Tutors
+              </h3>
+              <p className="text-slate-400 text-xs">Your child's active courses with tutor details and direct contact availability.</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {courses.length === 0 ? (
+              <div className="col-span-3 text-center py-10 text-slate-500 text-xs font-semibold">No courses enrolled yet.</div>
+            ) : (
+              courses.map((course, idx) => {
+                const isAvailable = course.tutorAvailability === 'Active';
+                const iconMap: Record<string, React.ReactNode> = {
+                  physics: <Atom className="h-5 w-5" />,
+                  math: <Calculator className="h-5 w-5" />,
+                  chem: <FlaskConical className="h-5 w-5" />,
+                  lit: <BookOpen className="h-5 w-5" />
+                };
+                const colorMap: Record<string, string> = {
+                  physics: 'indigo',
+                  math: 'teal',
+                  chem: 'amber',
+                  lit: 'rose'
+                };
+                const color = colorMap[course.iconType] || 'indigo';
+                const colorClasses: Record<string, { bg: string; border: string; text: string; progBg: string }> = {
+                  indigo: { bg: 'bg-indigo-500/10', border: 'border-indigo-500/20', text: 'text-indigo-400', progBg: 'bg-indigo-500' },
+                  teal:   { bg: 'bg-teal-500/10',   border: 'border-teal-500/20',   text: 'text-teal-400',   progBg: 'bg-teal-500'   },
+                  amber:  { bg: 'bg-amber-500/10',  border: 'border-amber-500/20',  text: 'text-amber-400',  progBg: 'bg-amber-500'  },
+                  rose:   { bg: 'bg-rose-500/10',   border: 'border-rose-500/20',   text: 'text-rose-400',   progBg: 'bg-rose-500'   }
+                };
+                const cc = colorClasses[color];
+
+                return (
+                  <motion.div
+                    key={course.id}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.07, duration: 0.35 }}
+                    whileHover={{ y: -3, scale: 1.01 }}
+                    className="bg-slate-950 border border-slate-850 rounded-2xl p-5 flex flex-col gap-4 transition-all hover:border-slate-700 hover:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.4)]"
+                  >
+                    {/* Course header */}
+                    <div className="flex items-start gap-3">
+                      <div className={`w-11 h-11 rounded-xl ${cc.bg} ${cc.border} border ${cc.text} flex items-center justify-center shrink-0`}>
+                        {iconMap[course.iconType] || <BookOpen className="h-5 w-5" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <span className="text-xs font-bold text-white block truncate">{course.name}</span>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <MapPin className="h-3 w-3 text-slate-500 shrink-0" />
+                          <span className="text-[10px] text-slate-500 font-semibold truncate">{course.room || 'TBA'}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Progress bar */}
+                    <div>
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-[9px] font-bold text-slate-500 uppercase">Course Progress</span>
+                        <span className={`text-[10px] font-extrabold font-mono ${cc.text}`}>{course.progress}%</span>
+                      </div>
+                      <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${course.progress}%` }}
+                          transition={{ duration: 1, ease: 'easeOut', delay: idx * 0.07 + 0.2 }}
+                          className={`h-full ${cc.progBg} rounded-full`}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Schedule */}
+                    <div className="flex items-center gap-2 bg-slate-900/60 rounded-xl px-3 py-2 border border-slate-800/60">
+                      <Clock className="h-3.5 w-3.5 text-slate-500 shrink-0" />
+                      <span className="text-[10px] text-slate-400 font-semibold">{course.schedule}</span>
+                    </div>
+
+                    {/* Tutor + Availability */}
+                    <div className="border-t border-slate-800 pt-3 flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className="w-7 h-7 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0">
+                          <User className="h-3.5 w-3.5 text-slate-400" />
+                        </div>
+                        <div className="min-w-0">
+                          <span className="text-[11px] font-bold text-white block truncate">{course.tutorName}</span>
+                          <div className="flex items-center gap-1 mt-0.5">
+                            {isAvailable ? (
+                              <>
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                                <span className="text-[9px] text-emerald-400 font-bold uppercase">Available</span>
+                              </>
+                            ) : course.tutorAvailability === 'On Leave' ? (
+                              <>
+                                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
+                                <span className="text-[9px] text-amber-400 font-bold uppercase">On Leave</span>
+                              </>
+                            ) : (
+                              <>
+                                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0" />
+                                <span className="text-[9px] text-indigo-400 font-bold uppercase">Contact Available</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Contact button */}
+                      <button
+                        onClick={() => setContactingTutor(contactingTutor === course.id ? null : course.id)}
+                        className={`shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
+                          isAvailable
+                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 hover:scale-105'
+                            : course.tutorAvailability === 'On Leave'
+                              ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20 hover:bg-amber-500/20 hover:scale-105'
+                              : 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/20 hover:scale-105'
+                        }`}
+                        title={`Contact ${course.tutorName}`}
+                      >
+                        <Mail className="h-3 w-3" />
+                        Contact
+                      </button>
+                    </div>
+
+                    {/* Expanded contact panel */}
+                    <AnimatePresence>
+                      {contactingTutor === course.id && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.25 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="bg-emerald-950/20 border border-emerald-500/15 rounded-xl p-3 flex flex-col gap-2">
+                            <span className="text-[10px] font-bold text-emerald-400 uppercase">Contact Options</span>
+                            <a
+                              href="mailto:alistair.miller@edumanage.com"
+                              className="flex items-center gap-2 text-[10px] text-slate-300 hover:text-white font-semibold transition group"
+                            >
+                              <div className="w-6 h-6 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center group-hover:bg-indigo-500/20 transition">
+                                <Mail className="h-3 w-3 text-indigo-400" />
+                              </div>
+                              Send Email
+                            </a>
+                            <a
+                              href="tel:+14155550001"
+                              className="flex items-center gap-2 text-[10px] text-slate-300 hover:text-white font-semibold transition group"
+                            >
+                              <div className="w-6 h-6 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center group-hover:bg-teal-500/20 transition">
+                                <Phone className="h-3 w-3 text-teal-400" />
+                              </div>
+                              Call Tutor
+                            </a>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                );
+              })
+            )}
+          </div>
         </div>
 
       </main>

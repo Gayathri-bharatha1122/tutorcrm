@@ -1,6 +1,6 @@
 import { Router, Response } from 'express';
 import { authenticateToken, AuthRequest } from '../middlewares/auth';
-import { User, StudentProfile, Bill, Attendance, Announcement, ActivityLog } from '../models';
+import { User, StudentProfile, Bill, Attendance, Announcement, ActivityLog, Course, TutorProfile } from '../models';
 
 const router = Router();
 
@@ -30,6 +30,24 @@ router.get('/dashboard', async (req: AuthRequest, res: Response) => {
     // Fetch monthly attendance logs for the child
     const attendances = await Attendance.find({ studentId: studentUser._id });
 
+    // Fetch all courses with tutor availability
+    const courses = await Course.find({});
+    const tutorProfiles = await TutorProfile.find({});
+    const coursesWithTutors = courses.map((course: any) => {
+      const tutorProfile = tutorProfiles.find((tp: any) => tp.userId === course.tutorId || tp.userId?.toString() === course.tutorId?.toString());
+      return {
+        id: course._id,
+        name: course.name,
+        tutorName: course.tutorName,
+        tutorId: course.tutorId,
+        schedule: course.schedule,
+        iconType: course.iconType,
+        progress: course.progress,
+        room: course.room,
+        tutorAvailability: tutorProfile ? tutorProfile.status : 'Unknown'
+      };
+    });
+
     return res.json({
       student: {
         id: studentUser._id,
@@ -40,7 +58,8 @@ router.get('/dashboard', async (req: AuthRequest, res: Response) => {
         learningGoal: studentProfile.learningGoal
       },
       announcements,
-      attendances: attendances.map(a => ({
+      courses: coursesWithTutors,
+      attendances: attendances.map((a: any) => ({
         date: a.date,
         status: a.status
       }))

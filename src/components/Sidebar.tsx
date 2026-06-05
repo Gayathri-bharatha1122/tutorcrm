@@ -105,6 +105,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       { name: t('Dashboard'), path: '/parent/dashboard', icon: <LayoutDashboard className="h-4.5 w-4.5" /> },
       { name: t('Child Progress'), path: '/parent/progress', icon: <TrendingUp className="h-4.5 w-4.5" /> },
       { name: t('Attendance'), path: '/parent/attendance', icon: <Calendar className="h-4.5 w-4.5" /> },
+      { name: t('Courses & Tutors'), path: '/parent/courses', icon: <GraduationCap className="h-4.5 w-4.5" /> },
       { name: t('Fees'), path: '/parent/fees', icon: <DollarSign className="h-4.5 w-4.5" /> },
       { name: t('Notifications'), path: '/parent/notifications', icon: <Bell className="h-4.5 w-4.5" /> },
       { name: t('Profile'), path: '/parent/profile', icon: <User className="h-4.5 w-4.5" /> }
