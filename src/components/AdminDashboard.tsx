@@ -104,6 +104,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [tutorModalOpen, setTutorModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<any>(null); 
   const [editingTutor, setEditingTutor] = useState<any>(null); 
+  const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] = useState(false);
+  const [tutorFormSalaryStatus, setTutorFormSalaryStatus] = useState<'Credited' | 'Pending'>('Pending');
+  const [tutorFormAttendance, setTutorFormAttendance] = useState('95%'); 
 
   // Modal form fields - Student
   const [studentFormFirstName, setStudentFormFirstName] = useState('');
@@ -191,6 +194,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setTutorFormCourses([]);
     setTutorFormStatus('Active');
     setTutorFormPassword('');
+    setTutorFormSalaryStatus('Pending');
+    setTutorFormAttendance('95%');
     setTutorModalOpen(true);
   };
 
@@ -205,6 +210,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setTutorFormCourses(tutor.courses || []);
     setTutorFormStatus(tutor.status || 'Active');
     setTutorFormPassword('');
+    setTutorFormSalaryStatus(tutor.salaryStatus || 'Pending');
+    setTutorFormAttendance(tutor.attendance || '95%');
     setTutorModalOpen(true);
   };
 
@@ -290,7 +297,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       experience: tutorFormExperience,
       courses: tutorFormCourses,
       status: tutorFormStatus,
-      password: tutorFormPassword
+      password: tutorFormPassword,
+      salaryStatus: tutorFormSalaryStatus,
+      attendance: tutorFormAttendance
     };
 
     try {
@@ -408,10 +417,59 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           <div className="flex items-center gap-4">
             <div className="relative">
-              <button className="p-1.5 hover:bg-slate-900 rounded-lg text-slate-400 hover:text-indigo-400 transition relative">
+              <button 
+                onClick={() => setIsNotificationDropdownOpen(!isNotificationDropdownOpen)}
+                className={`p-1.5 hover:bg-slate-900 rounded-lg transition relative cursor-pointer ${isNotificationDropdownOpen ? 'bg-slate-900 text-indigo-400' : 'text-slate-400 hover:text-indigo-400'}`}
+              >
                 <Bell className="h-4.5 w-4.5" />
                 <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-indigo-500" />
               </button>
+
+              <AnimatePresence>
+                {isNotificationDropdownOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setIsNotificationDropdownOpen(false)} />
+                    
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      className="absolute right-0 mt-2 w-80 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl z-50 p-4 space-y-3 text-xs text-slate-200"
+                    >
+                      <div className="flex justify-between items-center border-b border-slate-850 pb-2">
+                        <span className="font-bold text-white">System Notifications</span>
+                        <button 
+                          onClick={() => setIsNotificationDropdownOpen(false)}
+                          className="text-[10px] text-slate-500 hover:text-white"
+                        >
+                          Close
+                        </button>
+                      </div>
+
+                      <div className="space-y-2.5 max-h-64 overflow-y-auto pr-1">
+                        {activityLogs.slice(0, 5).map((log) => (
+                          <div key={log.id} className="p-2.5 bg-slate-950 border border-slate-850 rounded-xl space-y-1">
+                            <div className="flex justify-between items-start gap-1">
+                              <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold ${
+                                log.type === 'New Enrollment' ? 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/30' :
+                                log.type === 'Fee Payment' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' :
+                                'bg-slate-800 text-slate-400'
+                              }`}>
+                                {log.type}
+                              </span>
+                              <span className="text-[8px] text-slate-500 font-mono">{log.dateTime}</span>
+                            </div>
+                            <p className="text-[10px] text-slate-300 leading-normal">{log.detail}</p>
+                          </div>
+                        ))}
+                        {activityLogs.length === 0 && (
+                          <div className="text-center py-4 text-slate-500 italic">No notifications logged.</div>
+                        )}
+                      </div>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
             </div>
             <div className="flex items-center gap-3 border-l border-slate-800 pl-4">
               <div className="hidden sm:block text-right">
@@ -425,12 +483,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               >
                 {t('Home')}
               </button>
-              <button 
-                onClick={onLogout}
-                className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-xs text-slate-200 font-semibold rounded-lg transition-transform cursor-pointer"
-              >
-                {t('Sign Out')}
-              </button>
+              {/* Sign Out option removed */}
             </div>
           </div>
         </div>
@@ -801,7 +854,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
 
             {/* Performance and Connected Ledger Lists */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               
               {/* Primary Subject */}
               <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
@@ -810,10 +863,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <span className="text-[11px] text-slate-500">Primary teaching specialty honors</span>
                 </div>
                 <div className="bg-slate-950 p-4 rounded-xl border border-slate-850 flex items-center gap-3">
-                  <Award className="h-5 w-5 text-indigo-400" />
+                  <Award className="h-5 w-5 text-indigo-400 animate-pulse" />
                   <div>
                     <span className="text-[9px] text-slate-500 font-bold uppercase block">Subject Honors</span>
-                    <span className="text-sm font-bold text-white">{selectedTutorDetail.subject}</span>
+                    <span className="text-sm font-bold text-white truncate max-w-[120px]" title={selectedTutorDetail.subject}>{selectedTutorDetail.subject}</span>
                   </div>
                 </div>
               </div>
@@ -821,20 +874,54 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               {/* Courses list */}
               <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
                 <div>
-                  <h3 className="text-sm font-bold text-white mb-1">Assigned Honors Courses</h3>
-                  <span className="text-[11px] text-slate-500">Active sections listed in administrative directory</span>
+                  <h3 className="text-sm font-bold text-white mb-1">Assigned Courses</h3>
+                  <span className="text-[11px] text-slate-500">Active sections listed</span>
                 </div>
 
-                <div className="flex flex-wrap gap-2 pt-1">
+                <div className="flex flex-wrap gap-1.5 max-h-16 overflow-y-auto">
                   {selectedTutorDetail.courses && selectedTutorDetail.courses.length > 0 ? (
                     selectedTutorDetail.courses.map((course: string, idx: number) => (
-                      <span key={idx} className="bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-350 flex items-center gap-1.5 shadow-sm">
-                        <BookOpen className="h-3.5 w-3.5 text-indigo-400" /> {course}
+                      <span key={idx} className="bg-slate-950 border border-slate-800 px-2.5 py-1 rounded-lg text-[10px] font-semibold text-slate-350 flex items-center gap-1">
+                        <BookOpen className="h-3 w-3 text-indigo-400" /> {course}
                       </span>
                     ))
                   ) : (
-                    <span className="text-xs text-slate-550 italic text-slate-550">No courses currently assigned to this educator.</span>
+                    <span className="text-xs text-slate-500 italic">No courses assigned.</span>
                   )}
+                </div>
+              </div>
+
+              {/* Tutor Attendance */}
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
+                <div>
+                  <h3 className="text-sm font-bold text-white mb-1">Attendance Rate</h3>
+                  <span className="text-[11px] text-slate-500">Cumulative presence statistics</span>
+                </div>
+                <div className="bg-slate-950 p-4 rounded-xl border border-slate-850 flex items-center gap-3">
+                  <Activity className="h-5 w-5 text-teal-400 animate-pulse" />
+                  <div>
+                    <span className="text-[9px] text-slate-500 font-bold uppercase block">Attendance</span>
+                    <span className="text-base font-extrabold text-white font-mono">{selectedTutorDetail.attendance || '96%'}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Salary Status */}
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
+                <div>
+                  <h3 className="text-sm font-bold text-white mb-1">Salary Status</h3>
+                  <span className="text-[11px] text-slate-500">Tutor payment ledger status</span>
+                </div>
+                <div className="bg-slate-950 p-4 rounded-xl border border-slate-850 flex items-center gap-3">
+                  <DollarSign className="h-5 w-5 text-amber-400" />
+                  <div>
+                    <span className="text-[9px] text-slate-500 font-bold uppercase block">Payment Status</span>
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                      selectedTutorDetail.salaryStatus === 'Credited' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-450'
+                    }`}>
+                      {selectedTutorDetail.salaryStatus || 'Pending'}
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -1355,10 +1442,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <tr>
                     <th className="p-4">Faculty Member</th>
                     <th className="p-4">Primary Subject</th>
-                    <th className="p-4">Contact Phone</th>
-                    <th className="p-4">Email</th>
                     <th className="p-4">Assigned Courses</th>
-                    <th className="p-4">Status</th>
+                    <th className="p-4 text-center">Attendance Rate</th>
+                    <th className="p-4 text-center">Salary Status</th>
+                    <th className="p-4 text-center">Duty Status</th>
                     <th className="p-4 text-right">Actions</th>
                   </tr>
                 </thead>
@@ -1387,13 +1474,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               >
                                 {teacher.name}
                               </span>
-                              <span className="text-[10px] text-slate-500 block">{teacher.experience} Experience</span>
+                              <span className="text-[10px] text-slate-500 block">{teacher.phone} • {teacher.email}</span>
                             </div>
                           </div>
                         </td>
                         <td className="p-4 text-slate-300 font-medium">{teacher.subject}</td>
-                        <td className="p-4 text-slate-400 font-mono text-[11px]">{teacher.phone}</td>
-                        <td className="p-4 text-slate-450 text-slate-400">{teacher.email}</td>
                         <td className="p-4">
                           <div className="flex flex-wrap gap-1 max-w-[200px]">
                             {teacher.courses && teacher.courses.map((course, idx) => (
@@ -1403,10 +1488,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             ))}
                           </div>
                         </td>
-                        <td className="p-4">
+                        <td className="p-4 text-center font-mono font-bold text-slate-300">
+                          {teacher.attendance || '96%'}
+                        </td>
+                        <td className="p-4 text-center">
+                          <span className={`px-2.5 py-0.5 rounded text-[10px] font-bold ${
+                            teacher.salaryStatus === 'Credited' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-450'
+                          }`}>
+                            {teacher.salaryStatus || 'Pending'}
+                          </span>
+                        </td>
+                        <td className="p-4 text-center">
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                             teacher.status === 'Active' ? 'bg-teal-500/10 text-teal-400 border border-teal-500/30' :
-                            'bg-slate-950 text-slate-550 border border-slate-800 text-slate-500'
+                            'bg-slate-950 border border-slate-800 text-slate-500'
                           }`}>
                             {teacher.status}
                           </span>
@@ -1833,6 +1928,30 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <option value="Active">Active</option>
                     <option value="On Leave">On Leave</option>
                   </select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Attendance Rate</label>
+                    <input
+                      type="text"
+                      value={tutorFormAttendance}
+                      onChange={(e) => setTutorFormAttendance(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 text-white font-mono"
+                      placeholder="e.g. 96%"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Salary Status *</label>
+                    <select
+                      value={tutorFormSalaryStatus}
+                      onChange={(e) => setTutorFormSalaryStatus(e.target.value as any)}
+                      className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 text-slate-350 bg-slate-950"
+                    >
+                      <option value="Credited">Credited</option>
+                      <option value="Pending">Pending</option>
+                    </select>
+                  </div>
                 </div>
 
                 {!editingTutor && (

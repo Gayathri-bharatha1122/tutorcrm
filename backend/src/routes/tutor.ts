@@ -39,7 +39,8 @@ router.get('/students', async (req: AuthRequest, res: Response) => {
           id: s._id,
           name: `${s.firstName} ${s.lastName}`,
           grade: p?.grade || '11th Grade',
-          subject: p?.learningGoal || 'Advanced Physics'
+          subject: p?.learningGoal || 'Advanced Physics',
+          attendanceRate: p?.progress !== undefined ? p.progress : 95
         };
       })
       .filter(s => isMatch(s.subject));
@@ -203,6 +204,22 @@ router.post('/lectures/schedule', async (req: AuthRequest, res: Response) => {
     return res.status(201).json(session);
   } catch (error) {
     console.error('Error scheduling lecture seminar:', error);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
+// 6. GET TUTOR PROFILE DETAILS
+router.get('/profile', async (req: AuthRequest, res: Response) => {
+  const tutorId = req.user?.id;
+  if (!tutorId) return res.status(401).json({ error: 'Unauthorized.' });
+  try {
+    const profile = await TutorProfile.findOne({ userId: tutorId });
+    if (!profile) {
+      return res.status(404).json({ error: 'Tutor profile not found.' });
+    }
+    return res.json(profile);
+  } catch (error) {
+    console.error('Error fetching tutor profile:', error);
     return res.status(500).json({ error: 'Internal server error.' });
   }
 });

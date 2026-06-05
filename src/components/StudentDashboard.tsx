@@ -71,7 +71,23 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   const [courses, setCourses] = useState<Course[]>([]);
   const [exams, setExams] = useState<ExamResult[]>([]);
   const [upcomingExams, setUpcomingExams] = useState<ExamSchedule[]>([]);
-  const [activeTab, setActiveTab] = useState<'schedule' | 'grades' | 'results' | 'attendance' | 'quizzes'>('schedule');
+  const [activeTab, setActiveTab] = useState<'schedule' | 'grades' | 'results' | 'attendance' | 'quizzes' | 'feedback'>('schedule');
+  const [isUpcomingModalOpen, setIsUpcomingModalOpen] = useState(false);
+  const [feedbackText, setFeedbackText] = useState('');
+  const [feedbackRating, setFeedbackRating] = useState(5);
+  const [feedbackSubmissions, setFeedbackSubmissions] = useState<any[]>([]);
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
+  const [feedbackError, setFeedbackError] = useState('');
+  const [feedbackSuccess, setFeedbackSuccess] = useState('');
+
+  const loadFeedback = async () => {
+    try {
+      const data = await api.getStudentFeedback();
+      setFeedbackSubmissions(data || []);
+    } catch (err) {
+      console.error("Failed to load student feedback", err);
+    }
+  };
 
   useEffect(() => {
     if (currentPath) {
@@ -95,7 +111,14 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
       }
     };
     fetchData();
+    loadFeedback();
   }, []);
+
+  useEffect(() => {
+    if (activeTab === 'feedback') {
+      loadFeedback();
+    }
+  }, [activeTab]);
   
   // Quiz taking states
   const [activeQuizId, setActiveQuizId] = useState<string | null>(null);
@@ -196,12 +219,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               >
                 {t('Home')}
               </button>
-              <button 
-                onClick={onLogout}
-                className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs text-slate-200 font-semibold rounded-lg transition overflow-hidden cursor-pointer"
-              >
-                {t('Sign Out')}
-              </button>
+              {/* Sign Out option removed */}
             </div>
           </div>
         </div>
@@ -318,11 +336,20 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   >
                     {t('Subject Quizzes')}
                   </button>
+                  <button 
+                    onClick={() => setActiveTab('feedback')}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${activeTab === 'feedback' ? 'bg-indigo-600 text-white' : 'text-slate-450 hover:text-slate-300'}`}
+                  >
+                    Feedback & Rating
+                  </button>
                 </div>
 
-                <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-semibold bg-slate-950 px-2.5 py-1 rounded-lg">
+                <button 
+                  onClick={() => setIsUpcomingModalOpen(true)}
+                  className="flex items-center gap-1.5 text-[11px] text-indigo-400 hover:text-indigo-300 font-semibold bg-indigo-950/40 hover:bg-indigo-950 border border-indigo-900/40 px-2.5 py-1 rounded-lg transition cursor-pointer"
+                >
                   <Calendar className="h-3.5 w-3.5" /> Upcoming
-                </div>
+                </button>
               </div>
 
               {/* Sub-panels display */}
@@ -532,7 +559,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                       </div>
                     </div>
                   </motion.div>
-                ) : (
+                ) : activeTab === 'results' ? (
                   <motion.div 
                     key="results"
                     initial={{ opacity: 0, y: 5 }}
@@ -547,6 +574,122 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                       <button className="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition cursor-pointer flex items-center gap-1.5">
                         Download Report
                       </button>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="feedback"
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    className="space-y-4"
+                  >
+                    <div className="p-5 bg-slate-950 border border-slate-850 rounded-2xl">
+                      <h4 className="text-xs font-bold text-white uppercase tracking-widest border-b border-slate-850 pb-2 mb-4">Submit Feedback & Rating</h4>
+                      
+                      {feedbackSuccess && <div className="p-3 mb-3 text-xs bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl">{feedbackSuccess}</div>}
+                      {feedbackError && <div className="p-3 mb-3 text-xs bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-xl">{feedbackError}</div>}
+
+                      <form onSubmit={async (e) => {
+                        e.preventDefault();
+                        if (!feedbackText.trim()) return;
+                        setFeedbackLoading(true);
+                        setFeedbackError('');
+                        setFeedbackSuccess('');
+                        try {
+                          await api.submitStudentFeedback(feedbackText, feedbackRating);
+                          setFeedbackSuccess('Feedback submitted successfully!');
+                          setFeedbackText('');
+                          setFeedbackRating(5);
+                          await loadFeedback();
+                        } catch (err: any) {
+                          setFeedbackError(err.message || 'Failed to submit feedback');
+                        } finally {
+                          setFeedbackLoading(false);
+                        }
+                      }} className="space-y-4">
+                        <div>
+                          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Rating</label>
+                          <div className="flex gap-1.5">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <button
+                                key={star}
+                                type="button"
+                                onClick={() => setFeedbackRating(star)}
+                                className="text-amber-400 hover:scale-110 transition cursor-pointer"
+                              >
+                                <Sparkles className={`h-6 w-6 ${star <= feedbackRating ? 'fill-amber-400' : 'text-slate-600'}`} />
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Comment</label>
+                          <textarea
+                            placeholder="Share your experience, class quality, tutor guidance, or suggestions..."
+                            value={feedbackText}
+                            onChange={(e) => setFeedbackText(e.target.value)}
+                            rows={3}
+                            className="w-full bg-slate-900 border border-slate-850 text-xs p-3 rounded-xl outline-none focus:border-indigo-500 text-slate-200"
+                          />
+                        </div>
+
+                        <button
+                          type="submit"
+                          disabled={feedbackLoading || !feedbackText.trim()}
+                          className={`px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition cursor-pointer ${feedbackLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                          {feedbackLoading ? 'Submitting...' : 'Submit Feedback'}
+                        </button>
+                      </form>
+                    </div>
+
+                    <div className="p-5 bg-slate-950 border border-slate-850 rounded-2xl">
+                      <h4 className="text-xs font-bold text-white uppercase tracking-widest border-b border-slate-850 pb-2 mb-4">Previous Feedback & Ratings</h4>
+                      
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-xs text-left border-collapse">
+                          <thead>
+                            <tr className="border-b border-slate-850 text-slate-500">
+                              <th className="pb-2 font-bold uppercase text-[9px] tracking-wider">Date</th>
+                              <th className="pb-2 font-bold uppercase text-[9px] tracking-wider">Rating</th>
+                              <th className="pb-2 font-bold uppercase text-[9px] tracking-wider">Comment</th>
+                              <th className="pb-2 font-bold uppercase text-[9px] tracking-wider">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {feedbackSubmissions.map((sub, i) => (
+                              <tr key={sub.id || i} className="border-b border-slate-900/50 hover:bg-slate-900/10">
+                                <td className="py-2.5 font-mono text-[10px] text-slate-400 whitespace-nowrap">{sub.submissionDate}</td>
+                                <td className="py-2.5">
+                                  <div className="flex gap-0.5">
+                                    {Array.from({ length: 5 }).map((_, idx) => (
+                                      <Sparkles
+                                        key={idx}
+                                        className={`h-3 w-3 ${idx < sub.rating ? 'fill-amber-400 text-amber-400' : 'text-slate-800'}`}
+                                      />
+                                    ))}
+                                  </div>
+                                </td>
+                                <td className="py-2.5 text-slate-300 max-w-xs truncate" title={sub.feedback}>{sub.feedback}</td>
+                                <td className="py-2.5">
+                                  <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
+                                    sub.status === 'Reviewed' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-400'
+                                  }`}>
+                                    {sub.status}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                            {feedbackSubmissions.length === 0 && (
+                              <tr>
+                                <td colSpan={4} className="py-4 text-center text-slate-550 italic">No feedback submitted yet.</td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   </motion.div>
                 )}
@@ -850,6 +993,160 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   </button>
                 </div>
               )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Upcoming Modal */}
+      <AnimatePresence>
+        {isUpcomingModalOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.5 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black z-45"
+              onClick={() => setIsUpcomingModalOpen(false)}
+            />
+
+            {/* Modal Body */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="fixed inset-0 m-auto w-full max-w-2xl h-[85vh] bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl z-50 p-6 text-slate-100 flex flex-col justify-between overflow-hidden"
+            >
+              {/* Modal Header */}
+              <div className="flex justify-between items-center border-b border-slate-850 pb-4 shrink-0">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-indigo-400" />
+                  <div>
+                    <h4 className="text-base font-bold text-white">Upcoming Academic Schedule</h4>
+                    <span className="text-[10px] text-slate-500">Upcoming classes, exams, events, and assignments</span>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setIsUpcomingModalOpen(false)}
+                  className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition cursor-pointer"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto my-4 pr-1 space-y-6 text-xs">
+                
+                {/* 1. Upcoming Classes */}
+                <div>
+                  <h5 className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest border-b border-slate-850 pb-1.5 mb-3">Upcoming Classes</h5>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {courses.map((course) => (
+                      <div key={course.id} className="p-3 bg-slate-950 border border-slate-850 rounded-xl flex items-center justify-between">
+                        <div className="min-w-0 flex-1 pr-2">
+                          <h6 className="font-bold text-white truncate">{course.name}</h6>
+                          <span className="text-[10px] text-slate-400 block truncate">{course.tutorName} • {course.room || 'Room 101'}</span>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <span className="text-[10px] text-indigo-400 font-bold block">{course.schedule}</span>
+                        </div>
+                      </div>
+                    ))}
+                    {courses.length === 0 && (
+                      <div className="col-span-2 text-slate-500 italic text-center py-2">No registered classes.</div>
+                    )}
+                  </div>
+                </div>
+
+                {/* 2. Upcoming Exams */}
+                <div>
+                  <h5 className="text-[10px] font-bold text-teal-400 uppercase tracking-widest border-b border-slate-850 pb-1.5 mb-3">Upcoming Exams</h5>
+                  <div className="space-y-2.5">
+                    {upcomingExams.map((exam) => (
+                      <div key={exam.id} className="p-3 bg-slate-950 border border-slate-850 rounded-xl flex items-center justify-between">
+                        <div>
+                          <h6 className="font-bold text-white">{exam.name}</h6>
+                          <span className="text-[10px] text-slate-400">{exam.location} • {exam.type}</span>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <span className="text-[10px] text-teal-400 font-bold block">{exam.date}</span>
+                          <span className="text-[9px] text-slate-500 block">{exam.time}</span>
+                        </div>
+                      </div>
+                    ))}
+                    {upcomingExams.length === 0 && (
+                      <div className="text-slate-500 italic text-center py-2">No upcoming exams scheduled.</div>
+                    )}
+                  </div>
+                </div>
+
+                {/* 3. Upcoming Events */}
+                <div>
+                  <h5 className="text-[10px] font-bold text-amber-400 uppercase tracking-widest border-b border-slate-850 pb-1.5 mb-3">Academic Events</h5>
+                  <div className="space-y-2.5">
+                    <div className="p-3 bg-slate-950 border border-slate-850 rounded-xl flex items-center justify-between">
+                      <div>
+                        <h6 className="font-bold text-white">Interactive Science Symposium 2026</h6>
+                        <span className="text-[10px] text-slate-400">Dr. Sterling • Biotechnology seminar</span>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <span className="text-[10px] text-amber-400 font-bold block">June 10, 2026</span>
+                        <span className="text-[9px] text-slate-500 block">02:00 PM</span>
+                      </div>
+                    </div>
+                    <div className="p-3 bg-slate-950 border border-slate-850 rounded-xl flex items-center justify-between">
+                      <div>
+                        <h6 className="font-bold text-white">Summer Shift Orientation</h6>
+                        <span className="text-[10px] text-slate-400">Administration Office</span>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <span className="text-[10px] text-amber-400 font-bold block">June 14, 2026</span>
+                        <span className="text-[9px] text-slate-500 block">11:00 AM</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4. Upcoming Assignments */}
+                <div>
+                  <h5 className="text-[10px] font-bold text-rose-450 uppercase tracking-widest border-b border-slate-850 pb-1.5 mb-3">Pending Assignments</h5>
+                  <div className="space-y-2.5">
+                    <div className="p-3 bg-slate-950 border border-slate-850 rounded-xl flex items-center justify-between">
+                      <div>
+                        <h6 className="font-bold text-white">Calculus BC Integration Homework</h6>
+                        <span className="text-[10px] text-slate-400">Section 4.3 exercise problems</span>
+                      </div>
+                      <div className="text-right shrink-0 animate-pulse">
+                        <span className="text-[10px] text-rose-450 font-bold block">Due Tomorrow</span>
+                        <span className="text-[9px] text-slate-500 block">11:59 PM</span>
+                      </div>
+                    </div>
+                    <div className="p-3 bg-slate-950 border border-slate-850 rounded-xl flex items-center justify-between">
+                      <div>
+                        <h6 className="font-bold text-white">Electromagnetism Lab Writeup</h6>
+                        <span className="text-[10px] text-slate-400">Submit PDF copy to Prof. Miller</span>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <span className="text-[10px] text-rose-450 font-bold block">Due June 12, 2026</span>
+                        <span className="text-[9px] text-slate-500 block">05:00 PM</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Modal Footer */}
+              <div className="border-t border-slate-850 pt-4 flex justify-end shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setIsUpcomingModalOpen(false)}
+                  className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl transition cursor-pointer"
+                >
+                  Close Schedule
+                </button>
+              </div>
             </motion.div>
           </>
         )}

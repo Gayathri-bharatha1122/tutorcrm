@@ -94,12 +94,14 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
   const [filteredSlots, setFilteredSlots] = useState<TimetableSlot[]>([]);
   const [allSameSubject, setAllSameSubject] = useState<boolean>(false);
 
+  const [tutorProfile, setTutorProfile] = useState<any>(null);
+
   // Fetch tutor profile to determine courses
   useEffect(() => {
     const fetchTutorProfile = async () => {
       try {
-        const profile = await api.getCurrentUser();
-        // Assuming profile.courses is an array of course titles strings
+        const profile = await api.getTutorProfile();
+        setTutorProfile(profile);
         setTutorCourses(profile.courses || []);
       } catch (err) {
         console.error('Failed to load tutor profile', err);
@@ -305,12 +307,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
               >
                 {t('Home')}
               </button>
-              <button 
-                onClick={onLogout}
-                className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs text-slate-200 font-semibold rounded-lg transition overflow-hidden cursor-pointer"
-              >
-                {t('Sign Out')}
-              </button>
+              {/* Sign Out option removed */}
             </div>
           </div>
         </div>
@@ -345,6 +342,22 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
             <span className="text-xs font-bold text-teal-400 uppercase tracking-widest block">Senior Instructor Control</span>
             <h2 className="text-2xl font-bold text-white">{t('Daily Command Space')} – {tutorName}</h2>
             <p className="text-slate-400 text-xs">Manage active pupil attendances, input assignment metrics, and dispatch calendar coordinates.</p>
+            {tutorProfile && (
+              <div className="flex items-center gap-3 mt-2 text-xs">
+                <span className="flex items-center gap-1.5 bg-slate-950 border border-slate-850 px-2.5 py-1 rounded-lg">
+                  <span className="text-[10px] text-slate-500 font-bold uppercase">Tutor Attendance:</span>
+                  <span className="font-mono font-bold text-teal-400">{tutorProfile.attendance || '96%'}</span>
+                </span>
+                <span className="flex items-center gap-1.5 bg-slate-950 border border-slate-850 px-2.5 py-1 rounded-lg">
+                  <span className="text-[10px] text-slate-500 font-bold uppercase">Salary Status:</span>
+                  <span className={`font-mono font-bold px-1.5 py-0.5 rounded text-[10px] ${
+                    tutorProfile.salaryStatus === 'Credited' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-450'
+                  }`}>
+                    {tutorProfile.salaryStatus || 'Pending'}
+                  </span>
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-3 w-full md:w-auto shrink-0">
@@ -545,6 +558,57 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
             </form>
           </div>
 
+        </div>
+
+        {/* Student Attendance Overview Section */}
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
+          <div className="border-b border-slate-850 pb-4 mb-6">
+            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+              <Users className="h-5 w-5 text-teal-400 animate-pulse" /> Student Attendance Overview
+            </h3>
+            <span className="text-[11px] text-slate-550">Overview of student details, enrolled course tracks, and cumulative attendance rates</span>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs text-left border-collapse">
+              <thead>
+                <tr className="border-b border-slate-850 text-slate-500">
+                  <th className="pb-3 font-bold uppercase text-[9px] tracking-wider">Student Name</th>
+                  <th className="pb-3 font-bold uppercase text-[9px] tracking-wider">Grade Level</th>
+                  <th className="pb-3 font-bold uppercase text-[9px] tracking-wider">Course Track</th>
+                  <th className="pb-3 font-bold uppercase text-[9px] tracking-wider text-right">Attendance Rate</th>
+                </tr>
+              </thead>
+              <tbody>
+                {students.map((student: any, idx) => (
+                  <tr key={student.id || idx} className="border-b border-slate-900/50 hover:bg-slate-900/10 transition-colors">
+                    <td className="py-3.5 flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-slate-950 border border-slate-850 flex items-center justify-center font-bold text-teal-400">
+                        {student.name[0]}
+                      </div>
+                      <span className="font-bold text-white">{student.name}</span>
+                    </td>
+                    <td className="py-3.5 text-slate-300">{student.grade}</td>
+                    <td className="py-3.5 text-slate-400 max-w-xs truncate" title={student.subject}>{student.subject}</td>
+                    <td className="py-3.5 text-right font-mono font-bold">
+                      <span className={`px-2 py-0.5 rounded text-[10px] ${
+                        student.attendanceRate >= 85 ? 'bg-emerald-500/15 text-emerald-400' :
+                        student.attendanceRate >= 70 ? 'bg-indigo-500/15 text-indigo-400' :
+                        'bg-amber-500/15 text-amber-450'
+                      }`}>
+                        {student.attendanceRate}%
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+                {students.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="py-4 text-center text-slate-550 italic">No assigned students found.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* Interactive Quiz Builder & Composer */}

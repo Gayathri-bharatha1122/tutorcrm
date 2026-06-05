@@ -1,6 +1,6 @@
 import { Router, Response } from 'express';
 import { authenticateToken, AuthRequest } from '../middlewares/auth';
-import { User, StudentProfile, Bill, Attendance, Announcement, ActivityLog, Course, TutorProfile } from '../models';
+import { User, StudentProfile, Bill, Attendance, Announcement, ActivityLog, Course, TutorProfile, Feedback } from '../models';
 
 const router = Router();
 
@@ -127,6 +127,54 @@ router.post('/bills/:billId/pay', async (req: AuthRequest, res: Response) => {
     });
   } catch (error) {
     console.error('Error processing billing remittance:', error);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
+// 4. GET PARENT FEEDBACK HISTORY
+router.get('/feedback', async (req: AuthRequest, res: Response) => {
+  const parentId = req.user?.id;
+  if (!parentId) return res.status(401).json({ error: 'Unauthorized.' });
+  try {
+    const feedbacks = await Feedback.find({ authorId: parentId, authorRole: 'parent' });
+    return res.json(feedbacks);
+  } catch (error) {
+    console.error('Error fetching parent feedback:', error);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
+// 5. SUBMIT PARENT FEEDBACK & RATING
+router.post('/feedback', async (req: AuthRequest, res: Response) => {
+  const parentId = req.user?.id;
+  const { feedback, rating } = req.body;
+
+  if (!parentId) return res.status(401).json({ error: 'Unauthorized.' });
+  if (!feedback || rating === undefined) {
+    return res.status(400).json({ error: 'Feedback text and rating are required.' });
+  }
+  if (rating < 1 || rating > 5) {
+    return res.status(400).json({ error: 'Rating must be between 1 and 5.' });
+  }
+
+  try {
+    const parentUser = await User.findById(parentId);
+    const authorName = parentUser ? `${parentUser.firstName} ${parentUser.lastName}` : 'Parent';
+    const submissionDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' });
+
+    const newFeedback = await Feedback.create({
+      authorId: parentId,
+      authorRole: 'parent',
+      authorName,
+      feedback,
+      rating: Number(rating),
+      submissionDate,
+      status: 'Pending'
+    });
+
+    return res.status(201).json(newFeedback);
+  } catch (error) {
+    console.error('Error submitting parent feedback:', error);
     return res.status(500).json({ error: 'Internal server error.' });
   }
 });

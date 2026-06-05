@@ -8,7 +8,9 @@ import {
   Quiz, 
   QuizSubmission, 
   Attendance, 
-  IQuizQuestion 
+  IQuizQuestion,
+  Feedback,
+  User
 } from '../models';
 
 const router = Router();
@@ -104,6 +106,55 @@ router.post('/quizzes/:quizId/submit', async (req: AuthRequest, res: Response) =
     });
   } catch (error) {
     console.error('Error submitting quiz answers:', error);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
+
+// 3. GET STUDENT FEEDBACK HISTORY
+router.get('/feedback', async (req: AuthRequest, res: Response) => {
+  const studentId = req.user?.id;
+  if (!studentId) return res.status(401).json({ error: 'Unauthorized.' });
+  try {
+    const feedbacks = await Feedback.find({ authorId: studentId, authorRole: 'student' });
+    return res.json(feedbacks);
+  } catch (error) {
+    console.error('Error fetching student feedback:', error);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
+// 4. SUBMIT STUDENT FEEDBACK & RATING
+router.post('/feedback', async (req: AuthRequest, res: Response) => {
+  const studentId = req.user?.id;
+  const { feedback, rating } = req.body;
+
+  if (!studentId) return res.status(401).json({ error: 'Unauthorized.' });
+  if (!feedback || rating === undefined) {
+    return res.status(400).json({ error: 'Feedback text and rating are required.' });
+  }
+  if (rating < 1 || rating > 5) {
+    return res.status(400).json({ error: 'Rating must be between 1 and 5.' });
+  }
+
+  try {
+    const studentUser = await User.findById(studentId);
+    const authorName = studentUser ? `${studentUser.firstName} ${studentUser.lastName}` : 'Student';
+    const submissionDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' });
+
+    const newFeedback = await Feedback.create({
+      authorId: studentId,
+      authorRole: 'student',
+      authorName,
+      feedback,
+      rating: Number(rating),
+      submissionDate,
+      status: 'Pending'
+    });
+
+    return res.status(201).json(newFeedback);
+  } catch (error) {
+    console.error('Error submitting student feedback:', error);
     return res.status(500).json({ error: 'Internal server error.' });
   }
 });

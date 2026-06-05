@@ -29,7 +29,7 @@ export const collections: Record<string, any[]> = {
     { _id: 'sp-ethan', userId: 'u-ethan', grade: '11th Grade', learningGoal: 'Organic Chemistry', parentPhone: '14155554311', avgGrade: 2.8, progress: 0, status: 'Inactive' }
   ],
   TutorProfile: [
-    { _id: 'tp-tutor', userId: 'u-tutor', subject: 'Advanced Physics & Calculus', experience: '12 years', status: 'Active', courses: ['Physics Mechanics', 'Quantum Theory Basics', 'Calculus BC'] }
+    { _id: 'tp-tutor', userId: 'u-tutor', subject: 'Advanced Physics & Calculus', experience: '12 years', status: 'Active', courses: ['Physics Mechanics', 'Quantum Theory Basics', 'Calculus BC'], salaryStatus: 'Credited', attendance: '96%' }
   ],
   Course: [
     { _id: 'c-physics', name: 'Advanced General Physics', tutorName: 'Prof. Alistair Miller', tutorId: 'u-tutor', schedule: 'Tue, Thu at 3:00 PM', iconType: 'physics', progress: 84, room: 'Lab Hall 4B' },
@@ -82,7 +82,11 @@ export const collections: Record<string, any[]> = {
     { _id: 'act-4', studentName: 'Marcus Thorne', initials: 'MT', type: 'Payment Failed', detail: 'Late Fee of $120 overdue billing card decline - transaction error standard', dateTime: '2 Days ago', amount: 120, status: 'Failed' },
     { _id: 'act-5', studentName: 'Penelope Chen', initials: 'PC', type: 'New Enrollment', detail: 'Account created and awaiting verification checklist status approval', dateTime: '3 Days ago', status: 'Active' }
   ],
-  Message: []
+  Message: [],
+  Feedback: [
+    { _id: 'fb-1', authorId: 'u-marcus', authorRole: 'student', authorName: 'Marcus Thorne', feedback: 'The Physics sessions have been very thorough and helpful. Prof. Miller explains every concept with great clarity.', rating: 5, submissionDate: 'May 28, 2026', status: 'Reviewed', createdAt: new Date() },
+    { _id: 'fb-2', authorId: 'u-helena', authorRole: 'parent', authorName: 'Helena Thorne', feedback: 'Very satisfied with the progress my child has made. The personalised attention is outstanding.', rating: 4, submissionDate: 'May 30, 2026', status: 'Pending', createdAt: new Date() }
+  ]
 };
 
 // Builder to create common query methods for a mock collection
@@ -263,5 +267,6 @@ export const mockStore = {
   Attendance: createMockModel('Attendance'),
   ActivityLog: createMockModel('ActivityLog'),
   Announcement: createMockModel('Announcement'),
-  Message: createMockModel('Message')
+  Message: createMockModel('Message'),
+  Feedback: createMockModel('Feedback')
 };

@@ -191,7 +191,9 @@ router.get('/teachers', async (req: AuthRequest, res: Response) => {
         subject: p?.subject || 'Advanced Physics & Calculus',
         experience: p?.experience || '12 years',
         status: p?.status || 'Active',
-        courses: p?.courses || ['Physics Mechanics', 'Quantum Theory Basics']
+        courses: p?.courses || ['Physics Mechanics', 'Quantum Theory Basics'],
+        salaryStatus: p?.salaryStatus || 'Pending',
+        attendance: p?.attendance || 'N/A'
       };
     });
 
@@ -404,7 +406,9 @@ router.post('/tutors', async (req: AuthRequest, res: Response) => {
       subject: subject || 'General Tutoring',
       experience: experience || '1 year',
       status: status || 'Active',
-      courses: coursesArray
+      courses: coursesArray,
+      salaryStatus: 'Pending',
+      attendance: 'N/A'
     });
 
     return res.status(201).json({ msg: 'Tutor profile created successfully.' });
@@ -433,7 +437,9 @@ router.get('/tutors/:id', async (req: AuthRequest, res: Response) => {
       subject: profile?.subject || '',
       experience: profile?.experience || '',
       status: profile?.status || 'Active',
-      courses: profile?.courses || []
+      courses: profile?.courses || [],
+      salaryStatus: profile?.salaryStatus || 'Pending',
+      attendance: profile?.attendance || 'N/A'
     });
   } catch (error) {
     console.error('Error fetching tutor details:', error);

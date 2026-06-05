@@ -71,6 +71,22 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
   const [courses, setCourses] = useState<any[]>([]);
   const [contactingTutor, setContactingTutor] = useState<string | null>(null);
 
+  const [feedbackText, setFeedbackText] = useState('');
+  const [feedbackRating, setFeedbackRating] = useState(5);
+  const [feedbackSubmissions, setFeedbackSubmissions] = useState<any[]>([]);
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
+  const [feedbackError, setFeedbackError] = useState('');
+  const [feedbackSuccess, setFeedbackSuccess] = useState('');
+
+  const loadFeedback = async () => {
+    try {
+      const data = await api.getParentFeedback();
+      setFeedbackSubmissions(data || []);
+    } catch (err) {
+      console.error("Failed to load parent feedback", err);
+    }
+  };
+
   // Scroll to section when navigated via sidebar
   React.useEffect(() => {
     if (currentPath?.includes('/courses')) {
@@ -109,6 +125,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
       }
     };
     fetchData();
+    loadFeedback();
   }, []);
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
@@ -211,12 +228,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
               >
                 {t('Home')}
               </button>
-              <button 
-                onClick={onLogout}
-                className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs text-slate-200 font-semibold rounded-lg transition cursor-pointer"
-              >
-                {t('Sign Out')}
-              </button>
+              {/* Sign Out option removed */}
             </div>
           </div>
         </div>
@@ -761,6 +773,128 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                 );
               })
             )}
+          </div>
+        </div>
+
+        {/* Feedback & Rating Section */}
+        <div id="feedback" className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
+          <div className="border-b border-slate-850 pb-4 mb-6">
+            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+              <Sparkles className="h-4.5 w-4.5 text-amber-400 animate-pulse" /> Feedback & Ratings
+            </h3>
+            <span className="text-[11px] text-slate-550">Provide feedback on school facilities, course curriculums, or tutor guidance</span>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Submit Feedback Form */}
+            <div className="bg-slate-950 border border-slate-850 p-5 rounded-2xl">
+              <h4 className="text-xs font-bold text-white uppercase tracking-widest border-b border-slate-850 pb-2 mb-4">Submit Feedback & Rating</h4>
+              
+              {feedbackSuccess && <div className="p-3 mb-3 text-xs bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl">{feedbackSuccess}</div>}
+              {feedbackError && <div className="p-3 mb-3 text-xs bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-xl">{feedbackError}</div>}
+
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                if (!feedbackText.trim()) return;
+                setFeedbackLoading(true);
+                setFeedbackError('');
+                setFeedbackSuccess('');
+                try {
+                  await api.submitParentFeedback(feedbackText, feedbackRating);
+                  setFeedbackSuccess('Feedback submitted successfully!');
+                  setFeedbackText('');
+                  setFeedbackRating(5);
+                  await loadFeedback();
+                } catch (err: any) {
+                  setFeedbackError(err.message || 'Failed to submit feedback');
+                } finally {
+                  setFeedbackLoading(false);
+                }
+              }} className="space-y-4">
+                <div>
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Rating</label>
+                  <div className="flex gap-1.5">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setFeedbackRating(star)}
+                        className="text-amber-400 hover:scale-110 transition cursor-pointer"
+                      >
+                        <Sparkles className={`h-6 w-6 ${star <= feedbackRating ? 'fill-amber-400' : 'text-slate-600'}`} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Comment</label>
+                  <textarea
+                    placeholder="Share your feedback on the teaching standards, system interface, or other ideas..."
+                    value={feedbackText}
+                    onChange={(e) => setFeedbackText(e.target.value)}
+                    rows={3}
+                    className="w-full bg-slate-900 border border-slate-850 text-xs p-3 rounded-xl outline-none focus:border-indigo-500 text-slate-200"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={feedbackLoading || !feedbackText.trim()}
+                  className={`px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition cursor-pointer ${feedbackLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  {feedbackLoading ? 'Submitting...' : 'Submit Feedback'}
+                </button>
+              </form>
+            </div>
+
+            {/* Submissions History */}
+            <div className="bg-slate-950 border border-slate-850 p-5 rounded-2xl">
+              <h4 className="text-xs font-bold text-white uppercase tracking-widest border-b border-slate-850 pb-2 mb-4">Previous Feedback & Ratings</h4>
+              
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-850 text-slate-500">
+                      <th className="pb-2 font-bold uppercase text-[9px] tracking-wider">Date</th>
+                      <th className="pb-2 font-bold uppercase text-[9px] tracking-wider">Rating</th>
+                      <th className="pb-2 font-bold uppercase text-[9px] tracking-wider">Comment</th>
+                      <th className="pb-2 font-bold uppercase text-[9px] tracking-wider">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {feedbackSubmissions.map((sub, i) => (
+                      <tr key={sub.id || i} className="border-b border-slate-900/50 hover:bg-slate-900/10">
+                        <td className="py-2.5 font-mono text-[10px] text-slate-400 whitespace-nowrap">{sub.submissionDate}</td>
+                        <td className="py-2.5">
+                          <div className="flex gap-0.5">
+                            {Array.from({ length: 5 }).map((_, idx) => (
+                              <Sparkles
+                                key={idx}
+                                className={`h-3 w-3 ${idx < sub.rating ? 'fill-amber-400 text-amber-400' : 'text-slate-800'}`}
+                              />
+                            ))}
+                          </div>
+                        </td>
+                        <td className="py-2.5 text-slate-300 max-w-xs truncate" title={sub.feedback}>{sub.feedback}</td>
+                        <td className="py-2.5">
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
+                            sub.status === 'Reviewed' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-400'
+                          }`}>
+                            {sub.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                    {feedbackSubmissions.length === 0 && (
+                      <tr>
+                        <td colSpan={4} className="py-4 text-center text-slate-550 italic">No feedback submitted yet.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
 

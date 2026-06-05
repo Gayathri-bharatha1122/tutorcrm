@@ -236,5 +236,33 @@ export const api = {
     return request(`/admin/parents/${id}`, {
       method: 'DELETE'
     });
+  },
+
+  // Feedback API endpoints
+  getStudentFeedback: () => {
+    return request('/student/feedback');
+  },
+
+  submitStudentFeedback: (feedback: string, rating: number) => {
+    return request('/student/feedback', {
+      method: 'POST',
+      body: JSON.stringify({ feedback, rating })
+    });
+  },
+
+  getParentFeedback: () => {
+    return request('/parent/feedback');
+  },
+
+  submitParentFeedback: (feedback: string, rating: number) => {
+    return request('/parent/feedback', {
+      method: 'POST',
+      body: JSON.stringify({ feedback, rating })
+    });
+  },
+
+  // Tutor Profile Endpoint
+  getTutorProfile: () => {
+    return request('/tutor/profile');
   }
 };

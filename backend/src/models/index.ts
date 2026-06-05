@@ -82,6 +82,8 @@ export interface ITutorProfile extends Document {
   experience: string;
   status: 'Active' | 'On Leave';
   courses: string[];
+  salaryStatus: 'Credited' | 'Pending';
+  attendance: string;
 }
 
 const TutorProfileSchema = new Schema<ITutorProfile>({
@@ -89,7 +91,9 @@ const TutorProfileSchema = new Schema<ITutorProfile>({
   subject: { type: String, required: true },
   experience: { type: String, required: true },
   status: { type: String, enum: ['Active', 'On Leave'], default: 'Active' },
-  courses: { type: [String], default: [] }
+  courses: { type: [String], default: [] },
+  salaryStatus: { type: String, enum: ['Credited', 'Pending'], default: 'Pending' },
+  attendance: { type: String, default: '95%' }
 });
 
 const TutorProfileRaw = mongoose.model<ITutorProfile>('TutorProfile', TutorProfileSchema);
@@ -325,3 +329,28 @@ const AnnouncementSchema = new Schema<IAnnouncement>({
 
 const AnnouncementRaw = mongoose.model<IAnnouncement>('Announcement', AnnouncementSchema);
 export const Announcement = createModelProxy('Announcement', AnnouncementRaw) as any;
+
+
+// 14. FEEDBACK & RATING MODEL
+export interface IFeedback extends Document {
+  authorId: mongoose.Types.ObjectId;
+  authorRole: 'student' | 'parent';
+  authorName: string;
+  feedback: string;
+  rating: number;
+  submissionDate: string;
+  status: 'Reviewed' | 'Pending';
+}
+
+const FeedbackSchema = new Schema<IFeedback>({
+  authorId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  authorRole: { type: String, enum: ['student', 'parent'], required: true },
+  authorName: { type: String, required: true },
+  feedback: { type: String, required: true },
+  rating: { type: Number, min: 1, max: 5, required: true },
+  submissionDate: { type: String, required: true },
+  status: { type: String, enum: ['Reviewed', 'Pending'], default: 'Pending' }
+}, { timestamps: true });
+
+const FeedbackRaw = mongoose.model<IFeedback>('Feedback', FeedbackSchema);
+export const Feedback = createModelProxy('Feedback', FeedbackRaw) as any;
