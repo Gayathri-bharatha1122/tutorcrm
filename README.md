@@ -131,6 +131,12 @@ Each role gets personalized access and dashboard features.
 
 ---
 
+# 📊 ER Diagram
+
+![ER Diagram](./assets/er_diagram.png)
+
+---
+
 # 🎯 Goal
 
 ✔️ Simplify tuition center management
