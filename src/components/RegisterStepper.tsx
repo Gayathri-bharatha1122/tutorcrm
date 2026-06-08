@@ -37,6 +37,7 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   
   // Student specific inputs
   const [grade, setGrade] = useState('11th Grade');
@@ -119,6 +120,12 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
       alert(err.message || 'Registration failed. Please check your details.');
     }
   };
+
+  const hasUpper = /[A-Z]/.test(password);
+  const hasLower = /[a-z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSpecial = /[^A-Za-z0-9]/.test(password);
+  const passwordsMatch = password === confirmPassword && password.length > 0;
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-slate-950 flex flex-col justify-center items-center py-12 px-4 relative overflow-hidden font-sans">
@@ -381,6 +388,54 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                 </div>
               </div>
 
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">{t('Confirm Secure Control Key Password')}</label>
+                <div className="relative">
+                  <Lock className="absolute left-3.5 top-3 h-4 w-4 text-slate-500 pointer-events-none" />
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full bg-slate-950/40 border border-slate-850 text-slate-200 text-xs pl-10 pr-4 py-2.5 rounded-xl focus:border-indigo-500 outline-none transition input-focus-glow"
+                    placeholder="Confirm dashboard key password"
+                  />
+                </div>
+              </div>
+
+              {/* Password strength indicators */}
+              {password && (
+                <div className="bg-slate-950/50 p-3.5 rounded-xl border border-slate-850 text-[11px] space-y-1.5 animate-fadeIn">
+                  <span className="font-bold text-slate-400 block mb-1">Password Requirements:</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className={hasUpper ? "text-emerald-400 font-semibold" : "text-slate-500"}>
+                        {hasUpper ? "✓" : "○"} One uppercase letter
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className={hasLower ? "text-emerald-400 font-semibold" : "text-slate-500"}>
+                        {hasLower ? "✓" : "○"} One lowercase letter
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className={hasNumber ? "text-emerald-400 font-semibold" : "text-slate-500"}>
+                        {hasNumber ? "✓" : "○"} One number digit
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className={hasSpecial ? "text-emerald-400 font-semibold" : "text-slate-500"}>
+                        {hasSpecial ? "✓" : "○"} One special character
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 sm:col-span-2 border-t border-slate-900 pt-1.5 mt-0.5">
+                      <span className={passwordsMatch ? "text-emerald-400 font-semibold" : "text-slate-500"}>
+                        {passwordsMatch ? "✓" : "○"} Passwords match
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="flex justify-between pt-4">
                 <button
                   type="button"
@@ -407,6 +462,14 @@ export const RegisterStepper: React.FC<RegisterStepperProps> = ({ onNavigate, on
                         alert('Parent phone number must be exactly 10 digits.');
                         return;
                       }
+                    }
+                    if (!hasUpper || !hasLower || !hasNumber || !hasSpecial) {
+                      alert('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.');
+                      return;
+                    }
+                    if (!passwordsMatch) {
+                      alert('Passwords do not match.');
+                      return;
                     }
                     setCurrentStep(3);
                   }}
