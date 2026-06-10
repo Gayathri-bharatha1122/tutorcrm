@@ -150,7 +150,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   // Chat simulator state
   const [selectedTeacher, setSelectedTeacher] = useState('Prof. Alistair Miller');
   const [chatMessages, setChatMessages] = useState<Array<{ sender: 'user' | 'teacher', text: string, time: string }>>([
-    { sender: 'teacher', text: 'Hello Marcus, received your assessment draft! RotationKinematics are flawless. Do you have any questions on the electromagnetism formulas before the finals?', time: '09:30 AM' }
+    { sender: 'teacher', text: t('Hello Marcus, received your assessment draft! RotationKinematics are flawless. Do you have any questions on the electromagnetism formulas before the finals?'), time: '09:30 AM' }
   ]);
   const [newMessage, setNewMessage] = useState('');
   const [isTeacherTyping, setIsTeacherTyping] = useState(false);
@@ -167,11 +167,11 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
     // Simulate teacher automated feedback matching the course context
     setTimeout(() => {
-      let reply = "Good question, Marcus. I have logged that in our planner. Let's focus on electromagnetic induction chapters in our review session tomorrow.";
+      let reply = t("Good question, Marcus. I have logged that in our planner. Let's focus on electromagnetic induction chapters in our review session tomorrow.");
       if (typedText.toLowerCase().includes('calculus') || typedText.toLowerCase().includes('integration')) {
-        reply = "For integration constants, make sure you double-check bounds. Sarah Jenkins is hosting a calculus BC review session this Friday at 4:30 PM!";
+        reply = t("For integration constants, make sure you double-check bounds. Sarah Jenkins is hosting a calculus BC review session this Friday at 4:30 PM!");
       } else if (typedText.toLowerCase().includes('physics') || typedText.toLowerCase().includes('rotational')) {
-        reply = "Rotation kinematics require calculating the vector moment of inertia first. Keep practicing assessment sheet 4B.";
+        reply = t("Rotation kinematics require calculating the vector moment of inertia first. Keep practicing assessment sheet 4B.");
       }
       
       setChatMessages(prev => [...prev, {
@@ -201,7 +201,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               <GraduationCap className="h-5 w-5 text-white" />
             </div>
             <div>
-              <span className="font-sans font-bold text-base text-white tracking-tight">EduManage Student</span>
+              <span className="font-sans font-bold text-base text-white tracking-tight">{t('EduManage Student')}</span>
               <span className="text-[10px] block text-slate-500 font-semibold uppercase">{t('Academic Portal')}</span>
             </div>
           </div>
@@ -210,7 +210,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             <div className="flex items-center gap-3">
               <div className="text-right hidden sm:block">
                 <span className="text-xs font-bold text-slate-200 block">{studentName}</span>
-                <span className="text-[10px] text-emerald-400 font-bold uppercase font-mono">Enrolled • 11th Grade</span>
+                <span className="text-[10px] text-emerald-400 font-bold uppercase font-mono">{t('Enrolled • 11th Grade')}</span>
               </div>
               <LanguageSelector />
               <button 
@@ -234,9 +234,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             <Sparkles className="h-48 w-48 text-emerald-400 translate-x-12 translate-y-12" />
           </div>
           <div className="space-y-1 relative z-10">
-            <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest block">Dashboard Greeting</span>
-            <h2 className="text-2xl font-bold text-white">{t('Welcome back')}, {studentName.split(' ')[0]}!</h2>
-            <p className="text-slate-400 text-xs max-w-xl">Track your curriculum progress metrics, check scheduled midterm locations, or chat with assigned tutor personnel in real-time.</p>
+            <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest block">{t('Dashboard Greeting')}</span>
+            <h2 className="text-2xl font-bold text-white">{t('Welcome back, {studentName}!').replace('{studentName}', studentName.split(' ')[0])}</h2>
+            <p className="text-slate-400 text-xs max-w-xl">{t('Track your curriculum progress metrics, check scheduled midterm locations, or chat with assigned tutor personnel in real-time.')}</p>
           </div>
           
           <div className="flex items-center gap-4 shrink-0 relative z-10">
@@ -270,11 +270,11 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block bg-indigo-500/10 w-max px-2 py-0.5 rounded">
                   {course.iconType}
                 </span>
-                <h4 className="text-sm font-bold text-white truncate">{course.name}</h4>
-                <p className="text-xs text-slate-500 truncate">{course.tutorName} • {course.room || 'Seminar Space'}</p>
+                <h4 className="text-sm font-bold text-white truncate">{t(course.name)}</h4>
+                <p className="text-xs text-slate-500 truncate">{course.tutorName} • {t(course.room || 'Seminar Space')}</p>
                 <div className="flex items-center gap-2 text-[10px] text-slate-400">
                   <Clock className="h-3.5 w-3.5 text-slate-500" />
-                  <span className="font-semibold">{course.schedule}</span>
+                  <span className="font-semibold">{t(course.schedule)}</span>
                 </div>
               </div>
 
@@ -340,7 +340,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                     onClick={() => setActiveTab('feedback')}
                     className={`px-4 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${activeTab === 'feedback' ? 'bg-indigo-600 text-white' : 'text-slate-450 hover:text-slate-300'}`}
                   >
-                    Feedback & Rating
+                    {t('Feedback & Rating')}
                   </button>
                 </div>
 
@@ -348,7 +348,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   onClick={() => setIsUpcomingModalOpen(true)}
                   className="flex items-center gap-1.5 text-[11px] text-indigo-400 hover:text-indigo-300 font-semibold bg-indigo-950/40 hover:bg-indigo-950 border border-indigo-900/40 px-2.5 py-1 rounded-lg transition cursor-pointer"
                 >
-                  <Calendar className="h-3.5 w-3.5" /> Upcoming
+                  <Calendar className="h-3.5 w-3.5" /> {t('Upcoming')}
                 </button>
               </div>
 
@@ -366,15 +366,15 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                       <div key={exam.id} className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 transition rounded-2xl flex items-center justify-between">
                         <div>
                           <span className={`px-2 py-0.5 rounded text-[9px] font-bold block w-max mb-1.5 ${exam.type === 'Midterm' ? 'bg-indigo-500/10 text-indigo-400' : 'bg-teal-500/10 text-teal-400'}`}>
-                            {exam.type} Assessment
+                            {t(exam.type)} {t('Assessment')}
                           </span>
-                          <h5 className="text-sm font-bold text-white mb-0.5">{exam.name}</h5>
-                          <span className="text-xs text-slate-500">{exam.location}</span>
+                          <h5 className="text-sm font-bold text-white mb-0.5">{t(exam.name)}</h5>
+                          <span className="text-xs text-slate-500">{t(exam.location)}</span>
                         </div>
 
                         <div className="text-right shrink-0">
-                          <span className="text-xs font-extrabold text-indigo-400 block">{exam.date}</span>
-                          <span className="text-[10px] text-slate-500 font-bold block">{exam.time}</span>
+                          <span className="text-xs font-extrabold text-indigo-400 block">{t(exam.date)}</span>
+                          <span className="text-[10px] text-slate-500 font-bold block">{t(exam.time)}</span>
                         </div>
                       </div>
                     ))}
@@ -390,15 +390,15 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                     {exams.map((assessment) => (
                       <div key={assessment.id} className="p-4 bg-slate-950 border border-slate-850 rounded-2xl">
                         <div className="flex items-center justify-between mb-2">
-                          <h5 className="text-xs font-bold text-white truncate max-w-xs">{assessment.examName}</h5>
+                          <h5 className="text-xs font-bold text-white truncate max-w-xs">{t(assessment.examName)}</h5>
                           <span className="text-xs font-extrabold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
                             {assessment.score} / {assessment.maxScore}
                           </span>
                         </div>
                         <p className="text-[11px] text-slate-400 leading-normal mb-1">
-                          <strong className="text-slate-500">Instructor Notes:</strong> "{assessment.teacherNotes}"
+                          <strong className="text-slate-500">{t('Instructor Notes')}:</strong> "{t(assessment.teacherNotes)}"
                         </p>
-                        <span className="text-[9px] text-slate-500 font-semibold">Compiled on {assessment.date}</span>
+                        <span className="text-[9px] text-slate-500 font-semibold">{t('Compiled on')} {t(assessment.date)}</span>
                       </div>
                     ))}
                   </motion.div>
@@ -416,16 +416,16 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                         {/* Calendar Left */}
                         <div className="w-full max-w-xs mx-auto md:mx-0">
                           <div className="flex flex-col items-center mb-4 gap-2">
-                            <span className="text-xs font-bold text-white">May 2026</span>
+                            <span className="text-xs font-bold text-white">{t('May')} 2026</span>
                             <div className="flex gap-3 text-[9px] font-semibold text-slate-400">
-                              <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Present</span>
-                              <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-rose-500" /> Absent</span>
-                              <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-slate-700" /> Weekend</span>
+                              <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> {t('Present')}</span>
+                              <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-rose-500" /> {t('Absent')}</span>
+                              <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-slate-700" /> {t('Weekend')}</span>
                             </div>
                           </div>
 
                           <div className="grid grid-cols-7 gap-1.5 text-center text-[9px] font-bold text-slate-500 mb-2">
-                            <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                            <span>{t('Sun')}</span><span>{t('Mon')}</span><span>{t('Tue')}</span><span>{t('Wed')}</span><span>{t('Thu')}</span><span>{t('Fri')}</span><span>{t('Sat')}</span>
                           </div>
 
                           <div className="grid grid-cols-7 gap-1.5 text-center justify-items-center">
@@ -458,30 +458,30 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
                         {/* Attendance Statistics Right */}
                         <div className="space-y-4">
-                          <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-850 pb-2">May Attendance Stats</h4>
+                          <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-850 pb-2">{t('May Attendance Stats')}</h4>
                                                   <div className="grid grid-cols-3 gap-3">
                             <div className="bg-slate-900/55 p-3 rounded-xl border border-slate-850 text-center">
-                              <span className="text-[9px] font-bold text-slate-500 uppercase block">Conducted</span>
+                              <span className="text-[9px] font-bold text-slate-500 uppercase block">{t('Conducted')}</span>
                               <span className="text-sm font-extrabold text-white block mt-1">
                                 <AnimatedCounter value={21} />
                               </span>
-                              <span className="text-[8px] text-slate-400 block font-semibold">Sessions</span>
+                              <span className="text-[8px] text-slate-400 block font-semibold">{t('Sessions')}</span>
                             </div>
                             
                             <div className="bg-emerald-950/20 p-3 rounded-xl border border-emerald-500/10 text-center">
-                              <span className="text-[9px] font-bold text-emerald-550 uppercase block">Attended</span>
+                              <span className="text-[9px] font-bold text-emerald-555 uppercase block">{t('Attended')}</span>
                               <span className="text-sm font-extrabold text-emerald-400 block mt-1">
                                 <AnimatedCounter value={19} />
                               </span>
-                              <span className="text-[8px] text-emerald-500/70 block font-semibold">Present</span>
+                              <span className="text-[8px] text-emerald-500/70 block font-semibold">{t('Present')}</span>
                             </div>
 
                             <div className="bg-rose-950/20 p-3 rounded-xl border border-rose-500/10 text-center">
-                              <span className="text-[9px] font-bold text-rose-550 uppercase block">Absent</span>
+                              <span className="text-[9px] font-bold text-rose-555 uppercase block">{t('Absent')}</span>
                               <span className="text-sm font-extrabold text-rose-400 block mt-1">
                                 <AnimatedCounter value={2} />
                               </span>
-                              <span className="text-[8px] text-rose-500/70 block font-semibold">Missed</span>
+                              <span className="text-[8px] text-rose-500/70 block font-semibold">{t('Missed')}</span>
                             </div>
                           </div>
 
@@ -503,8 +503,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                               </span>
                             </div>
                             <div className="space-y-0.5">
-                              <span className="text-xs font-bold text-white block">Attendance Percentage</span>
-                              <p className="text-[10px] text-slate-400 leading-snug">Attended 19 out of 21 sessions. Maintain 90%+ attendance to qualify for term exams.</p>
+                              <span className="text-xs font-bold text-white block">{t('Attendance Percentage')}</span>
+                              <p className="text-[10px] text-slate-400 leading-snug">{t('Attended 19 out of 21 sessions. Maintain 90%+ attendance to qualify for term exams.')}</p>
                             </div>
                           </div>
                         </div>
@@ -524,9 +524,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                       <div className="border-b border-slate-850 pb-3 mb-4 flex items-center justify-between">
                         <div>
                           <h5 className="text-xs font-bold text-white uppercase tracking-wider">{t('Assigned Topic Quizzes')}</h5>
-                          <span className="text-[10px] text-slate-500">Test your conceptual knowledge in registered courses</span>
+                          <span className="text-[10px] text-slate-500">{t('Test your conceptual knowledge in registered courses')}</span>
                         </div>
-                        <span className="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded">Active Evaluation</span>
+                        <span className="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded">{t('Active Evaluation')}</span>
                       </div>
 
                       <div className="space-y-3">
@@ -536,8 +536,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                               <span className="text-[9px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded w-max block">
                                 {quiz.subject}
                               </span>
-                              <h6 className="text-sm font-bold text-white">{quiz.title}</h6>
-                              <span className="text-[10px] text-slate-500 block">Total Questions: {quiz.questions.length} • Format: MCQ</span>
+                              <h6 className="text-sm font-bold text-white">{t(quiz.title)}</h6>
+                              <span className="text-[10px] text-slate-500 block">{t('Total Questions')}: {quiz.questions.length} • {t('Format')}: {t('MCQ')}</span>
                             </div>
                             <button
                               onClick={() => {
@@ -547,13 +547,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                               }}
                               className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition cursor-pointer"
                             >
-                              Start Quiz
+                              {t('Start Quiz')}
                             </button>
                           </div>
                         ))}
                         {publishedQuizzes.length === 0 && (
                           <div className="text-center py-8 text-xs text-slate-550 italic">
-                            No quizzes have been published by the instructor yet.
+                            {t('No quizzes have been published by the instructor yet.')}
                           </div>
                         )}
                       </div>
@@ -569,10 +569,10 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   >
                     <div className="p-4 bg-slate-950 border border-slate-850 rounded-2xl flex flex-col items-center justify-center py-8">
                       <Award className="h-12 w-12 text-indigo-400 mb-3 opacity-50" />
-                      <h5 className="text-sm font-bold text-white mb-1">Final Term Results Published</h5>
-                      <p className="text-xs text-slate-500 max-w-sm text-center">Your final grades for this semester have been compiled. Download the full PDF report below.</p>
+                      <h5 className="text-sm font-bold text-white mb-1">{t('Final Term Results Published')}</h5>
+                      <p className="text-xs text-slate-500 max-w-sm text-center">{t('Your final grades for this semester have been compiled. Download the full PDF report below.')}</p>
                       <button className="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition cursor-pointer flex items-center gap-1.5">
-                        Download Report
+                        {t('Download Report')}
                       </button>
                     </div>
                   </motion.div>
@@ -598,18 +598,18 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                         setFeedbackSuccess('');
                         try {
                           await api.submitStudentFeedback(feedbackText, feedbackRating);
-                          setFeedbackSuccess('Feedback submitted successfully!');
+                          setFeedbackSuccess(t('Feedback submitted successfully!'));
                           setFeedbackText('');
                           setFeedbackRating(5);
                           await loadFeedback();
                         } catch (err: any) {
-                          setFeedbackError(err.message || 'Failed to submit feedback');
+                          setFeedbackError(err.message || t('Failed to submit feedback'));
                         } finally {
                           setFeedbackLoading(false);
                         }
                       }} className="space-y-4">
                         <div>
-                          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Rating</label>
+                          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">{t('Rating')}</label>
                           <div className="flex gap-1.5">
                             {[1, 2, 3, 4, 5].map((star) => (
                               <button
@@ -625,9 +625,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                         </div>
                         
                         <div>
-                          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Comment</label>
+                          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">{t('Comment')}</label>
                           <textarea
-                            placeholder="Share your experience, class quality, tutor guidance, or suggestions..."
+                            placeholder={t("Share your experience, class quality, tutor guidance, or suggestions...")}
                             value={feedbackText}
                             onChange={(e) => setFeedbackText(e.target.value)}
                             rows={3}
@@ -640,22 +640,22 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                           disabled={feedbackLoading || !feedbackText.trim()}
                           className={`px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition cursor-pointer ${feedbackLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
-                          {feedbackLoading ? 'Submitting...' : 'Submit Feedback'}
+                          {feedbackLoading ? t('Submitting...') : t('Submit Feedback')}
                         </button>
                       </form>
                     </div>
 
                     <div className="p-5 bg-slate-950 border border-slate-850 rounded-2xl">
-                      <h4 className="text-xs font-bold text-white uppercase tracking-widest border-b border-slate-850 pb-2 mb-4">Previous Feedback & Ratings</h4>
+                      <h4 className="text-xs font-bold text-white uppercase tracking-widest border-b border-slate-850 pb-2 mb-4">{t('Previous Feedback & Ratings')}</h4>
                       
                       <div className="overflow-x-auto">
                         <table className="w-full text-xs text-left border-collapse">
                           <thead>
                             <tr className="border-b border-slate-850 text-slate-500">
-                              <th className="pb-2 font-bold uppercase text-[9px] tracking-wider">Date</th>
-                              <th className="pb-2 font-bold uppercase text-[9px] tracking-wider">Rating</th>
-                              <th className="pb-2 font-bold uppercase text-[9px] tracking-wider">Comment</th>
-                              <th className="pb-2 font-bold uppercase text-[9px] tracking-wider">Status</th>
+                              <th className="pb-2 font-bold uppercase text-[9px] tracking-wider">{t('Date')}</th>
+                              <th className="pb-2 font-bold uppercase text-[9px] tracking-wider">{t('Rating')}</th>
+                              <th className="pb-2 font-bold uppercase text-[9px] tracking-wider">{t('Comment')}</th>
+                              <th className="pb-2 font-bold uppercase text-[9px] tracking-wider">{t('Status')}</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -677,14 +677,14 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                                   <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
                                     sub.status === 'Reviewed' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-400'
                                   }`}>
-                                    {sub.status}
+                                    {t(sub.status)}
                                   </span>
                                 </td>
                               </tr>
                             ))}
                             {feedbackSubmissions.length === 0 && (
                               <tr>
-                                <td colSpan={4} className="py-4 text-center text-slate-550 italic">No feedback submitted yet.</td>
+                                <td colSpan={4} className="py-4 text-center text-slate-550 italic">{t('No feedback submitted yet.')}</td>
                               </tr>
                             )}
                           </tbody>
@@ -697,9 +697,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             </div>
 
             <div className="mt-6 pt-5 border-t border-slate-850 flex items-center justify-between text-[11px] text-slate-500">
-              <span>Looking for homework templates?</span>
+              <span>{t('Looking for homework templates?')}</span>
               <a href="#materials" className="text-indigo-400 hover:underline flex items-center gap-1 font-bold">
-                Access PDF Materials <ArrowUpRight className="h-3 w-3" />
+                {t('Access PDF Materials')} <ArrowUpRight className="h-3 w-3" />
               </a>
             </div>
           </div>
@@ -720,14 +720,14 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 onChange={(e) => {
                   setSelectedTeacher(e.target.value);
                   setChatMessages([
-                    { sender: 'teacher', text: `Hi Marcus, this is ${e.target.value}. Ask me anything about current class curriculums or upcoming evaluations.`, time: '10:00 AM' }
+                    { sender: 'teacher', text: t("Hi Marcus, this is {teacher}. Ask me anything about current class curriculums or upcoming evaluations.").replace("{teacher}", e.target.value), time: '10:00 AM' }
                   ]);
                 }}
                 className="bg-slate-950 border border-slate-850 text-[10px] text-slate-300 font-bold p-1 px-2 rounded-lg outline-none"
               >
-                <option>Prof. Alistair Miller</option>
-                <option>Sarah Jenkins</option>
-                <option>Dr. Evelyn Sterling</option>
+                <option>{t('Prof. Alistair Miller')}</option>
+                <option>{t('Sarah Jenkins')}</option>
+                <option>{t('Dr. Evelyn Sterling')}</option>
               </select>
             </div>
 
@@ -753,7 +753,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                     <span className="w-1.5 h-1.5 bg-slate-500 rounded-full animate-bounce [animation-delay:0.2s]"></span>
                     <span className="w-1.5 h-1.5 bg-slate-500 rounded-full animate-bounce [animation-delay:0.4s]"></span>
                   </div>
-                  <span>Tutor compiling notes...</span>
+                  <span>{t('Tutor compiling notes...')}</span>
                 </div>
               )}
             </div>
@@ -762,7 +762,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             <form onSubmit={handleSendMessage} className="flex gap-2">
               <input
                 type="text"
-                placeholder="Ask about 'Physics Final' or 'CalculusBC'..."
+                placeholder={t("Ask about 'Physics Final' or 'CalculusBC'...")}
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 className="bg-slate-950 border border-slate-850 text-xs p-2.5 rounded-xl flex-1 outline-none focus:border-indigo-500 text-slate-200"
@@ -785,7 +785,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
         <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6" id="materials">
           <div className="mb-4">
             <h3 className="text-sm font-bold text-white">{t('Student Hub Academic Resources')}</h3>
-            <span className="text-[11px] text-slate-500">Curated materials matching active course registration tracks</span>
+            <span className="text-[11px] text-slate-500">{t('Curated materials matching active course registration tracks')}</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
@@ -798,8 +798,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 hover:shadow-[0_10px_20px_-10px_rgba(99,102,241,0.15)] transition rounded-2xl flex items-center justify-between cursor-pointer"
             >
               <div>
-                <span className="text-xs font-bold text-white block">Physics Mechanics 4B</span>
-                <span className="text-[10px] text-slate-500">PDF Study Syllabus</span>
+                <span className="text-xs font-bold text-white block">{t('Physics Mechanics 4B')}</span>
+                <span className="text-[10px] text-slate-500">{t('PDF Study Syllabus')}</span>
               </div>
               <Award className="h-5 w-5 text-indigo-400 shrink-0" />
             </motion.div>
@@ -813,8 +813,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 hover:shadow-[0_10px_20px_-10px_rgba(20,184,166,0.15)] transition rounded-2xl flex items-center justify-between cursor-pointer"
             >
               <div>
-                <span className="text-xs font-bold text-white block">Integration Vectors Assessment</span>
-                <span className="text-[10px] text-slate-500">Practice Exam Questions</span>
+                <span className="text-xs font-bold text-white block">{t('Integration Vectors Assessment')}</span>
+                <span className="text-[10px] text-slate-500">{t('Practice Exam Questions')}</span>
               </div>
               <Award className="h-5 w-5 text-teal-400 shrink-0" />
             </motion.div>
@@ -828,8 +828,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 hover:shadow-[0_10px_20px_-10px_rgba(245,158,11,0.15)] transition rounded-2xl flex items-center justify-between cursor-pointer"
             >
               <div>
-                <span className="text-xs font-bold text-white block">Lab safety index Honors</span>
-                <span className="text-[10px] text-slate-500">Lab Assessment Criteria</span>
+                <span className="text-xs font-bold text-white block">{t('Lab safety index Honors')}</span>
+                <span className="text-[10px] text-slate-500">{t('Lab Assessment Criteria')}</span>
               </div>
               <Award className="h-5 w-5 text-amber-400 shrink-0" />
             </motion.div>
@@ -843,8 +843,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               className="p-4 bg-slate-950 border border-emerald-500/30 bg-emerald-500/5 hover:shadow-[0_10px_20px_-10px_rgba(16,185,129,0.15)] transition rounded-2xl flex items-center justify-between cursor-pointer"
             >
               <div>
-                <span className="text-xs font-bold text-emerald-400 block">Summer Prep Course Book</span>
-                <span className="text-[10px] text-slate-400">Bonus Academic Guide</span>
+                <span className="text-xs font-bold text-emerald-400 block">{t('Summer Prep Course Book')}</span>
+                <span className="text-[10px] text-slate-400">{t('Bonus Academic Guide')}</span>
               </div>
               <Award className="h-5 w-5 text-emerald-400 shrink-0 animate-pulse" />
             </motion.div>
@@ -910,9 +910,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                     </div>
 
                     <div className="text-center space-y-1">
-                      <h5 className="text-base font-bold text-white">Evaluation Complete</h5>
+                      <h5 className="text-base font-bold text-white">{t('Evaluation Complete')}</h5>
                       <p className="text-xs text-slate-400">
-                        You scored <strong className="text-indigo-400">{quizScoreResult.score}</strong> out of <strong className="text-slate-350">{quizScoreResult.total}</strong> questions correctly.
+                        {t('You scored')} <strong className="text-indigo-400">{quizScoreResult.score}</strong> {t('out of')} <strong className="text-slate-355">{quizScoreResult.total}</strong> {t('questions correctly.')}
                       </p>
                     </div>
 
@@ -921,7 +921,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                       onClick={() => setActiveQuizId(null)}
                       className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl transition cursor-pointer"
                     >
-                      Close Evaluation Board
+                      {t('Close Evaluation Board')}
                     </button>
                   </div>
                 ) : (
@@ -963,7 +963,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               {!quizScoreResult && (
                 <div className="border-t border-slate-850 pt-4 flex justify-between items-center shrink-0">
                   <span className="text-[10px] text-slate-500 font-semibold">
-                    Ensure all questions are completed before submitting.
+                    {t('Ensure all questions are completed before submitting.')}
                   </span>
                   <button
                     type="button"
@@ -989,7 +989,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                         : 'bg-slate-800 text-slate-500 cursor-not-allowed'
                     }`}
                   >
-                    Submit & Evaluate <ArrowUpRight className="h-4 w-4" />
+                    {t('Submit & Evaluate')} <ArrowUpRight className="h-4 w-4" />
                   </button>
                 </div>
               )}
@@ -1023,8 +1023,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 <div className="flex items-center gap-2">
                   <Calendar className="h-5 w-5 text-indigo-400" />
                   <div>
-                    <h4 className="text-base font-bold text-white">Upcoming Academic Schedule</h4>
-                    <span className="text-[10px] text-slate-500">Upcoming classes, exams, events, and assignments</span>
+                    <h4 className="text-base font-bold text-white">{t('Upcoming Academic Schedule')}</h4>
+                    <span className="text-[10px] text-slate-500">{t('Upcoming classes, exams, events, and assignments')}</span>
                   </div>
                 </div>
                 <button 
@@ -1040,7 +1040,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 
                 {/* 1. Upcoming Classes */}
                 <div>
-                  <h5 className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest border-b border-slate-850 pb-1.5 mb-3">Upcoming Classes</h5>
+                  <h5 className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest border-b border-slate-850 pb-1.5 mb-3">{t('Upcoming Classes')}</h5>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {courses.map((course) => (
                       <div key={course.id} className="p-3 bg-slate-950 border border-slate-850 rounded-xl flex items-center justify-between">
@@ -1054,14 +1054,14 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                       </div>
                     ))}
                     {courses.length === 0 && (
-                      <div className="col-span-2 text-slate-500 italic text-center py-2">No registered classes.</div>
+                      <div className="col-span-2 text-slate-500 italic text-center py-2">{t('No registered classes.')}</div>
                     )}
                   </div>
                 </div>
 
                 {/* 2. Upcoming Exams */}
                 <div>
-                  <h5 className="text-[10px] font-bold text-teal-400 uppercase tracking-widest border-b border-slate-850 pb-1.5 mb-3">Upcoming Exams</h5>
+                  <h5 className="text-[10px] font-bold text-teal-400 uppercase tracking-widest border-b border-slate-850 pb-1.5 mb-3">{t('Upcoming Exams')}</h5>
                   <div className="space-y-2.5">
                     {upcomingExams.map((exam) => (
                       <div key={exam.id} className="p-3 bg-slate-950 border border-slate-850 rounded-xl flex items-center justify-between">
@@ -1076,19 +1076,19 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                       </div>
                     ))}
                     {upcomingExams.length === 0 && (
-                      <div className="text-slate-500 italic text-center py-2">No upcoming exams scheduled.</div>
+                      <div className="text-slate-500 italic text-center py-2">{t('No upcoming exams scheduled.')}</div>
                     )}
                   </div>
                 </div>
 
                 {/* 3. Upcoming Events */}
                 <div>
-                  <h5 className="text-[10px] font-bold text-amber-400 uppercase tracking-widest border-b border-slate-850 pb-1.5 mb-3">Academic Events</h5>
+                  <h5 className="text-[10px] font-bold text-amber-400 uppercase tracking-widest border-b border-slate-850 pb-1.5 mb-3">{t('Academic Events')}</h5>
                   <div className="space-y-2.5">
                     <div className="p-3 bg-slate-950 border border-slate-850 rounded-xl flex items-center justify-between">
                       <div>
-                        <h6 className="font-bold text-white">Interactive Science Symposium 2026</h6>
-                        <span className="text-[10px] text-slate-400">Dr. Sterling • Biotechnology seminar</span>
+                        <h6 className="font-bold text-white">{t('Interactive Science Symposium 2026')}</h6>
+                        <span className="text-[10px] text-slate-400">{t('Dr. Sterling • Biotechnology seminar')}</span>
                       </div>
                       <div className="text-right shrink-0">
                         <span className="text-[10px] text-amber-400 font-bold block">June 10, 2026</span>
@@ -1097,8 +1097,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                     </div>
                     <div className="p-3 bg-slate-950 border border-slate-850 rounded-xl flex items-center justify-between">
                       <div>
-                        <h6 className="font-bold text-white">Summer Shift Orientation</h6>
-                        <span className="text-[10px] text-slate-400">Administration Office</span>
+                        <h6 className="font-bold text-white">{t('Summer Shift Orientation')}</h6>
+                        <span className="text-[10px] text-slate-400">{t('Administration Office')}</span>
                       </div>
                       <div className="text-right shrink-0">
                         <span className="text-[10px] text-amber-400 font-bold block">June 14, 2026</span>
@@ -1110,25 +1110,25 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
                 {/* 4. Upcoming Assignments */}
                 <div>
-                  <h5 className="text-[10px] font-bold text-rose-450 uppercase tracking-widest border-b border-slate-850 pb-1.5 mb-3">Pending Assignments</h5>
+                  <h5 className="text-[10px] font-bold text-rose-450 uppercase tracking-widest border-b border-slate-850 pb-1.5 mb-3">{t('Pending Assignments')}</h5>
                   <div className="space-y-2.5">
                     <div className="p-3 bg-slate-950 border border-slate-850 rounded-xl flex items-center justify-between">
                       <div>
-                        <h6 className="font-bold text-white">Calculus BC Integration Homework</h6>
-                        <span className="text-[10px] text-slate-400">Section 4.3 exercise problems</span>
+                        <h6 className="font-bold text-white">{t('Calculus BC Integration Homework')}</h6>
+                        <span className="text-[10px] text-slate-400">{t('Section 4.3 exercise problems')}</span>
                       </div>
                       <div className="text-right shrink-0 animate-pulse">
-                        <span className="text-[10px] text-rose-450 font-bold block">Due Tomorrow</span>
+                        <span className="text-[10px] text-rose-450 font-bold block">{t('Due Tomorrow')}</span>
                         <span className="text-[9px] text-slate-500 block">11:59 PM</span>
                       </div>
                     </div>
                     <div className="p-3 bg-slate-950 border border-slate-850 rounded-xl flex items-center justify-between">
                       <div>
-                        <h6 className="font-bold text-white">Electromagnetism Lab Writeup</h6>
-                        <span className="text-[10px] text-slate-400">Submit PDF copy to Prof. Miller</span>
+                        <h6 className="font-bold text-white">{t('Electromagnetism Lab Writeup')}</h6>
+                        <span className="text-[10px] text-slate-400">{t('Submit PDF copy to Prof. Miller')}</span>
                       </div>
                       <div className="text-right shrink-0">
-                        <span className="text-[10px] text-rose-450 font-bold block">Due June 12, 2026</span>
+                        <span className="text-[10px] text-rose-450 font-bold block">{t('Due June 12, 2026')}</span>
                         <span className="text-[9px] text-slate-500 block">05:00 PM</span>
                       </div>
                     </div>
@@ -1144,7 +1144,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   onClick={() => setIsUpcomingModalOpen(false)}
                   className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl transition cursor-pointer"
                 >
-                  Close Schedule
+                  {t('Close Schedule')}
                 </button>
               </div>
             </motion.div>

@@ -1,7 +1,8 @@
 import React from 'react';
 import { DashboardPage } from '../DashboardPage';
 import { motion } from 'motion/react';
-import { TrendingUp, Calendar, DollarSign, Bell, User, CheckCircle, AlertCircle } from 'lucide-react';
+import { TrendingUp, Calendar, IndianRupee, Bell, User, CheckCircle, AlertCircle } from 'lucide-react';
+import { useLanguage } from '../../LanguageContext';
 
 interface ParentPageProps {
   pageKey: string;
@@ -10,16 +11,21 @@ interface ParentPageProps {
   onBack: () => void;
 }
 
-const StatCard: React.FC<{ label: string; value: string; sub?: string; color: string }> = ({ label, value, sub, color }) => (
-  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-    className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">{label}</span>
-    <span className={`text-xl font-extrabold block ${color}`}>{value}</span>
-    {sub && <span className="text-xs text-slate-500 mt-1 block">{sub}</span>}
-  </motion.div>
-);
+const StatCard: React.FC<{ label: string; value: string; sub?: string; color: string }> = ({ label, value, sub, color }) => {
+  const { t } = useLanguage();
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+      className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">{t(label)}</span>
+      <span className={`text-xl font-extrabold block ${color}`}>{t(value)}</span>
+      {sub && <span className="text-xs text-slate-500 mt-1 block">{t(sub)}</span>}
+    </motion.div>
+  );
+};
 
 export const ParentPage: React.FC<ParentPageProps> = ({ pageKey, parentName, studentName, onBack }) => {
+  const { t } = useLanguage();
+  
   const pageContent: Record<string, React.ReactNode> = {
     'progress': (
       <div className="space-y-6">
@@ -30,9 +36,9 @@ export const ParentPage: React.FC<ParentPageProps> = ({ pageKey, parentName, stu
         </div>
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
           <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-amber-400" /> {studentName}'s Academic Progress
+            <TrendingUp className="h-4 w-4 text-amber-400" /> {studentName}'s {t("Academic Progress")}
           </h3>
-          <p className="text-xs text-slate-500 mb-5">Subject-wise performance for the current academic year.</p>
+          <p className="text-xs text-slate-500 mb-5">{t("Subject-wise performance for the current academic year.")}</p>
           {[
             { subject: 'Advanced Physics', score: 88, grade: 'A' },
             { subject: 'Calculus BC', score: 74, grade: 'B+' },
@@ -41,10 +47,10 @@ export const ParentPage: React.FC<ParentPageProps> = ({ pageKey, parentName, stu
           ].map((s, i) => (
             <div key={i} className="py-3 border-b border-slate-800 last:border-0">
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-bold text-white">{s.subject}</span>
+                <span className="text-xs font-bold text-white">{t(s.subject)}</span>
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-bold text-white font-mono">{s.score}%</span>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/10 text-indigo-400">{s.grade}</span>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/10 text-indigo-400">{t(s.grade)}</span>
                 </div>
               </div>
               <div className="w-full bg-slate-800 rounded-full h-1.5">
@@ -66,7 +72,7 @@ export const ParentPage: React.FC<ParentPageProps> = ({ pageKey, parentName, stu
         </div>
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
           <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-amber-400" /> {studentName}'s Attendance History
+            <Calendar className="h-4 w-4 text-amber-400" /> {studentName}'s {t("Attendance History")}
           </h3>
           {[
             { subject: 'Advanced Physics', sessions: 8, present: 8 },
@@ -76,8 +82,8 @@ export const ParentPage: React.FC<ParentPageProps> = ({ pageKey, parentName, stu
           ].map((a, i) => (
             <div key={i} className="flex items-center justify-between py-3 border-b border-slate-800 last:border-0">
               <div>
-                <span className="text-xs font-bold text-white block">{a.subject}</span>
-                <span className="text-[10px] text-slate-500">{a.present}/{a.sessions} sessions</span>
+                <span className="text-xs font-bold text-white block">{t(a.subject)}</span>
+                <span className="text-[10px] text-slate-500">{a.present}/{a.sessions} {t("sessions")}</span>
               </div>
               <span className={`text-sm font-extrabold ${a.present === a.sessions ? 'text-emerald-400' : a.present / a.sessions >= 0.75 ? 'text-amber-400' : 'text-rose-400'}`}>
                 {Math.round((a.present / a.sessions) * 100)}%
@@ -91,13 +97,13 @@ export const ParentPage: React.FC<ParentPageProps> = ({ pageKey, parentName, stu
     'fees': (
       <div className="space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <StatCard label="Outstanding Dues" value="$320" sub="Due by Jun 30" color="text-rose-400" />
-          <StatCard label="Total Paid" value="$1,820" sub="This academic year" color="text-emerald-400" />
+          <StatCard label="Outstanding Dues" value="₹320" sub="Due by Jun 30" color="text-rose-400" />
+          <StatCard label="Total Paid" value="₹1,820" sub="This academic year" color="text-emerald-400" />
           <StatCard label="Next Due" value="Jul 1" sub="Quarterly tuition" color="text-amber-400" />
         </div>
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
           <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
-            <DollarSign className="h-4 w-4 text-amber-400" /> Fee Ledger
+            <IndianRupee className="h-4 w-4 text-amber-400" /> {t("Fee Ledger")}
           </h3>
           {[
             { item: 'Q1 Tuition Fee', amount: 820, status: 'Paid', date: 'Jan 5' },
@@ -107,19 +113,19 @@ export const ParentPage: React.FC<ParentPageProps> = ({ pageKey, parentName, stu
           ].map((f, i) => (
             <div key={i} className="flex items-center justify-between py-3 border-b border-slate-800 last:border-0">
               <div>
-                <span className="text-xs font-bold text-white block">{f.item}</span>
-                <span className="text-[10px] text-slate-500">Due: {f.date}</span>
+                <span className="text-xs font-bold text-white block">{t(f.item)}</span>
+                <span className="text-[10px] text-slate-500">{t("Due")}: {t(f.date)}</span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-sm font-extrabold text-white font-mono">${f.amount}</span>
+                <span className="text-sm font-extrabold text-white font-mono">₹{f.amount}</span>
                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                   f.status === 'Paid' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400 animate-pulse'
-                }`}>{f.status}</span>
+                }`}>{t(f.status)}</span>
               </div>
             </div>
           ))}
           <button className="mt-5 w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold rounded-xl transition cursor-pointer">
-            Pay Outstanding Balance ($320)
+            {t("Pay Outstanding Balance (₹320)")}
           </button>
         </div>
       </div>
@@ -128,10 +134,10 @@ export const ParentPage: React.FC<ParentPageProps> = ({ pageKey, parentName, stu
     'notifications': (
       <div className="space-y-4">
         {[
-          { title: 'Attendance Alert', msg: `${studentName} was marked absent on May 20 in Calculus BC.`, time: '2 days ago', type: 'warning' },
-          { title: 'Assignment Graded', msg: `${studentName} received 94% on the Chemistry Lab report.`, time: '3 days ago', type: 'success' },
-          { title: 'Fee Reminder', msg: 'Q3 tuition fee of $320 is due by June 30.', time: '5 days ago', type: 'warning' },
-          { title: 'Teacher Message', msg: `Prof. Miller: "${studentName} has been doing exceptionally well in physics!"`, time: '1 week ago', type: 'info' },
+          { title: t('Attendance Alert'), msg: t("{student} was marked absent on May 20 in Calculus BC.").replace("{student}", studentName), time: t('2 days ago'), type: 'warning' },
+          { title: t('Assignment Graded'), msg: t("{student} received 94% on the Chemistry Lab report.").replace("{student}", studentName), time: t('3 days ago'), type: 'success' },
+          { title: t('Fee Reminder'), msg: t("Q3 tuition fee of ₹320 is due by June 30."), time: t('5 days ago'), type: 'warning' },
+          { title: t('Teacher Message'), msg: t('Prof. Miller: "{student} has been doing exceptionally well in physics!"').replace("{student}", studentName), time: t('1 week ago'), type: 'info' },
         ].map((n, i) => (
           <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }}
             className={`bg-slate-900 border rounded-2xl p-4 flex items-start gap-3 ${
@@ -164,15 +170,15 @@ export const ParentPage: React.FC<ParentPageProps> = ({ pageKey, parentName, stu
           </div>
           <div>
             <h2 className="text-xl font-extrabold text-white">{parentName}</h2>
-            <span className="text-xs text-amber-400 font-bold uppercase">Parent / Guardian</span>
+            <span className="text-xs text-amber-400 font-bold uppercase">{t("Parent / Guardian")}</span>
           </div>
         </div>
         <div className="space-y-3">
           {[
-            { label: 'Linked Student', value: studentName },
-            { label: 'Student Grade', value: '11th Grade' },
-            { label: 'Email', value: 'parent@edumanage.com' },
-            { label: 'Phone', value: '+1 (555) 234-5678' },
+            { label: t('Linked Student'), value: studentName },
+            { label: t('Student Grade'), value: t('11th Grade') },
+            { label: t('Email'), value: 'parent@edumanage.com' },
+            { label: t('Phone'), value: '+1 (555) 234-5678' },
           ].map((f, i) => (
             <div key={i} className="flex justify-between py-2.5 border-b border-slate-800">
               <span className="text-[10px] font-bold text-slate-500 uppercase">{f.label}</span>
@@ -185,8 +191,8 @@ export const ParentPage: React.FC<ParentPageProps> = ({ pageKey, parentName, stu
   };
 
   const pageTitles: Record<string, { title: string; subtitle: string }> = {
-    progress: { title: "Child's Academic Progress", subtitle: `Track ${studentName}'s performance across subjects.` },
-    attendance: { title: 'Attendance Overview', subtitle: `Monitor ${studentName}'s daily attendance records.` },
+    progress: { title: "Child's Academic Progress", subtitle: t("Track {student}'s performance across subjects.").replace("{student}", studentName) },
+    attendance: { title: 'Attendance Overview', subtitle: t("Monitor {student}'s daily attendance records.").replace("{student}", studentName) },
     fees: { title: 'Fees & Payments', subtitle: 'Track tuition invoices and outstanding dues.' },
     notifications: { title: 'Notifications', subtitle: 'Stay updated on important alerts and messages.' },
     profile: { title: 'My Profile', subtitle: 'View and update your guardian profile details.' },

@@ -385,10 +385,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, isLoggedIn
                     className="absolute -bottom-6 -left-3 md:-left-6 p-2.5 bg-slate-900/95 border border-slate-800 rounded-xl shadow-xl backdrop-blur-md hidden sm:flex items-center gap-2.5"
                     style={{ transform: `translateY(${scrollY * 0.03}px)` }}
                   >
-                    <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-bold">$</div>
+                    <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-bold">₹</div>
                     <div className="text-left">
                       <span className="text-[8px] text-slate-500 font-bold block">FEE INVOICE</span>
-                      <span className="text-[11px] font-extrabold text-white block">$2,140 Paid</span>
+                      <span className="text-[11px] font-extrabold text-white block">₹2,140 Paid</span>
                     </div>
                   </motion.div>
 

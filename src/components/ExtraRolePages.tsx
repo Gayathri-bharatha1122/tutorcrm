@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   Users, 
   BookOpen, 
-  DollarSign, 
+  IndianRupee, 
   Settings, 
   FileText, 
   Check, 
@@ -264,9 +264,9 @@ export const AdminParentManagement: React.FC = () => {
                   <td className="p-3 font-mono text-[10px] text-slate-400">{p.phone}</td>
                   <td className="p-3 text-center font-bold font-mono text-white text-[13px]">
                     {p.dues > 0 ? (
-                      <span className="text-amber-450 text-amber-500">${p.dues}</span>
+                      <span className="text-amber-450 text-amber-500">₹{p.dues}</span>
                     ) : (
-                      <span className="text-emerald-450 text-emerald-400">$0</span>
+                      <span className="text-emerald-450 text-emerald-400">₹0</span>
                     )}
                   </td>
                   <td className="p-3 text-right">
@@ -361,8 +361,8 @@ export const AdminFeesPage: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StaticCounter value="$1,350" label="Total Revenue Collected" icon={<TrendingUp className="h-4.5 w-4.5" />} colorClass="bg-emerald-600/10 text-emerald-400" />
-        <StaticCounter value="$750" label="Outstanding Receivables" icon={<DollarSign className="h-4.5 w-4.5" />} colorClass="bg-amber-600/10 text-amber-400" />
+        <StaticCounter value="₹1,350" label="Total Revenue Collected" icon={<TrendingUp className="h-4.5 w-4.5" />} colorClass="bg-emerald-600/10 text-emerald-400" />
+        <StaticCounter value="₹750" label="Outstanding Receivables" icon={<IndianRupee className="h-4.5 w-4.5" />} colorClass="bg-amber-600/10 text-amber-400" />
         <StaticCounter value="50%" label="Invoice Paid Ratio" icon={<Award className="h-4.5 w-4.5" />} colorClass="bg-indigo-600/10 text-indigo-400" />
       </div>
 
@@ -385,7 +385,7 @@ export const AdminFeesPage: React.FC = () => {
                   <td className="p-3 font-mono text-[10px] text-slate-450 font-bold">{inv.code}</td>
                   <td className="p-3 font-semibold text-white">{inv.parent}</td>
                   <td className="p-3 text-slate-405 text-[10px] font-mono text-slate-400">{inv.date}</td>
-                  <td className="p-3 text-center font-bold font-mono text-white text-[13px]">${inv.amount}</td>
+                  <td className="p-3 text-center font-bold font-mono text-white text-[13px]">₹{inv.amount}</td>
                   <td className="p-3 text-right">
                     <span className={`px-2 py-0.5 rounded text-[9px] font-bold ${
                       inv.status === 'Paid' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400 animate-pulse'

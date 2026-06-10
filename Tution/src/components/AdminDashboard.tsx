@@ -145,7 +145,7 @@ export default function AdminDashboard({
           </div>
           <div className="mt-4">
             <p className="text-gray-400 font-bold text-[10px] uppercase tracking-wider font-sans">Fees Collected</p>
-            <h3 className="text-3xl font-black text-gray-950 mt-1">${totalPaid.toLocaleString()}</h3>
+            <h3 className="text-3xl font-black text-gray-950 mt-1">₹{totalPaid.toLocaleString()}</h3>
           </div>
         </div>
 
@@ -163,8 +163,8 @@ export default function AdminDashboard({
             </span>
           </div>
           <div className="mt-4">
-            <p className="text-gray-400 font-bold text-[10px] uppercase tracking-wider">Pending Payments</p>
-            <h3 className="text-3xl font-black text-red-700 mt-1">${totalOutstanding.toLocaleString()}</h3>
+            <p className="text-gray-400 font-bold text-[10px] uppercase tracking-wider font-sans">Pending Payments</p>
+            <h3 className="text-3xl font-black text-red-700 mt-1">₹{totalOutstanding.toLocaleString()}</h3>
           </div>
         </div>
 
@@ -300,14 +300,14 @@ export default function AdminDashboard({
                 <span className="w-3 h-3 bg-blue-900 rounded-full flex-shrink-0 animate-pulse"></span>
                 <div className="text-left">
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Paid</p>
-                  <p className="text-xs font-bold text-gray-800">${totalPaid.toLocaleString()}</p>
+                  <p className="text-xs font-bold text-gray-800">₹{totalPaid.toLocaleString()}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2 bg-gray-50 border border-gray-150 p-2.5 rounded-lg">
                 <span className="w-3 h-3 bg-red-600 rounded-full flex-shrink-0"></span>
                 <div className="text-left">
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest font-sans">Pending</p>
-                  <p className="text-xs font-bold text-red-650">${totalOutstanding.toLocaleString()}</p>
+                  <p className="text-xs font-bold text-red-650">₹{totalOutstanding.toLocaleString()}</p>
                 </div>
               </div>
             </div>
@@ -403,7 +403,7 @@ export default function AdminDashboard({
                     <td className="px-6 py-4">
                       {log.amount !== undefined ? (
                         <span className={`font-extrabold ${log.type === 'Payment Failed' ? 'text-red-600' : 'text-gray-900'}`}>
-                          ${log.amount.toFixed(2)}
+                          ₹{log.amount.toFixed(2)}
                         </span>
                       ) : (
                         <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold ${

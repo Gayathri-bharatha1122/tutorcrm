@@ -35,6 +35,8 @@ export interface Teacher {
   lastName?: string;
   phone?: string;
   email?: string;
+  attendance?: string;
+  salaryStatus?: string;
 }
 
 export interface ActivityLog {

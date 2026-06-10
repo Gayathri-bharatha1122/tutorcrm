@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { ArrowLeft } from 'lucide-react';
+import { useLanguage } from '../LanguageContext';
 
 interface DashboardPageProps {
   title: string;
@@ -17,6 +18,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   onBack,
   children
 }) => {
+  const { t } = useLanguage();
   const colorMap: Record<string, string> = {
     indigo: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20 hover:bg-indigo-500/20',
     teal: 'text-teal-400 bg-teal-500/10 border-teal-500/20 hover:bg-teal-500/20',
@@ -41,16 +43,16 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer mb-6 ${accent}`}
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Dashboard
+          {t('Back to Dashboard')}
         </button>
 
         <div className="space-y-1">
           <span className={`text-[10px] font-bold uppercase tracking-widest block ${textColor}`}>
-            Portal Navigation
+            {t('Portal Navigation')}
           </span>
-          <h1 className="text-2xl font-extrabold text-white">{title}</h1>
+          <h1 className="text-2xl font-extrabold text-white">{t(title)}</h1>
           {subtitle && (
-            <p className="text-slate-400 text-sm">{subtitle}</p>
+            <p className="text-slate-400 text-sm">{t(subtitle)}</p>
           )}
         </div>
       </div>

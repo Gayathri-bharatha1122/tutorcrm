@@ -8,7 +8,6 @@ import {
   AlertTriangle, 
   Calendar, 
   Sliders,
-  DollarSign,
   Briefcase,
   Layers,
   ChevronRight,
@@ -559,7 +558,7 @@ export default function App() {
                 <div className="grid grid-cols-2 gap-4 border-t border-gray-100 pt-4">
                   {/* Initial Fees Paid */}
                   <div>
-                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Initial Fees Paid ($)</label>
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Initial Fees Paid (₹)</label>
                     <input 
                       type="number" 
                       min="0"
@@ -571,7 +570,7 @@ export default function App() {
 
                   {/* Outstanding balance */}
                   <div>
-                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Outstanding Due ($)</label>
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Outstanding Due (₹)</label>
                     <input 
                       type="number" 
                       min="0"
@@ -667,7 +666,7 @@ export default function App() {
                 <div className="grid grid-cols-2 gap-4">
                   {/* Amount charge */}
                   <div>
-                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Charge Amount ($)</label>
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Charge Amount (₹)</label>
                     <input 
                       type="number" 
                       required

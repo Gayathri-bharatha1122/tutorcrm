@@ -3,7 +3,9 @@ import { api } from '../services/api';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   User,
-  DollarSign,
+  IndianRupee,
+  QrCode,
+  Smartphone,
   Calendar,
   Activity,
   AlertCircle,
@@ -126,11 +128,10 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
     }
   }, [currentPath]);
 
-  // Card details mock states
-  const [cardNumber, setCardNumber] = useState('•••• •••• •••• 4921');
-  const [cardHolder, setCardHolder] = useState('HELENA THORNE');
-  const [cardExpiry, setCardExpiry] = useState('09/29');
-  const [cardCvv, setCardCvv] = useState('642');
+  // UPI payment gateway states
+  const [paymentMethod, setPaymentMethod] = useState<'qr' | 'upi_id'>('qr');
+  const [upiId, setUpiId] = useState('helena@okaxis');
+  const [paymentStep, setPaymentStep] = useState(0);
 
   const handlePayClick = (bill: Bill) => {
     setSelectedBill(bill);
@@ -142,20 +143,35 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
     if (!selectedBill) return;
 
     setIsProcessingPayment(true);
+    setPaymentStep(1);
+
+    // Simulated progress steps for real-time payments
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    setPaymentStep(2);
+
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setPaymentStep(3);
+
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    setPaymentStep(4);
 
     try {
       await api.payBill(selectedBill.id);
       const updatedBills = await api.getParentBills();
       setBills(updatedBills);
 
+      await new Promise((resolve) => setTimeout(resolve, 600));
+
       setIsProcessingPayment(false);
       setSelectedBill(null);
-
-      setPaymentSuccessMessage(`Payment for "${selectedBill.itemName}" processed successfully. Invoiced balance cleared.`);
+      setPaymentStep(0);
+      
+      setPaymentSuccessMessage(`UPI Payment of ₹${selectedBill.amount} for "${selectedBill.itemName}" settled instantly in real-time. Reference ID: TXN${Date.now().toString().slice(-8)}.`);
       setTimeout(() => setPaymentSuccessMessage(null), 4000);
     } catch (err: any) {
       setIsProcessingPayment(false);
-      alert(`Payment failed: ${err.message}`);
+      setPaymentStep(0);
+      alert(`UPI Payment failed: ${err.message}`);
     }
   };
 
@@ -197,7 +213,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
               <User className="h-5 w-5 text-white" />
             </div>
             <div>
-              <span className="font-sans font-bold text-base text-white tracking-tight">EduManage Parent</span>
+              <span className="font-sans font-bold text-base text-white tracking-tight">{t('EduManage Parent')}</span>
               <span className="text-[10px] block text-slate-500 font-semibold uppercase">{t('Guardian Link Account')}</span>
             </div>
           </div>
@@ -206,7 +222,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
             <div className="flex items-center gap-3">
               <div className="text-right hidden sm:block">
                 <span className="text-xs font-bold text-slate-200 block">{parentName}</span>
-                <span className="text-[10px] text-amber-400 font-bold uppercase font-mono">Linked Child • {linkedStudentName}</span>
+                <span className="text-[10px] text-amber-400 font-bold uppercase font-mono">{t('Linked Child • {name}').replace('{name}', linkedStudentName)}</span>
               </div>
               <LanguageSelector />
               <button
@@ -215,16 +231,13 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
               >
                 {t('Home')}
               </button>
-              {/* Sign Out option removed */}
             </div>
           </div>
         </div>
       </nav>
 
-      {/* Main Content Area */}
       <main className="w-full px-4 sm:px-8 lg:px-12 py-8 space-y-8 relative z-10">
 
-        {/* Payments Status Notification alerts */}
         <AnimatePresence>
           {paymentSuccessMessage && (
             <motion.div
@@ -244,42 +257,38 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
           )}
         </AnimatePresence>
 
-        {/* Highlight Child Metrics Header with tracking gauges */}
         {showOverview && (
         <div id="overview" className="bg-slate-900 border border-slate-800 rounded-3xl p-6 scroll-mt-20">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-slate-850 pb-6 mb-6 gap-4">
             <div className="space-y-1">
               <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest block bg-amber-500/10 w-max px-2.5 py-0.5 rounded-md">
-                Active Student Linkage
+                {t('Active Student Linkage')}
               </span>
-              <h2 className="text-xl font-bold text-white">{linkedStudentName === 'Marcus Thorne' ? t('Student Progress Directory: Marcus Thorne') : `${t('Student Progress Directory')}: ${linkedStudentName}`}</h2>
-              <p className="text-slate-400 text-xs">Educational metrics synchronized directly with Prof. Alistair Miller's study journals.</p>
+              <h2 className="text-xl font-bold text-white">{t('Student Progress Directory: {name}').replace('{name}', linkedStudentName)}</h2>
+              <p className="text-slate-400 text-xs">{t("Educational metrics synchronized directly with Prof. Alistair Miller's study journals.")}</p>
             </div>
 
-            {/* Total Balance block */}
             <div className="bg-slate-950 p-4 rounded-2xl border border-slate-850 flex items-center justify-between gap-6 w-full sm:min-w-xs shrink-0">
               <div>
                 <span className="text-[10px] font-bold text-slate-500 uppercase block mb-0.5">{t('Outstanding Balance Due')}</span>
                 <span className="text-2xl font-extrabold text-white block">
-                  <AnimatedCounter value={totalOutstanding} prefix="$" />
+                  <AnimatedCounter value={totalOutstanding} prefix="₹" />
                 </span>
               </div>
               {totalOutstanding > 0 ? (
                 <span className="px-3 py-1 bg-amber-500/10 text-amber-400 rounded-full text-[10px] font-bold border border-amber-500/20 flex items-center gap-1 animate-pulse">
-                  <AlertCircle className="h-3.5 w-3.5 shrink-0" /> Action Required
+                  <AlertCircle className="h-3.5 w-3.5 shrink-0" /> {t('Action Required')}
                 </span>
               ) : (
                 <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full text-[10px] font-bold border border-emerald-500/20">
-                  <CheckCircle className="h-3.5 w-3.5 shrink-0" /> Zero Dues
+                  <CheckCircle className="h-3.5 w-3.5 shrink-0" /> {t('Zero Dues')}
                 </span>
               )}
             </div>
           </div>
 
-          {/* Progress Indicators and circular tracker panels */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
 
-            {/* Metric 1 */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
@@ -295,11 +304,10 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                 <span className="text-lg font-bold text-white block mt-0.5">
                   <AnimatedCounter value={98.2} decimals={1} suffix="%" />
                 </span>
-                <span className="text-[10px] text-emerald-400 font-bold block">Excellent • Standard Class 11B</span>
+                <span className="text-[10px] text-emerald-400 font-bold block">{t('Excellent • Standard Class 11B')}</span>
               </div>
             </motion.div>
 
-            {/* Metric 2 */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
@@ -315,11 +323,10 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                 <span className="text-lg font-bold text-white block mt-0.5">
                   <AnimatedCounter value={94.1} decimals={1} suffix="%" />
                 </span>
-                <span className="text-[10px] text-teal-400 font-bold block">Highly Consistent • +3% vs. Avg</span>
+                <span className="text-[10px] text-teal-400 font-bold block">{t('Highly Consistent • +3% vs. Avg')}</span>
               </div>
             </motion.div>
 
-            {/* Metric 3 */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
@@ -335,7 +342,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                 <span className="text-lg font-bold text-white block mt-0.5">
                   <AnimatedCounter value={91} suffix="% (Grade A-)" />
                 </span>
-                <span className="text-[10px] text-indigo-400 font-bold block">Top 10% of Cohort tier</span>
+                <span className="text-[10px] text-indigo-400 font-bold block">{t('Top 10% of Cohort tier')}</span>
               </div>
             </motion.div>
 
@@ -343,34 +350,32 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
         </div>
         )}
 
-        {/* Attendance Calendar Card */}
         {showAttendance && (
         <div id="attendance" className="bg-slate-900 border border-slate-800 rounded-3xl p-6 scroll-mt-20">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
             <div className="space-y-1">
               <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest block bg-emerald-500/10 w-max px-2.5 py-0.5 rounded-md">
-                Attendance Log
+                {t('Attendance Log')}
               </span>
               <h3 className="text-lg font-bold text-white flex items-center gap-1.5">
                 <Calendar className="h-5 w-5 text-emerald-400" /> {t('Attendance Calendar')}
               </h3>
-              <p className="text-slate-400 text-xs">Verify your child's daily presence and session check-ins for the current month.</p>
+              <p className="text-slate-400 text-xs">{t("Verify your child's daily presence and session check-ins for the current month.")}</p>
             </div>
             <div className="flex flex-wrap gap-3 text-[10px] font-semibold text-slate-400">
-              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500" /> Present</span>
-              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-rose-500" /> Absent</span>
-              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-slate-700" /> Weekend</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500" /> {t('Present')}</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-rose-500" /> {t('Absent')}</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-slate-700" /> {t('Weekend')}</span>
             </div>
           </div>
 
           <div className="p-6 bg-slate-950 border border-slate-850 rounded-2xl">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
 
-              {/* Calendar Left */}
               <div className="w-full max-w-xs mx-auto md:mx-0">
-                <div className="text-center font-bold text-xs text-slate-350 mb-3">May 2026</div>
+                <div className="text-center font-bold text-xs text-slate-350 mb-3">{t('May')} 2026</div>
                 <div className="grid grid-cols-7 gap-1.5 text-center text-[9px] font-bold text-slate-500 mb-2">
-                  <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                  <span>{t('Sun')}</span><span>{t('Mon')}</span><span>{t('Tue')}</span><span>{t('Wed')}</span><span>{t('Thu')}</span><span>{t('Fri')}</span><span>{t('Sat')}</span>
                 </div>
 
                 <div className="grid grid-cols-7 gap-1.5 text-center justify-items-center">
@@ -391,7 +396,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                     return (
                       <div
                         key={`day-${day.dayNum}`}
-                        title={day.status === 'present' ? `Present on May ${day.dayNum}` : day.status === 'absent' ? `Absent on May ${day.dayNum}` : `Weekend`}
+                        title={day.status === 'present' ? `${t('Present on')} ${t('May')} ${day.dayNum}` : day.status === 'absent' ? `${t('Absent on')} ${t('May')} ${day.dayNum}` : t('Weekend')}
                         className={`w-8 h-8 flex items-center justify-center text-[10px] font-bold font-mono transition-all hover:scale-110 cursor-pointer ${cellStyle}`}
                       >
                         {day.dayNum}
@@ -401,37 +406,35 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                 </div>
               </div>
 
-              {/* Attendance Statistics Right */}
               <div className="space-y-4">
-                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-850 pb-2">May Attendance Stats</h4>
+                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-850 pb-2">{t('May Attendance Stats')}</h4>
 
                 <div className="grid grid-cols-3 gap-3">
                   <div className="bg-slate-900/55 p-3 rounded-xl border border-slate-850 text-center">
-                    <span className="text-[9px] font-bold text-slate-500 uppercase block">Conducted</span>
+                    <span className="text-[9px] font-bold text-slate-500 uppercase block">{t('Conducted')}</span>
                     <span className="text-sm font-extrabold text-white block mt-1">
                       <AnimatedCounter value={21} />
                     </span>
-                    <span className="text-[8px] text-slate-400 block font-semibold">Sessions</span>
+                    <span className="text-[8px] text-slate-400 block font-semibold">{t('Sessions')}</span>
                   </div>
 
                   <div className="bg-emerald-950/20 p-3 rounded-xl border border-emerald-500/10 text-center">
-                    <span className="text-[9px] font-bold text-emerald-550 uppercase block">Attended</span>
+                    <span className="text-[9px] font-bold text-emerald-550 uppercase block">{t('Attended')}</span>
                     <span className="text-sm font-extrabold text-emerald-400 block mt-1">
                       <AnimatedCounter value={19} />
                     </span>
-                    <span className="text-[8px] text-emerald-500/70 block font-semibold">Present</span>
+                    <span className="text-[8px] text-emerald-500/70 block font-semibold">{t('Present')}</span>
                   </div>
 
                   <div className="bg-rose-950/20 p-3 rounded-xl border border-rose-500/10 text-center">
-                    <span className="text-[9px] font-bold text-rose-550 uppercase block">Absent</span>
+                    <span className="text-[9px] font-bold text-rose-550 uppercase block">{t('Absent')}</span>
                     <span className="text-sm font-extrabold text-rose-400 block mt-1">
                       <AnimatedCounter value={2} />
                     </span>
-                    <span className="text-[8px] text-rose-500/70 block font-semibold">Missed</span>
+                    <span className="text-[8px] text-rose-500/70 block font-semibold">{t('Missed')}</span>
                   </div>
                 </div>
 
-                {/* Attendance Ratio Circular Gauge & Text */}
                 <div className="flex items-center gap-4 bg-slate-900/40 p-4 rounded-xl border border-slate-850/60">
                   <div className="relative w-14 h-14 shrink-0 flex items-center justify-center">
                     <svg className="w-14 h-14 transform -rotate-90">
@@ -449,8 +452,8 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                     </span>
                   </div>
                   <div className="space-y-0.5">
-                    <span className="text-xs font-bold text-white block">Attendance Percentage</span>
-                    <p className="text-[10px] text-slate-400 leading-snug">Attended 19 out of 21 sessions. {linkedStudentName}'s attendance is above the 90% threshold.</p>
+                    <span className="text-xs font-bold text-white block">{t('Attendance Percentage')}</span>
+                    <p className="text-[10px] text-slate-400 leading-snug">{t("Attended 19 out of 21 sessions. {name}'s attendance is above the 90% threshold.").replace("{name}", linkedStudentName)}</p>
                   </div>
                 </div>
               </div>
@@ -460,16 +463,14 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
         </div>
         )}
 
-        {/* Split layouts: billing list left, announcements logs right */}
         {showBilling && (
         <div id="billing" className="grid grid-cols-1 lg:grid-cols-5 gap-6 scroll-mt-20">
 
-          {/* Itemized ledger outstanding tuition bills list */}
           <div className="lg:col-span-3 bg-slate-900 border border-slate-800 rounded-3xl p-6">
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-bold text-white">{t('Itemized Tuition Billing & Fees Ledger')}</h3>
-                <span className="text-xs text-slate-550 block">Complete billing file with authorized gateway links</span>
+                <span className="text-xs text-slate-550 block">{t('Complete billing file with authorized gateway links')}</span>
               </div>
             </div>
 
@@ -477,10 +478,10 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
               <table className="w-full text-left text-xs border-collapse">
                 <thead className="bg-slate-950/80 border-b border-slate-850 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
                   <tr>
-                    <th className="p-4">Item Name / Service Category</th>
-                    <th className="p-4">Paid Status</th>
-                    <th className="p-4 text-center">Amount Due</th>
-                    <th className="p-4 text-right">Actions Link</th>
+                    <th className="p-4">{t('Item Name / Service Category')}</th>
+                    <th className="p-4">{t('Paid Status')}</th>
+                    <th className="p-4 text-center">{t('Amount Due')}</th>
+                    <th className="p-4 text-right">{t('Actions Link')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-850 text-xs">
@@ -493,18 +494,18 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                       className="hover:bg-slate-950/20 transition"
                     >
                       <td className="p-4">
-                        <span className="font-bold text-white block">{bill.itemName}</span>
-                        <span className="text-[10px] text-slate-500 block">Billing Code: {bill.id} • Date compiled: {bill.status === 'Paid' ? bill.paidDate : 'Overdue Period'}</span>
+                        <span className="font-bold text-white block">{t(bill.itemName)}</span>
+                        <span className="text-[10px] text-slate-500 block">{t('Billing Code')}: {bill.id} • {t('Date compiled')}: {bill.status === 'Paid' ? t(bill.paidDate) : t('Overdue Period')}</span>
                       </td>
                       <td className="p-4">
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold block w-max ${bill.status === 'Paid' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' :
                             bill.status === 'Overdue' ? 'bg-red-500/10 text-red-500 border border-red-500/20 animate-pulse' :
                               'bg-amber-500/10 text-amber-500 border border-amber-500/20'
                           }`}>
-                          {bill.status}
+                          {t(bill.status)}
                         </span>
                       </td>
-                      <td className="p-4 font-bold text-white text-center font-mono text-[13px]">${bill.amount}</td>
+                      <td className="p-4 font-bold text-white text-center font-mono text-[13px]">₹{bill.amount}</td>
                       <td className="p-4 text-right">
                         {bill.status !== 'Paid' ? (
                           <button
@@ -515,7 +516,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                             {t('Pay Now')}
                           </button>
                         ) : (
-                          <span className="text-[10px] font-bold text-slate-500 block mr-2">Paid on {bill.paidDate}</span>
+                          <span className="text-[10px] font-bold text-slate-500 block mr-2">{t('Paid on')} {t(bill.paidDate)}</span>
                         )}
                       </td>
                     </motion.tr>
@@ -525,7 +526,6 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
             </div>
           </div>
 
-          {/* Announcements block */}
           <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between">
             <div className="space-y-4">
               <div>
@@ -534,13 +534,13 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                     onClick={() => setActiveTab('announcements')}
                     className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${activeTab === 'announcements' ? 'bg-amber-600 text-white' : 'text-slate-500 hover:text-slate-300'}`}
                   >
-                    Campus Announcements
+                    {t('Campus Announcements')}
                   </button>
                   <button
                     onClick={() => setActiveTab('messages')}
                     className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${activeTab === 'messages' ? 'bg-amber-600 text-white' : 'text-slate-500 hover:text-slate-300'}`}
                   >
-                    Direct Messages
+                    {t('Direct Messages')}
                   </button>
                 </div>
                 <h3 className="text-sm font-bold text-white mt-4">{activeTab === 'announcements' ? t('Advisory Board Bulletin') : t('Teacher Communications')}</h3>
@@ -558,10 +558,10 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                       className="p-4 bg-slate-950 border border-slate-850 hover:border-slate-800 transition rounded-2xl relative"
                     >
                       <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-xs font-bold text-slate-200 block truncate max-w-[180px]">{ann.title}</span>
-                        <span className="text-[9px] text-slate-500 font-mono italic">{ann.timeAgo}</span>
+                        <span className="text-xs font-bold text-slate-200 block truncate max-w-[180px]">{t(ann.title)}</span>
+                        <span className="text-[9px] text-slate-500 font-mono italic">{t(ann.timeAgo)}</span>
                       </div>
-                      <p className="text-[11px] text-slate-400 leading-relaxed font-sans">{ann.content}</p>
+                      <p className="text-[11px] text-slate-400 leading-relaxed font-sans">{t(ann.content)}</p>
                     </motion.div>
                   ))
                 ) : (
@@ -571,20 +571,20 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                     className="p-4 bg-slate-950 border border-slate-850 rounded-2xl flex flex-col gap-2"
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-bold text-slate-200 block">Prof. Alistair Miller</span>
-                      <span className="text-[9px] text-slate-500 font-mono italic">Today, 10:30 AM</span>
+                      <span className="text-xs font-bold text-slate-200 block">{t('Prof. Alistair Miller')}</span>
+                      <span className="text-[9px] text-slate-500 font-mono italic">{t('Today, 10:30 AM')}</span>
                     </div>
-                    <p className="text-[11px] text-slate-400 leading-relaxed font-sans">Marcus has been doing exceptionally well in his rotational physics units. Let's touch base next week regarding the upcoming science fair.</p>
-                    <button className="mt-2 text-[10px] bg-amber-600/10 text-amber-400 border border-amber-500/20 px-3 py-1.5 rounded-lg font-bold hover:bg-amber-600/20 hover:scale-[1.03] active:scale-[0.97] transition-all self-start cursor-pointer btn-ripple">Reply to Message</button>
+                    <p className="text-[11px] text-slate-400 leading-relaxed font-sans">{t("Marcus has been doing exceptionally well in his rotational physics units. Let's touch base next week regarding the upcoming science fair.")}</p>
+                    <button className="mt-2 text-[10px] bg-amber-600/10 text-amber-400 border border-amber-500/20 px-3 py-1.5 rounded-lg font-bold hover:bg-amber-600/20 hover:scale-[1.03] active:scale-[0.97] transition-all self-start cursor-pointer btn-ripple">{t('Reply to Message')}</button>
                   </motion.div>
                 )}
               </div>
             </div>
 
             <div className="mt-4 pt-4 border-t border-slate-850 text-center text-xs text-slate-500 font-semibold flex items-center justify-between">
-              <span>Parent Advisory Line</span>
+              <span>{t('Parent Advisory Line')}</span>
               <span className="text-indigo-400 hover:underline cursor-pointer flex items-center gap-1 text-[10px]">
-                Link Secondary Contact ID <ArrowRight className="h-3 w-3" />
+                {t('Link Secondary Contact ID')} <ArrowRight className="h-3 w-3" />
               </span>
             </div>
           </div>
@@ -592,30 +592,27 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
         </div>
         )}
 
-        {/* Messages anchor */}
         <div id="messages" className="hidden scroll-mt-20" />
 
-        {/* Enrolled Courses & Tutors Section */}
         {showCourses && (
         <div id="courses" className="bg-slate-900 border border-slate-800 rounded-3xl p-6 scroll-mt-20">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
             <div className="space-y-1">
               <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest block bg-indigo-500/10 w-max px-2.5 py-0.5 rounded-md">
-                Enrolled Courses
+                {t('Enrolled Courses')}
               </span>
               <h3 className="text-lg font-bold text-white flex items-center gap-1.5">
-                <GraduationCap className="h-5 w-5 text-indigo-400" /> Courses & Assigned Tutors
+                <GraduationCap className="h-5 w-5 text-indigo-400" /> {t('Courses & Assigned Tutors')}
               </h3>
-              <p className="text-slate-400 text-xs">Your child's active courses with tutor details and direct contact availability.</p>
+              <p className="text-slate-400 text-xs">{t("Your child's active courses with tutor details and direct contact availability.")}</p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {courses.length === 0 ? (
-              <div className="col-span-3 text-center py-10 text-slate-500 text-xs font-semibold">No courses enrolled yet.</div>
+              <div className="col-span-3 text-center py-10 text-slate-500 text-xs font-semibold">{t('No courses enrolled yet.')}</div>
             ) : (
               courses.map((course, idx) => {
-                const isAvailable = course.tutorAvailability === 'Active';
                 const iconMap: Record<string, React.ReactNode> = {
                   physics: <Atom className="h-5 w-5" />,
                   math: <Calculator className="h-5 w-5" />,
@@ -646,17 +643,15 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                     whileHover={{ y: -3, scale: 1.01 }}
                     className="bg-slate-950 border border-slate-850 rounded-2xl p-5 flex flex-col gap-4 transition-all hover:border-slate-700 hover:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.4)]"
                   >
-                    {/* Course header */}
                     <div className="flex items-center gap-3">
                       <div className={`w-11 h-11 rounded-xl ${cc.bg} ${cc.border} border ${cc.text} flex items-center justify-center shrink-0`}>
                         {iconMap[course.iconType] || <BookOpen className="h-5 w-5" />}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <span className="text-sm font-bold text-white block truncate">{course.name}</span>
+                        <span className="text-sm font-bold text-white block truncate">{t(course.name)}</span>
                       </div>
                     </div>
 
-                    {/* Tutor + Contact */}
                     <div className="border-t border-slate-800 pt-3 flex items-center justify-between gap-2 mt-2">
                       <div className="flex items-center gap-2 min-w-0">
                         <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0">
@@ -668,18 +663,16 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                         </div>
                       </div>
 
-                      {/* Contact button */}
                       <button
                         onClick={() => setContactingTutor(contactingTutor === course.id ? null : course.id)}
                         className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/20 hover:scale-105`}
-                        title={`Contact ${course.tutorName}`}
+                        title={t(`Contact {tutor}`).replace('{tutor}', course.tutorName)}
                       >
                         <Mail className="h-3.5 w-3.5" />
-                        Contact
+                        {t('Contact')}
                       </button>
                     </div>
 
-                    {/* Expanded contact panel */}
                     <AnimatePresence>
                       {contactingTutor === course.id && (
                         <motion.div
@@ -690,7 +683,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                           className="overflow-hidden"
                         >
                           <div className="bg-emerald-950/20 border border-emerald-500/15 rounded-xl p-3 flex flex-col gap-2">
-                            <span className="text-[10px] font-bold text-emerald-400 uppercase">Contact Options</span>
+                            <span className="text-[10px] font-bold text-emerald-400 uppercase">{t('Contact Options')}</span>
                             <a
                               href="mailto:alistair.miller@edumanage.com"
                               className="flex items-center gap-2 text-[10px] text-slate-300 hover:text-white font-semibold transition group"
@@ -698,7 +691,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                               <div className="w-6 h-6 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center group-hover:bg-indigo-500/20 transition">
                                 <Mail className="h-3 w-3 text-indigo-400" />
                               </div>
-                              Send Email
+                              {t('Send Email')}
                             </a>
                             <a
                               href="tel:+14155550001"
@@ -707,7 +700,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                               <div className="w-6 h-6 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center group-hover:bg-teal-500/20 transition">
                                 <Phone className="h-3 w-3 text-teal-400" />
                               </div>
-                              Call Tutor
+                              {t('Call Tutor')}
                             </a>
                           </div>
                         </motion.div>
@@ -721,20 +714,18 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
         </div>
         )}
 
-        {/* Feedback & Rating Section */}
         {showFeedback && (
         <div id="feedback" className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
           <div className="border-b border-slate-850 pb-4 mb-6">
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <Sparkles className="h-4.5 w-4.5 text-amber-400 animate-pulse" /> Feedback & Ratings
+              <Sparkles className="h-4.5 w-4.5 text-amber-400 animate-pulse" /> {t('Feedback & Ratings')}
             </h3>
-            <span className="text-[11px] text-slate-550">Provide feedback on school facilities, course curriculums, or tutor guidance</span>
+            <span className="text-[11px] text-slate-550">{t('Provide feedback on school facilities, course curriculums, or tutor guidance')}</span>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Submit Feedback Form */}
             <div className="bg-slate-950 border border-slate-850 p-5 rounded-2xl">
-              <h4 className="text-xs font-bold text-white uppercase tracking-widest border-b border-slate-850 pb-2 mb-4">Submit Feedback & Rating</h4>
+              <h4 className="text-xs font-bold text-white uppercase tracking-widest border-b border-slate-850 pb-2 mb-4">{t('Submit Feedback & Rating')}</h4>
 
               {feedbackSuccess && <div className="p-3 mb-3 text-xs bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl">{feedbackSuccess}</div>}
               {feedbackError && <div className="p-3 mb-3 text-xs bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-xl">{feedbackError}</div>}
@@ -747,12 +738,12 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                 setFeedbackSuccess('');
                 try {
                   await api.submitParentFeedback(feedbackText, feedbackRating);
-                  setFeedbackSuccess('Feedback submitted successfully!');
+                  setFeedbackSuccess(t('Feedback submitted successfully!'));
                   setFeedbackText('');
                   setFeedbackRating(5);
                   await loadFeedback();
                 } catch (err: any) {
-                  setFeedbackError(err.message || 'Failed to submit feedback');
+                  setFeedbackError(err.message || t('Failed to submit feedback'));
                 } finally {
                   setFeedbackLoading(false);
                 }
@@ -774,9 +765,9 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Comment</label>
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">{t('Comment')}</label>
                   <textarea
-                    placeholder="Share your feedback on the teaching standards, system interface, or other ideas..."
+                    placeholder={t("Share your feedback on the teaching standards, system interface, or other ideas...")}
                     value={feedbackText}
                     onChange={(e) => setFeedbackText(e.target.value)}
                     rows={3}
@@ -789,23 +780,22 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                   disabled={feedbackLoading || !feedbackText.trim()}
                   className={`px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition cursor-pointer ${feedbackLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  {feedbackLoading ? 'Submitting...' : 'Submit Feedback'}
+                  {feedbackLoading ? t('Submitting...') : t('Submit Feedback')}
                 </button>
               </form>
             </div>
 
-            {/* Submissions History */}
             <div className="bg-slate-950 border border-slate-850 p-5 rounded-2xl">
-              <h4 className="text-xs font-bold text-white uppercase tracking-widest border-b border-slate-850 pb-2 mb-4">Previous Feedback & Ratings</h4>
+              <h4 className="text-xs font-bold text-white uppercase tracking-widest border-b border-slate-850 pb-2 mb-4">{t('Previous Feedback & Ratings')}</h4>
 
               <div className="overflow-x-auto">
                 <table className="w-full text-xs text-left border-collapse">
                   <thead>
                     <tr className="border-b border-slate-850 text-slate-500">
-                      <th className="pb-2 font-bold uppercase text-[9px] tracking-wider">Date</th>
-                      <th className="pb-2 font-bold uppercase text-[9px] tracking-wider">Rating</th>
-                      <th className="pb-2 font-bold uppercase text-[9px] tracking-wider">Comment</th>
-                      <th className="pb-2 font-bold uppercase text-[9px] tracking-wider">Status</th>
+                      <th className="pb-2 font-bold uppercase text-[9px] tracking-wider">{t('Date')}</th>
+                      <th className="pb-2 font-bold uppercase text-[9px] tracking-wider">{t('Rating')}</th>
+                      <th className="pb-2 font-bold uppercase text-[9px] tracking-wider">{t('Comment')}</th>
+                      <th className="pb-2 font-bold uppercase text-[9px] tracking-wider">{t('Status')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -826,14 +816,14 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                         <td className="py-2.5">
                           <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${sub.status === 'Reviewed' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-400'
                             }`}>
-                            {sub.status}
+                            {t(sub.status)}
                           </span>
                         </td>
                       </tr>
                     ))}
                     {feedbackSubmissions.length === 0 && (
                       <tr>
-                        <td colSpan={4} className="py-4 text-center text-slate-550 italic">No feedback submitted yet.</td>
+                        <td colSpan={4} className="py-4 text-center text-slate-550 italic">{t('No feedback submitted yet.')}</td>
                       </tr>
                     )}
                   </tbody>
@@ -846,113 +836,205 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
 
       </main>
 
-      {/* Credit Card payment checkout popup simulator */}
       <AnimatePresence>
         {selectedBill && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.5 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black z-40"
-              onClick={() => setSelectedBill(null)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-xs z-40"
+              onClick={() => {
+                if (!isProcessingPayment) setSelectedBill(null);
+              }}
             />
 
-            {/* Checkout modal panel */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="fixed inset-0 m-auto w-full max-w-md h-max bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl z-50 p-6 text-slate-100"
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="fixed inset-0 m-auto w-full max-w-md h-max bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl z-50 p-6 text-slate-100 overflow-hidden"
             >
+              <style>{`
+                @keyframes scan {
+                  0%, 100% { top: 0%; opacity: 0.8; }
+                  50% { top: 100%; opacity: 0.8; }
+                }
+                .scan-line {
+                  animation: scan 2.5s infinite linear;
+                }
+              `}</style>
+
               <div className="flex justify-between items-center mb-6">
                 <div>
                   <h4 className="text-sm font-bold text-white flex items-center gap-1.5">
-                    <CreditCard className="h-4.5 w-4.5 text-indigo-400" /> {t('Secure Payment Gateway')}
+                    <IndianRupee className="h-4.5 w-4.5 text-amber-400" /> {t('BHIM UPI Real-Time Gateway')}
                   </h4>
-                  <span className="text-[11px] text-slate-550">{t('Authorize instant bank ledger wire transfers')}</span>
+                  <span className="text-[11px] text-slate-400">{t('NPCI Unified Payments Interface Secure Node')}</span>
                 </div>
-                <button
-                  onClick={() => setSelectedBill(null)}
-                  className="p-1 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white"
-                >
-                  <X className="h-5 w-5" />
-                </button>
+                {!isProcessingPayment && (
+                  <button
+                    onClick={() => setSelectedBill(null)}
+                    className="p-1 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                )}
               </div>
 
               <div className="bg-slate-950 p-4 rounded-2xl border border-slate-850 mb-6 flex justify-between items-center">
                 <div>
-                  <span className="text-[10px] text-slate-500 uppercase block font-bold">Checkout Item</span>
-                  <span className="text-xs font-bold text-white block max-w-[200px] truncate">{selectedBill.itemName}</span>
+                  <span className="text-[10px] text-slate-500 uppercase block font-bold">{t('Item Description')}</span>
+                  <span className="text-xs font-bold text-white block max-w-[200px] truncate">{t(selectedBill.itemName)}</span>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] text-slate-500 uppercase block font-bold">Total billing</span>
-                  <span className="text-base font-extrabold text-white block font-mono">${selectedBill.amount}</span>
+                  <span className="text-[10px] text-slate-500 uppercase block font-bold">{t('Amount Due')}</span>
+                  <span className="text-base font-extrabold text-amber-400 block font-mono">₹{selectedBill.amount}</span>
                 </div>
               </div>
 
-              {/* Credit card fields */}
-              <form onSubmit={handleConfirmMockPayment} className="space-y-4">
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Card Number *</label>
-                  <input
-                    type="text"
-                    required
-                    value={cardNumber}
-                    onChange={(e) => setCardNumber(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-850 text-xs px-3 py-2.5 rounded-xl outline-none focus:border-indigo-500 text-slate-300 font-mono text-center tracking-widest"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Card Holder Identification *</label>
-                  <input
-                    type="text"
-                    required
-                    value={cardHolder}
-                    onChange={(e) => setCardHolder(e.target.value.toUpperCase())}
-                    className="w-full bg-slate-950 border border-slate-850 text-xs px-3 py-2.5 rounded-xl outline-none focus:border-indigo-500 text-slate-300 font-sans tracking-wide"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Expiry Date *</label>
-                    <input
-                      type="text"
-                      required
-                      value={cardExpiry}
-                      onChange={(e) => setCardExpiry(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-850 text-xs px-3 py-2.5 rounded-xl outline-none focus:border-indigo-500 text-slate-300 text-center font-mono"
-                    />
+              {paymentStep > 0 ? (
+                <div className="py-8 text-center space-y-5">
+                  <div className="relative w-16 h-16 mx-auto flex items-center justify-center">
+                    {paymentStep === 4 ? (
+                      <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center animate-bounce">
+                        <CheckCircle className="h-8 w-8" />
+                      </div>
+                    ) : (
+                      <>
+                        <div className="absolute inset-0 border-4 border-indigo-500/20 rounded-full" />
+                        <div className="absolute inset-0 border-4 border-t-indigo-400 rounded-full animate-spin" />
+                        <span className="text-lg font-bold text-indigo-400">UPI</span>
+                      </>
+                    )}
                   </div>
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Secure CVV *</label>
-                    <input
-                      type="text"
-                      required
-                      value={cardCvv}
-                      onChange={(e) => setCardCvv(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-850 text-xs px-3 py-2.5 rounded-xl outline-none focus:border-indigo-500 text-slate-300 text-center font-mono"
-                    />
+                  <div className="space-y-1">
+                    <h5 className="text-xs font-bold text-white uppercase tracking-wider">
+                      {paymentStep === 1 && t("Initiating UPI Transaction")}
+                      {paymentStep === 2 && t("Awaiting VPA Authorization")}
+                      {paymentStep === 3 && t("Verifying NPCI Settlement")}
+                      {paymentStep === 4 && t("Transaction Successful")}
+                    </h5>
+                    <p className="text-[11px] text-slate-400 max-w-xs mx-auto leading-relaxed">
+                      {paymentStep === 1 && t("Setting up secure connection parameters with payment servers...")}
+                      {paymentStep === 2 && t("Push notification sent to parent app. Please authorize the request in Google Pay or PhonePe.")}
+                      {paymentStep === 3 && t("NPCI ledger confirmations in progress. Validating real-time bank settlement...")}
+                      {paymentStep === 4 && t("Payment cleared successfully. Invoiced balance has been fully settled.")}
+                    </p>
                   </div>
                 </div>
-
-                {isProcessingPayment ? (
-                  <div className="p-3 bg-indigo-950/40 border border-indigo-500/20 text-indigo-400 font-semibold text-xs rounded-xl flex items-center justify-center gap-2">
-                    <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-                    <span>Processing transaction with merchant bank networks...</span>
+              ) : (
+                <form onSubmit={handleConfirmMockPayment} className="space-y-5">
+                  <div className="flex bg-slate-950 p-1 rounded-xl border border-slate-850">
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod('qr')}
+                      className={`flex-1 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                        paymentMethod === 'qr'
+                          ? 'bg-slate-900 text-white shadow-sm'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      <QrCode className="h-4 w-4" /> {t('Scan QR Code')}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod('upi_id')}
+                      className={`flex-1 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                        paymentMethod === 'upi_id'
+                          ? 'bg-slate-900 text-white shadow-sm'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      <Smartphone className="h-4 w-4" /> {t('UPI ID / VPA')}
+                    </button>
                   </div>
-                ) : (
-                  <button
-                    type="submit"
-                    className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl transition cursor-pointer flex justify-center items-center gap-1.5"
-                  >
-                    {t('Confirm & Remit Outstanding Dues')} <ArrowRight className="h-4 w-4" />
-                  </button>
-                )}
-              </form>
+
+                  {paymentMethod === 'qr' ? (
+                    <div className="space-y-4 text-center">
+                      <div className="relative w-36 h-36 bg-white p-2 rounded-2xl mx-auto flex items-center justify-center border-4 border-slate-800 overflow-hidden shadow-lg shadow-white/5">
+                        <div className="absolute left-0 right-0 h-0.5 bg-[#d97706] shadow-[0_0_8px_rgba(217,119,6,0.8)] scan-line pointer-events-none" />
+                        
+                        <svg className="w-28 h-28 text-slate-900" viewBox="0 0 100 100" fill="currentColor">
+                          <path d="M 0,0 H 30 V 10 H 10 V 30 H 0 Z M 10,10 H 20 V 20 H 10 Z" />
+                          <path d="M 70,0 H 100 V 30 H 90 V 10 H 70 Z M 80,10 H 90 V 20 H 80 Z" />
+                          <path d="M 0,70 H 10 V 90 H 30 V 100 H 0 Z M 10,80 H 20 V 90 H 10 Z" />
+                          <rect x="40" y="0" width="10" height="10" />
+                          <rect x="50" y="10" width="10" height="10" />
+                          <rect x="40" y="20" width="20" height="10" />
+                          <rect x="0" y="40" width="10" height="10" />
+                          <rect x="10" y="50" width="10" height="10" />
+                          <rect x="20" y="40" width="20" height="10" />
+                          <rect x="50" y="40" width="10" height="10" />
+                          <rect x="60" y="50" width="10" height="10" />
+                          <rect x="80" y="40" width="20" height="10" />
+                          <rect x="80" y="60" width="10" height="10" />
+                          <rect x="90" y="70" width="10" height="10" />
+                          <rect x="40" y="60" width="10" height="10" />
+                          <rect x="50" y="70" width="10" height="10" />
+                          <rect x="60" y="80" width="10" height="10" />
+                          <rect x="40" y="90" width="20" height="10" />
+                          <rect x="70" y="80" width="25" height="10" />
+                          <rect x="80" y="90" width="10" height="10" />
+                          <rect x="42" y="42" width="16" height="16" rx="2" fill="#d97706" />
+                          <path d="M 47,46 H 53 V 54 H 47 Z" fill="white" />
+                        </svg>
+                      </div>
+                      <p className="text-[11px] text-slate-400 max-w-xs mx-auto leading-relaxed">
+                        {t("Scan the UPI QR code above using any UPI enabled app (GPay, PhonePe, Paytm, BHIM) to pay")} <span className="text-white font-bold">₹{selectedBill.amount}</span>.
+                      </p>
+                      
+                      <button
+                        type="submit"
+                        className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl transition cursor-pointer flex justify-center items-center gap-1.5"
+                      >
+                        {t('Verify Settlement in Real-Time')} <ArrowRight className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">{t('Enter Virtual Payment Address (VPA / UPI ID) *')}</label>
+                        <input
+                          type="text"
+                          required
+                          value={upiId}
+                          onChange={(e) => setUpiId(e.target.value)}
+                          placeholder={t('username@bank')}
+                          className="w-full bg-slate-950 border border-slate-850 text-xs px-3 py-2.5 rounded-xl outline-none focus:border-indigo-500 text-slate-300 font-mono tracking-wide placeholder:text-slate-700"
+                        />
+                      </div>
+
+                      <div className="flex flex-wrap gap-1.5">
+                        {['@upi', '@paytm', '@okaxis', '@okicici', '@okhdfcbank'].map((suffix) => (
+                          <button
+                            key={suffix}
+                            type="button"
+                            onClick={() => {
+                              const username = upiId.split('@')[0] || 'parent';
+                              setUpiId(username + suffix);
+                            }}
+                            className="text-[10px] bg-slate-950 hover:bg-slate-800 border border-slate-850 text-slate-400 hover:text-white px-2.5 py-1 rounded-lg font-mono transition cursor-pointer"
+                          >
+                            {suffix}
+                          </button>
+                        ))}
+                      </div>
+
+                      <p className="text-[10px] text-slate-500 leading-snug">
+                        {t('A transaction notification request will be pushed instantly to your mobile app for confirmation.')}
+                      </p>
+
+                      <button
+                        type="submit"
+                        className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl transition cursor-pointer flex justify-center items-center gap-1.5"
+                      >
+                        {t('Send Real-Time UPI Request')} <ArrowRight className="h-4 w-4" />
+                      </button>
+                    </div>
+                  )}
+                </form>
+              )}
             </motion.div>
           </>
         )}

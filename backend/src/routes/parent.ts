@@ -115,7 +115,7 @@ router.post('/bills/:billId/pay', async (req: AuthRequest, res: Response) => {
     await ActivityLog.create({
       studentName: 'Marcus Thorne', // In a production app, fetch from StudentUser profile
       type: 'Fee Payment',
-      detail: `Tuition transaction of $${bill.amount} successfully settled online by parent ${parentName}.`,
+      detail: `Tuition transaction of ₹${bill.amount} successfully settled in real-time via UPI by parent ${parentName}.`,
       dateTime: 'Just now',
       amount: bill.amount,
       status: 'Completed'

@@ -36,36 +36,28 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavi
       tagColor: 'bg-indigo-600',
       icon: <Shield className="h-4 w-4" />,
       title: 'Administrative Control Panel',
-      desc: 'Access audit registries, students list databases, and revenue trends.',
-      demoUser: 'admin@edumanage.com',
-      demoPass: 'admin123'
+      desc: 'Access audit registries, students list databases, and revenue trends.'
     },
     tutor: {
       accent: 'border-teal-500 text-teal-400 bg-teal-500/10',
       tagColor: 'bg-teal-600',
       icon: <Users className="h-4 w-4" />,
       title: 'Tutor Workspace Portal',
-      desc: 'Mark attendances, review course timetables, and compile homework grades.',
-      demoUser: 'alistair.miller@edumanage.com',
-      demoPass: 'tutor123'
+      desc: 'Mark attendances, review course timetables, and compile homework grades.'
     },
     parent: {
       accent: 'border-amber-500 text-amber-400 bg-amber-500/10',
       tagColor: 'bg-amber-600',
       icon: <User className="h-4 w-4" />,
       title: 'Parent Linkage Portal',
-      desc: 'Review Helena Thorne linking Marcus, check unpaid fees, and monitor announcements.',
-      demoUser: 'helena.thorne@edumanage.com',
-      demoPass: 'parent123'
+      desc: 'Review Helena Thorne linking Marcus, check unpaid fees, and monitor announcements.'
     },
     student: {
       accent: 'border-emerald-500 text-emerald-400 bg-emerald-500/10',
       tagColor: 'bg-emerald-600',
       icon: <GraduationCap className="h-4 w-4" />,
       title: 'Student Learning CRM',
-      desc: 'Track Marcus Thorne active learning curves, complete assignments, and query tools.',
-      demoUser: 'marcus.thorne@edumail.com',
-      demoPass: 'student123'
+      desc: 'Track Marcus Thorne active learning curves, complete assignments, and query tools.'
     }
   };
 
@@ -81,15 +73,6 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavi
     setPassword('');
     setErrorStatus(null);
   }, [selectedRole]);
-
-  const handleQuickFill = (role: Role) => {
-    setSelectedRole(role);
-    setEmail(roleConfig[role].demoUser);
-    setPassword(roleConfig[role].demoPass);
-    setErrorStatus(null);
-    setTypedMessage(`Demo credentials loaded for ${role.toUpperCase()} mode.`);
-    setTimeout(() => setTypedMessage(null), 3000);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -182,7 +165,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavi
                   setErrorStatus(null);
                 }}
                 className="w-full bg-slate-950/40 border border-slate-800 text-slate-200 text-sm pl-10 pr-4 py-2.5 rounded-xl focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all font-mono input-focus-glow"
-                placeholder={roleConfig[selectedRole].demoUser}
+                placeholder=""
               />
             </div>
           </div>
@@ -204,7 +187,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavi
                   setErrorStatus(null);
                 }}
                 className="w-full bg-slate-950/40 border border-slate-800 text-slate-200 text-sm pl-10 pr-10 py-2.5 rounded-xl focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all font-mono input-focus-glow"
-                placeholder={roleConfig[selectedRole].demoPass}
+                placeholder=""
               />
               <button
                 type="button"

@@ -1,8 +1,7 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
-  CreditCard, 
-  DollarSign, 
+  IndianRupee, 
   AlertTriangle, 
   CheckCircle, 
   Download, 
@@ -72,11 +71,10 @@ export default function FinancialOverview({
   const totalPaidRevenue = students.reduce((tot, s) => tot + s.feesPaid, 0);
   const overdueStudentsCount = students.filter(s => s.paymentStatus === 'Overdue').length;
 
-  // Trigger simulated Stripe synchronization
   const triggerStripeSync = () => {
     if (stripeSyncing) return;
     setStripeSyncing(true);
-    setStripeSyncLogs('Initializing Stripe Secure API Handshake...');
+    setStripeSyncLogs('Initializing BHIM UPI Secure Gateway Handshake...');
     
     setTimeout(() => {
       setStripeSyncLogs('Validating merchant keys and token streams...');
@@ -138,10 +136,10 @@ export default function FinancialOverview({
           <div className="flex justify-between items-start">
             <div>
               <p className="text-gray-400 font-bold text-[10px] uppercase tracking-wider font-sans">Total Revenue</p>
-              <h3 className="text-3xl font-black text-blue-900 mt-1">${(142580 + totalPaidRevenue).toLocaleString()}</h3>
+              <h3 className="text-3xl font-black text-blue-900 mt-1">₹{(142580 + totalPaidRevenue).toLocaleString()}</h3>
             </div>
-            <div className="p-2.5 bg-blue-50 text-blue-900 border border-blue-100 rounded-lg">
-              <DollarSign className="h-5.5 w-5.5" />
+            <div className="p-2.5 bg-blue-50 text-blue-900 border border-blue-105 rounded-lg">
+              <IndianRupee className="h-5.5 w-5.5" />
             </div>
           </div>
           <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-green-700 bg-green-50 px-2 py-1 rounded w-fit border border-green-150">
@@ -155,7 +153,7 @@ export default function FinancialOverview({
           <div className="flex justify-between items-start">
             <div>
               <p className="text-gray-400 font-bold text-[10px] uppercase tracking-wider font-sans">Outstanding Dues</p>
-              <h3 className="text-3xl font-black text-red-700 mt-1">${(12450 + totalOutstanding).toLocaleString()}</h3>
+              <h3 className="text-3xl font-black text-red-700 mt-1">₹{(12450 + totalOutstanding).toLocaleString()}</h3>
             </div>
             <div className="p-2.5 bg-red-50 text-red-900 border border-red-150 rounded-lg">
               <AlertTriangle className="h-5.5 w-5.5" />
@@ -286,7 +284,7 @@ export default function FinancialOverview({
 
                         {/* Transaction outstanding cost */}
                         <td className="px-6 py-4 font-black text-gray-900">
-                          ${(trx.outstandingDue || 210).toFixed(2)}
+                          ₹{(trx.outstandingDue || 210).toFixed(2)}
                         </td>
 
                         {/* Late Invoice status badges */}
@@ -385,7 +383,7 @@ export default function FinancialOverview({
               {/* Pie diagram circular paths representation in SVG */}
               <svg className="w-36 h-36 transform -rotate-90" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="38" fill="transparent" stroke="#F1F5F9" strokeWidth="18" />
-                {/* Credit Card: 64% */}
+                {/* UPI Payments: 64% */}
                 <circle 
                   cx="50" 
                   cy="50" 
@@ -416,7 +414,7 @@ export default function FinancialOverview({
             <div className="w-1/2 space-y-3 font-sans">
               <div className="flex items-center gap-2">
                 <span className="w-3.5 h-3.5 bg-blue-900 rounded-full flex-shrink-0 animate-pulse"></span>
-                <span className="text-xs font-bold text-gray-700">Credit Card (64%)</span>
+                <span className="text-xs font-bold text-gray-700">UPI Payments (64%)</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-3.5 h-3.5 bg-blue-500 rounded-full flex-shrink-0"></span>
@@ -454,17 +452,16 @@ export default function FinancialOverview({
               <span className="text-xs font-bold text-gray-800 group-hover:text-white transition-colors">Late Fee Rules</span>
             </button>
 
-            {/* Interactive Stripe key database sync button tool */}
             <button 
               onClick={triggerStripeSync}
               className={`flex flex-col items-center justify-center gap-2.5 p-4 rounded-xl border transition-all duration-200 ${
                 stripeSyncing 
-                  ? 'bg-emerald-50 border-emerald-300 text-emerald-800' 
+                  ? 'bg-emerald-55 bg-emerald-500/10 border-emerald-300 text-emerald-800' 
                   : 'bg-gray-50 border-gray-200/50 hover:bg-emerald-900 hover:text-white text-gray-800 hover:border-emerald-900 group'
               }`}
             >
               <RefreshCcw className={`h-6 w-6 text-emerald-600 group-hover:text-white ${stripeSyncing ? 'animate-spin text-emerald-700' : ''}`} />
-              <span className="text-xs font-bold group-hover:text-white transition-colors">Stripe Sync</span>
+              <span className="text-xs font-bold group-hover:text-white transition-colors">Gateway Sync</span>
             </button>
 
           </div>

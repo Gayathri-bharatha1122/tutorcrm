@@ -79,7 +79,7 @@ export const collections: Record<string, any[]> = {
     { _id: 'act-1', studentName: 'Marcus Thorne', initials: 'MT', type: 'New Enrollment', detail: 'Successfully enrolled by Administrator into AP Literature Course under Sarah Jenkins', dateTime: 'Today, 10:45 AM', status: 'Completed' },
     { _id: 'act-2', studentName: 'Zoe Vance', initials: 'ZV', type: 'Fee Payment', detail: 'Automatic recurring payment received for Spring Tutors Session Fee package', dateTime: 'Today, 09:12 AM', amount: 320, status: 'Completed' },
     { _id: 'act-3', studentName: 'Liam Sterling', initials: 'LS', type: 'Session Scheduled', detail: 'Private Calculus tutoring session booked with Sarah Jenkins for June 4', dateTime: 'Yesterday, 04:30 PM', status: 'Pending' },
-    { _id: 'act-4', studentName: 'Marcus Thorne', initials: 'MT', type: 'Payment Failed', detail: 'Late Fee of $120 overdue billing card decline - transaction error standard', dateTime: '2 Days ago', amount: 120, status: 'Failed' },
+    { _id: 'act-4', studentName: 'Marcus Thorne', initials: 'MT', type: 'Payment Failed', detail: 'Late Fee of ₹120 overdue billing UPI transaction decline - network timeout standard', dateTime: '2 Days ago', amount: 120, status: 'Failed' },
     { _id: 'act-5', studentName: 'Penelope Chen', initials: 'PC', type: 'New Enrollment', detail: 'Account created and awaiting verification checklist status approval', dateTime: '3 Days ago', status: 'Active' }
   ],
   Message: [],

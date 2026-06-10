@@ -5,7 +5,7 @@ import {
   Users, 
   GraduationCap, 
   Activity, 
-  DollarSign, 
+  IndianRupee, 
   Plus, 
   Search, 
   Download, 
@@ -219,19 +219,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const handleStudentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!studentFormFirstName || !studentFormLastName || !studentFormPhone) {
-      alert('First name, last name, and student phone are required.');
+      alert(t('First name, last name, and student phone are required.'));
       return;
     }
     if (studentFormPhone.length !== 10) {
-      alert('Student phone number must be exactly 10 digits.');
+      alert(t('Student phone number must be exactly 10 digits.'));
       return;
     }
     if (studentFormParentPhone && studentFormParentPhone.length !== 10) {
-      alert('Parent phone number must be exactly 10 digits.');
+      alert(t('Parent phone number must be exactly 10 digits.'));
       return;
     }
     if (!editingStudent && !studentFormPassword) {
-      alert('Password is required.');
+      alert(t('Password is required.'));
       return;
     }
 
@@ -251,10 +251,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     try {
       if (editingStudent) {
         await api.editStudent(editingStudent.id, payload);
-        setAdminNotification(`Successfully updated student ${payload.name}`);
+        setAdminNotification(t('Successfully updated student {name}').replace('{name}', payload.name));
       } else {
         await api.enrollStudent(payload);
-        setAdminNotification(`Successfully enrolled student ${payload.name}`);
+        setAdminNotification(t('Successfully enrolled student {name}').replace('{name}', payload.name));
       }
       setTimeout(() => setAdminNotification(null), 4000);
       setStudentModalOpen(false);
@@ -269,22 +269,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         viewStudentDetails(editingStudent.id);
       }
     } catch (err: any) {
-      alert(err.message || 'Operation failed.');
+      alert(err.message || t('Operation failed.'));
     }
   };
 
   const handleTutorSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!tutorFormFirstName || !tutorFormLastName || !tutorFormEmail || !tutorFormPhone) {
-      alert('First name, last name, email, and tutor phone are required.');
+      alert(t('First name, last name, email, and tutor phone are required.'));
       return;
     }
     if (tutorFormPhone.length !== 10) {
-      alert('Tutor phone number must be exactly 10 digits.');
+      alert(t('Tutor phone number must be exactly 10 digits.'));
       return;
     }
     if (!editingTutor && !tutorFormPassword) {
-      alert('Password is required.');
+      alert(t('Password is required.'));
       return;
     }
 
@@ -305,10 +305,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     try {
       if (editingTutor) {
         await api.editTutor(editingTutor.id, payload);
-        setAdminNotification(`Successfully updated tutor Prof. ${payload.firstName} ${payload.lastName}`);
+        setAdminNotification(t('Successfully updated tutor Prof. {first} {last}').replace('{first}', payload.firstName).replace('{last}', payload.lastName));
       } else {
         await api.addTutor(payload);
-        setAdminNotification(`Successfully added tutor Prof. ${payload.firstName} ${payload.lastName}`);
+        setAdminNotification(t('Successfully added tutor Prof. {first} {last}').replace('{first}', payload.firstName).replace('{last}', payload.lastName));
       }
       setTimeout(() => setAdminNotification(null), 4000);
       setTutorModalOpen(false);
@@ -321,16 +321,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         viewTutorDetails(editingTutor.id);
       }
     } catch (err: any) {
-      alert(err.message || 'Operation failed.');
+      alert(err.message || t('Operation failed.'));
     }
   };
 
   // Delete Action Handlers
   const handleDeleteStudent = async (studentId: string, studentName: string) => {
-    if (confirm(`Are you sure you want to delete student ${studentName}? This will permanently remove their profile and bills.`)) {
+    if (confirm(t("Are you sure you want to delete student {name}? This will permanently remove their profile and bills.").replace('{name}', studentName))) {
       try {
         await api.deleteStudent(studentId);
-        setAdminNotification(`Deleted student ${studentName}`);
+        setAdminNotification(t('Deleted student {name}').replace('{name}', studentName));
         setTimeout(() => setAdminNotification(null), 4000);
         
         const updatedStudents = await api.getAdminStudents();
@@ -342,16 +342,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           setSelectedStudentDetail(null);
         }
       } catch (err: any) {
-        alert(err.message || 'Delete student failed.');
+        alert(err.message || t('Delete student failed.'));
       }
     }
   };
 
   const handleDeleteTutor = async (tutorId: string, tutorName: string) => {
-    if (confirm(`Are you sure you want to delete tutor ${tutorName}? This will permanently remove their profile.`)) {
+    if (confirm(t("Are you sure you want to delete tutor {name}? This will permanently remove their profile.").replace('{name}', tutorName))) {
       try {
         await api.deleteTutor(tutorId);
-        setAdminNotification(`Deleted tutor ${tutorName}`);
+        setAdminNotification(t('Deleted tutor {name}').replace('{name}', tutorName));
         setTimeout(() => setAdminNotification(null), 4000);
         
         const updatedTeachers = await api.getTeachers();
@@ -361,7 +361,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           setSelectedTutorDetail(null);
         }
       } catch (err: any) {
-        alert(err.message || 'Delete tutor failed.');
+        alert(err.message || t('Delete tutor failed.'));
       }
     }
   };
@@ -373,7 +373,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       setSelectedStudentDetail(data);
       setSelectedTutorDetail(null);
     } catch (err: any) {
-      alert(err.message || 'Failed to fetch student details.');
+      alert(err.message || t('Failed to fetch student details.'));
     }
   };
 
@@ -383,7 +383,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       setSelectedTutorDetail(data);
       setSelectedStudentDetail(null);
     } catch (err: any) {
-      alert(err.message || 'Failed to fetch tutor details.');
+      alert(err.message || t('Failed to fetch tutor details.'));
     }
   };
 
@@ -437,12 +437,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       className="absolute right-0 mt-2 w-80 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl z-50 p-4 space-y-3 text-xs text-slate-200"
                     >
                       <div className="flex justify-between items-center border-b border-slate-850 pb-2">
-                        <span className="font-bold text-white">System Notifications</span>
+                        <span className="font-bold text-white">{t('System Notifications')}</span>
                         <button 
                           onClick={() => setIsNotificationDropdownOpen(false)}
                           className="text-[10px] text-slate-500 hover:text-white"
                         >
-                          Close
+                          {t('Close')}
                         </button>
                       </div>
 
@@ -455,15 +455,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                 log.type === 'Fee Payment' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' :
                                 'bg-slate-800 text-slate-400'
                               }`}>
-                                {log.type}
+                                {t(log.type)}
                               </span>
                               <span className="text-[8px] text-slate-500 font-mono">{log.dateTime}</span>
                             </div>
-                            <p className="text-[10px] text-slate-300 leading-normal">{log.detail}</p>
+                            <p className="text-[10px] text-slate-300 leading-normal">{t(log.detail)}</p>
                           </div>
                         ))}
                         {activityLogs.length === 0 && (
-                          <div className="text-center py-4 text-slate-500 italic">No notifications logged.</div>
+                          <div className="text-center py-4 text-slate-550 italic">{t('No notifications logged.')}</div>
                         )}
                       </div>
                     </motion.div>
@@ -521,7 +521,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           >
             <div className="flex items-center gap-2">
               <Bell className="h-4.5 w-4.5 text-amber-400 animate-bounce" />
-              <span>{pendingStudentsCount} new student registration(s) pending administrative review. Switch to **Console Overview** to Accept or Decline.</span>
+              <span>{t('{count} new student registration(s) pending administrative review. Switch to Console Overview to Accept or Decline.').replace('{count}', pendingStudentsCount.toString())}</span>
             </div>
           </motion.div>
         )}
@@ -537,7 +537,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   : 'text-slate-400 hover:text-white hover:bg-slate-900'
               }`}
             >
-              Console Overview
+              {t('Console Overview')}
             </button>
             <button
               onClick={() => setActiveTab('students')}
@@ -547,7 +547,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   : 'text-slate-400 hover:text-white hover:bg-slate-900'
               }`}
             >
-              Manage Students
+              {t('Manage Students')}
             </button>
             <button
               onClick={() => setActiveTab('tutors')}
@@ -557,7 +557,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   : 'text-slate-400 hover:text-white hover:bg-slate-900'
               }`}
             >
-              Manage Tutors
+              {t('Manage Tutors')}
             </button>
           </div>
         )}
@@ -575,20 +575,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 onClick={() => setSelectedStudentDetail(null)}
                 className="flex items-center gap-2 px-4 py-2 bg-slate-905 hover:bg-slate-900 border border-slate-800 rounded-xl text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer bg-slate-900"
               >
-                <ArrowLeft className="h-4 w-4" /> Back to Directory
+                <ArrowLeft className="h-4 w-4" /> {t('Back to Directory')}
               </button>
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => openEditStudentModal(selectedStudentDetail)}
                   className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-xs font-bold text-white transition cursor-pointer"
                 >
-                  <Edit2 className="h-4 w-4" /> Edit Profile
+                  <Edit2 className="h-4 w-4" /> {t('Edit Profile')}
                 </button>
                 <button
                   onClick={() => handleDeleteStudent(selectedStudentDetail.id, selectedStudentDetail.name)}
                   className="flex items-center gap-1.5 px-4 py-2 bg-rose-600 hover:bg-rose-500 rounded-xl text-xs font-bold text-white transition cursor-pointer"
                 >
-                  <Trash2 className="h-4 w-4" /> Delete Account
+                  <Trash2 className="h-4 w-4" /> {t('Delete Account')}
                 </button>
               </div>
             </div>
@@ -604,34 +604,34 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <h2 className="text-xl font-extrabold text-white">{selectedStudentDetail.name}</h2>
                     <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                       selectedStudentDetail.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' :
-                      selectedStudentDetail.status === 'Pending' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' :
+                      selectedStudentDetail.status === 'Pending' ? 'bg-amber-500/10 text-amber-400 border border-emerald-500/30' :
                       'bg-slate-950 text-slate-500 border border-slate-800'
                     }`}>
-                      {selectedStudentDetail.status}
+                      {t(selectedStudentDetail.status)}
                     </span>
                   </div>
-                  <span className="text-xs text-slate-400 mt-1 block">{selectedStudentDetail.grade} Standard</span>
+                  <span className="text-xs text-slate-400 mt-1 block">{t(selectedStudentDetail.grade)} {t('Standard')}</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 border-t border-slate-850 pt-4">
                   <div className="flex items-center gap-2.5 text-xs">
                     <Mail className="h-4 w-4 text-indigo-400 shrink-0" />
                     <div>
-                      <span className="text-slate-500 block font-semibold text-[10px] uppercase">Email Address</span>
+                      <span className="text-slate-500 block font-semibold text-[10px] uppercase">{t('Email Address')}</span>
                       <span className="text-slate-200">{selectedStudentDetail.email}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2.5 text-xs">
                     <Phone className="h-4 w-4 text-indigo-400 shrink-0" />
                     <div>
-                      <span className="text-slate-500 block font-semibold text-[10px] uppercase">Student Contact</span>
+                      <span className="text-slate-500 block font-semibold text-[10px] uppercase">{t('Student Contact')}</span>
                       <span className="text-slate-200 font-mono">{selectedStudentDetail.phone}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2.5 text-xs">
                     <Users className="h-4 w-4 text-indigo-400 shrink-0" />
                     <div>
-                      <span className="text-slate-500 block font-semibold text-[10px] uppercase">Parent Contact Link</span>
+                      <span className="text-slate-500 block font-semibold text-[10px] uppercase">{t('Parent Contact Link')}</span>
                       <span className="text-indigo-300 font-mono font-bold">{selectedStudentDetail.parentPhone || 'N/A'}</span>
                     </div>
                   </div>
@@ -645,21 +645,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               {/* Metrics & Goal */}
               <div className="bg-slate-905 border border-slate-800 rounded-3xl p-6 space-y-6 bg-slate-900">
                 <div>
-                  <h3 className="text-sm font-bold text-white mb-1">Academic Metrics</h3>
-                  <span className="text-[11px] text-slate-500">Current progress and average scores</span>
+                  <h3 className="text-sm font-bold text-white mb-1">{t('Academic Metrics')}</h3>
+                  <span className="text-[11px] text-slate-550">{t('Current progress and average scores')}</span>
                 </div>
                 
                 <div className="space-y-4">
                   <div className="bg-slate-950 p-4 rounded-xl border border-slate-850">
-                    <span className="text-[10px] text-slate-550 font-bold uppercase block mb-1 text-slate-500">Assigned subject</span>
+                    <span className="text-[10px] text-slate-550 font-bold uppercase block mb-1 text-slate-500">{t('Assigned subject')}</span>
                     <span className="text-sm font-bold text-white flex items-center gap-2">
-                      <BookOpen className="h-4 w-4 text-indigo-400" /> {selectedStudentDetail.subject}
+                      <BookOpen className="h-4 w-4 text-indigo-400" /> {t(selectedStudentDetail.subject)}
                     </span>
                   </div>
 
                   <div className="bg-slate-950 p-4 rounded-xl border border-slate-850 flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] text-slate-550 font-bold uppercase block text-slate-500">Average GPA</span>
+                      <span className="text-[10px] text-slate-550 font-bold uppercase block text-slate-500">{t('Average GPA')}</span>
                       <span className="text-lg font-black text-white">{selectedStudentDetail.avgGrade?.toFixed(2) || '3.50'}</span>
                     </div>
                     <div className="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold">
@@ -669,7 +669,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
                   <div className="bg-slate-950 p-4 rounded-xl border border-slate-850">
                     <div className="flex justify-between items-center mb-1 text-[11px]">
-                      <span className="text-slate-550 font-bold uppercase text-slate-500">Syllabus Progress</span>
+                      <span className="text-slate-550 font-bold uppercase text-slate-500">{t('Syllabus Progress')}</span>
                       <span className="text-indigo-400 font-bold">{selectedStudentDetail.progress}%</span>
                     </div>
                     <div className="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
@@ -682,42 +682,42 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               {/* Bills list */}
               <div className="bg-slate-905 border border-slate-800 rounded-3xl p-6 lg:col-span-2 space-y-4 bg-slate-900">
                 <div>
-                  <h3 className="text-sm font-bold text-white mb-1">Tuition Billing Ledger</h3>
-                  <span className="text-[11px] text-slate-500 block font-semibold text-slate-400">Bills issued to parent contact</span>
+                  <h3 className="text-sm font-bold text-white mb-1">{t('Tuition Billing Ledger')}</h3>
+                  <span className="text-[11px] text-slate-550 block font-semibold text-slate-400">{t('Bills issued to parent contact')}</span>
                 </div>
 
                 <div className="overflow-x-auto border border-slate-850 rounded-2xl bg-slate-950 shadow-inner">
                   <table className="w-full text-left text-xs border-collapse">
                     <thead className="bg-slate-950 border-b border-slate-850 text-slate-400 font-bold uppercase tracking-wider text-[9px]">
                       <tr>
-                        <th className="p-3">Item details</th>
-                        <th className="p-3">Paid Date</th>
-                        <th className="p-3">Amount</th>
-                        <th className="p-3 text-right">Status</th>
+                        <th className="p-3">{t('Item details')}</th>
+                        <th className="p-3">{t('Paid Date')}</th>
+                        <th className="p-3">{t('Amount')}</th>
+                        <th className="p-3 text-right">{t('Status')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-850">
                       {selectedStudentDetail.bills && selectedStudentDetail.bills.length > 0 ? (
                         selectedStudentDetail.bills.map((bill: any) => (
                           <tr key={bill._id || bill.id} className="hover:bg-slate-900/40">
-                            <td className="p-3 font-semibold text-slate-205 text-slate-200">{bill.itemName}</td>
-                            <td className="p-3 text-slate-400 font-mono text-[10px]">{bill.paidDate}</td>
-                            <td className="p-3 text-slate-202 font-mono font-bold text-slate-200">${bill.amount}</td>
+                            <td className="p-3 font-semibold text-slate-205 text-slate-200">{t(bill.itemName)}</td>
+                            <td className="p-3 text-slate-400 font-mono text-[10px]">{t(bill.paidDate)}</td>
+                            <td className="p-3 text-slate-202 font-mono font-bold text-slate-200">₹{bill.amount}</td>
                             <td className="p-3 text-right">
                               <span className={`px-2 py-0.5 rounded text-[9px] font-bold ${
                                 bill.status === 'Paid' ? 'bg-emerald-500/10 text-emerald-400' :
                                 bill.status === 'Overdue' ? 'bg-rose-500/10 text-rose-400' :
                                 'bg-amber-500/10 text-amber-400'
                               }`}>
-                                {bill.status}
+                                {t(bill.status)}
                               </span>
                             </td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={4} className="text-center p-8 text-slate-500 font-medium">
-                            No tuition bills issued to this student yet.
+                          <td colSpan={4} className="text-center p-8 text-slate-550 font-medium">
+                            {t('No tuition bills issued to this student yet.')}
                           </td>
                         </tr>
                       )}
@@ -731,17 +731,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             {/* Audit Logs list */}
             <div className="bg-slate-905 border border-slate-800 rounded-3xl p-6 bg-slate-900">
               <div className="mb-4">
-                <h3 className="text-sm font-bold text-white">Student Enrollment Activity Logs</h3>
-                <span className="text-[11px] text-slate-500 block font-semibold text-slate-400">Administrative actions and transaction logs regarding this student</span>
+                <h3 className="text-sm font-bold text-white">{t('Student Enrollment Activity Logs')}</h3>
+                <span className="text-[11px] text-slate-550 block font-semibold text-slate-400">{t('Administrative actions and transaction logs regarding this student')}</span>
               </div>
               <div className="overflow-x-auto border border-slate-850 rounded-2xl bg-slate-950 shadow-inner">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead className="bg-slate-950 border-b border-slate-850 text-slate-400 font-bold uppercase tracking-wider text-[9px]">
                     <tr>
-                      <th className="p-3">Action Type</th>
-                      <th className="p-3">Log Details</th>
-                      <th className="p-3">Timestamp</th>
-                      <th className="p-3 text-right">Result</th>
+                      <th className="p-3">{t('Action Type')}</th>
+                      <th className="p-3">{t('Log Details')}</th>
+                      <th className="p-3">{t('Timestamp')}</th>
+                      <th className="p-3 text-right">{t('Result')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-850">
@@ -754,10 +754,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               log.type === 'Fee Payment' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' :
                               'bg-slate-800 text-slate-400'
                             }`}>
-                              {log.type}
+                              {t(log.type)}
                             </span>
                           </td>
-                          <td className="p-3 text-slate-350">{log.detail}</td>
+                          <td className="p-3 text-slate-350">{t(log.detail)}</td>
                           <td className="p-3 text-slate-500 font-mono text-[10px]">{log.dateTime}</td>
                           <td className="p-3 text-right">
                             <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
@@ -765,15 +765,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               log.status === 'Failed' ? 'bg-rose-500/10 text-rose-400' :
                               'bg-slate-800 text-slate-500'
                             }`}>
-                              {log.status}
+                              {t(log.status)}
                             </span>
                           </td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={4} className="text-center p-8 text-slate-500 font-medium">
-                          No audit transcript events logged for this student.
+                        <td colSpan={4} className="text-center p-8 text-slate-550 font-medium">
+                          {t('No audit transcript events logged for this student.')}
                         </td>
                       </tr>
                     )}
@@ -783,7 +783,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
           </motion.div>
         )}
-
         {/* DETAILS SCREEN - TUTOR */}
         {selectedTutorDetail && (
           <motion.div 
@@ -797,20 +796,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 onClick={() => setSelectedTutorDetail(null)}
                 className="flex items-center gap-2 px-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer"
               >
-                <ArrowLeft className="h-4 w-4" /> Back to Directory
+                <ArrowLeft className="h-4 w-4" /> {t('Back to Directory')}
               </button>
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => openEditTutorModal(selectedTutorDetail)}
                   className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-xs font-bold text-white transition cursor-pointer"
                 >
-                  <Edit2 className="h-4 w-4" /> Edit Profile
+                  <Edit2 className="h-4 w-4" /> {t('Edit Profile')}
                 </button>
                 <button
                   onClick={() => handleDeleteTutor(selectedTutorDetail.id, selectedTutorDetail.name)}
                   className="flex items-center gap-1.5 px-4 py-2 bg-rose-600 hover:bg-rose-500 rounded-xl text-xs font-bold text-white transition cursor-pointer"
                 >
-                  <Trash2 className="h-4 w-4" /> Delete Faculty Record
+                  <Trash2 className="h-4 w-4" /> {t('Delete Faculty Record')}
                 </button>
               </div>
             </div>
@@ -828,24 +827,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       selectedTutorDetail.status === 'Active' ? 'bg-teal-500/10 text-teal-400 border border-teal-500/30' :
                       'bg-slate-950 text-slate-500 border border-slate-800'
                     }`}>
-                      {selectedTutorDetail.status}
+                      {t(selectedTutorDetail.status)}
                     </span>
                   </div>
-                  <span className="text-xs text-slate-400 mt-1 block">{selectedTutorDetail.experience} Experience</span>
+                  <span className="text-xs text-slate-400 mt-1 block">{selectedTutorDetail.experience} {t('Experience')}</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-850 pt-4">
                   <div className="flex items-center gap-2.5 text-xs">
                     <Mail className="h-4 w-4 text-indigo-400 shrink-0" />
                     <div>
-                      <span className="text-slate-500 block font-semibold text-[10px] uppercase">Email Address</span>
+                      <span className="text-slate-500 block font-semibold text-[10px] uppercase">{t('Email Address')}</span>
                       <span className="text-slate-200">{selectedTutorDetail.email}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2.5 text-xs">
                     <Phone className="h-4 w-4 text-indigo-400 shrink-0" />
                     <div>
-                      <span className="text-slate-500 block font-semibold text-[10px] uppercase">Faculty Contact Phone</span>
+                      <span className="text-slate-500 block font-semibold text-[10px] uppercase">{t('Faculty Contact Phone')}</span>
                       <span className="text-slate-200 font-mono">{selectedTutorDetail.phone}</span>
                     </div>
                   </div>
@@ -859,14 +858,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               {/* Primary Subject */}
               <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
                 <div>
-                  <h3 className="text-sm font-bold text-white mb-1">Academic Subject Area</h3>
-                  <span className="text-[11px] text-slate-500">Primary teaching specialty honors</span>
+                  <h3 className="text-sm font-bold text-white mb-1">{t('Academic Subject Area')}</h3>
+                  <span className="text-[11px] text-slate-550">{t('Primary teaching specialty honors')}</span>
                 </div>
                 <div className="bg-slate-950 p-4 rounded-xl border border-slate-850 flex items-center gap-3">
                   <Award className="h-5 w-5 text-indigo-400 animate-pulse" />
                   <div>
-                    <span className="text-[9px] text-slate-500 font-bold uppercase block">Subject Honors</span>
-                    <span className="text-sm font-bold text-white truncate max-w-[120px]" title={selectedTutorDetail.subject}>{selectedTutorDetail.subject}</span>
+                    <span className="text-[9px] text-slate-550 font-bold uppercase block">{t('Subject Honors')}</span>
+                    <span className="text-sm font-bold text-white truncate max-w-[120px]" title={t(selectedTutorDetail.subject)}>{t(selectedTutorDetail.subject)}</span>
                   </div>
                 </div>
               </div>
@@ -874,19 +873,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               {/* Courses list */}
               <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
                 <div>
-                  <h3 className="text-sm font-bold text-white mb-1">Assigned Courses</h3>
-                  <span className="text-[11px] text-slate-500">Active sections listed</span>
+                  <h3 className="text-sm font-bold text-white mb-1">{t('Assigned Courses')}</h3>
+                  <span className="text-[11px] text-slate-550">{t('Active sections listed')}</span>
                 </div>
 
                 <div className="flex flex-wrap gap-1.5 max-h-16 overflow-y-auto">
                   {selectedTutorDetail.courses && selectedTutorDetail.courses.length > 0 ? (
                     selectedTutorDetail.courses.map((course: string, idx: number) => (
                       <span key={idx} className="bg-slate-950 border border-slate-800 px-2.5 py-1 rounded-lg text-[10px] font-semibold text-slate-350 flex items-center gap-1">
-                        <BookOpen className="h-3 w-3 text-indigo-400" /> {course}
+                        <BookOpen className="h-3 w-3 text-indigo-400" /> {t(course)}
                       </span>
                     ))
                   ) : (
-                    <span className="text-xs text-slate-500 italic">No courses assigned.</span>
+                    <span className="text-xs text-slate-500 italic">{t('No courses assigned.')}</span>
                   )}
                 </div>
               </div>
@@ -894,13 +893,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               {/* Tutor Attendance */}
               <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
                 <div>
-                  <h3 className="text-sm font-bold text-white mb-1">Attendance Rate</h3>
-                  <span className="text-[11px] text-slate-500">Cumulative presence statistics</span>
+                  <h3 className="text-sm font-bold text-white mb-1">{t('Attendance Rate')}</h3>
+                  <span className="text-[11px] text-slate-550">{t('Cumulative presence statistics')}</span>
                 </div>
                 <div className="bg-slate-950 p-4 rounded-xl border border-slate-850 flex items-center gap-3">
                   <Activity className="h-5 w-5 text-teal-400 animate-pulse" />
                   <div>
-                    <span className="text-[9px] text-slate-500 font-bold uppercase block">Attendance</span>
+                    <span className="text-[9px] text-slate-550 font-bold uppercase block">{t('Attendance')}</span>
                     <span className="text-base font-extrabold text-white font-mono">{selectedTutorDetail.attendance || '96%'}</span>
                   </div>
                 </div>
@@ -909,17 +908,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               {/* Salary Status */}
               <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
                 <div>
-                  <h3 className="text-sm font-bold text-white mb-1">Salary Status</h3>
-                  <span className="text-[11px] text-slate-500">Tutor payment ledger status</span>
+                  <h3 className="text-sm font-bold text-white mb-1">{t('Salary Status')}</h3>
+                  <span className="text-[11px] text-slate-550">{t('Tutor payment ledger status')}</span>
                 </div>
                 <div className="bg-slate-950 p-4 rounded-xl border border-slate-850 flex items-center gap-3">
-                  <DollarSign className="h-5 w-5 text-amber-400" />
+                  <IndianRupee className="h-5 w-5 text-amber-400" />
                   <div>
-                    <span className="text-[9px] text-slate-500 font-bold uppercase block">Payment Status</span>
+                    <span className="text-[9px] text-slate-550 font-bold uppercase block">{t('Payment Status')}</span>
                     <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                       selectedTutorDetail.salaryStatus === 'Credited' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-450'
                     }`}>
-                      {selectedTutorDetail.salaryStatus || 'Pending'}
+                      {t(selectedTutorDetail.salaryStatus || 'Pending')}
                     </span>
                   </div>
                 </div>
@@ -928,7 +927,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
           </motion.div>
         )}
-
         {/* VIEW 1 - CONSOLE OVERVIEW */}
         {!selectedStudentDetail && !selectedTutorDetail && activeTab === 'overview' && (
           <motion.div 
@@ -953,7 +951,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <span className="text-2xl font-extrabold text-white">
                     <AnimatedCounter value={activeStudentsCount} /> / <AnimatedCounter value={students.length} />
                   </span>
-                  <span className="text-[10px] text-indigo-400 font-semibold">+{pendingStudentsCount} pending</span>
+                  <span className="text-[10px] text-indigo-400 font-semibold">+{pendingStudentsCount} {t('pending')}</span>
                 </div>
               </motion.div>
 
@@ -972,7 +970,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <span className="text-2xl font-extrabold text-white">
                     <AnimatedCounter value={teachers.length} />
                   </span>
-                  <span className="text-[10px] text-teal-400 font-semibold">100% On Duty</span>
+                  <span className="text-[10px] text-teal-400 font-semibold">{t('100% On Duty')}</span>
                 </div>
               </motion.div>
 
@@ -984,14 +982,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 className="bg-slate-900 border border-slate-800 rounded-2xl p-5 relative overflow-hidden transition-all hover:shadow-[0_10px_20px_-10px_rgba(16,185,129,0.15)]"
               >
                 <div className="absolute right-3 top-3 w-8 h-8 rounded-lg bg-emerald-600/10 text-emerald-400 flex items-center justify-center">
-                  <DollarSign className="h-4.5 w-4.5" />
+                  <IndianRupee className="h-4.5 w-4.5" />
                 </div>
                 <span className="text-[11px] font-bold text-slate-500 uppercase">{t('Fees Receivable')}</span>
                 <div className="mt-1 flex items-baseline gap-2">
                   <span className="text-2xl font-extrabold text-white">
-                    <AnimatedCounter value={2140} prefix="$" />
+                    <AnimatedCounter value={2140} prefix="₹" />
                   </span>
-                  <span className="text-[10px] text-emerald-400 font-semibold">+12% vs last term</span>
+                  <span className="text-[10px] text-emerald-400 font-semibold">{t('+12% vs last term')}</span>
                 </div>
               </motion.div>
 
@@ -1008,9 +1006,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <span className="text-[11px] font-bold text-slate-500 uppercase">{t('Audit Records')}</span>
                 <div className="mt-1 flex items-baseline gap-2">
                   <span className="text-2xl font-extrabold text-white">
-                    <AnimatedCounter value={activityLogs.length} /> Logged
+                    <AnimatedCounter value={activityLogs.length} /> {t('Logged')}
                   </span>
-                  <span className="text-[10px] text-amber-400 font-semibold">Real-Time Sync</span>
+                  <span className="text-[10px] text-amber-450 font-semibold">{t('Real-Time Sync')}</span>
                 </div>
               </motion.div>
             </div>
@@ -1022,9 +1020,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h3 className="text-sm font-bold text-white">{t('Enrollment Growth Trend')}</h3>
-                    <span className="text-[11px] text-slate-550 block text-slate-400">Student registration loads across standard academic periods</span>
+                    <span className="text-[11px] block text-slate-400">{t('Student registration loads across standard academic periods')}</span>
                   </div>
-                  <span className="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-full">Primary Cohorts</span>
+                  <span className="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-full">{t('Primary Cohorts')}</span>
                 </div>
 
                 {/* Custom Interactive SVG bar chart using framer motion */}
@@ -1038,7 +1036,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <div key={i} className="flex-1 flex flex-col items-center gap-2 group cursor-pointer relative">
                       {/* Tooltip on hover */}
                       <div className="absolute -top-10 opacity-0 group-hover:opacity-100 transition duration-200 bg-indigo-600 text-white font-extrabold text-[10px] px-2.5 py-1 rounded shadow-lg z-20 pointer-events-none">
-                        {bar.count} Students
+                        {t('{count} Students').replace('{count}', bar.count.toString())}
                       </div>
                       
                       {/* Visual column bar */}
@@ -1051,7 +1049,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       />
                       
                       {/* Label */}
-                      <span className="text-[10px] text-slate-500 font-semibold">{bar.period}</span>
+                      <span className="text-[10px] text-slate-500 font-semibold">{t(bar.period)}</span>
                     </div>
                   ))}
                 </div>
@@ -1061,7 +1059,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between">
                 <div>
                   <h3 className="text-sm font-bold text-white mb-0.5">{t('Budget Ledger Share')}</h3>
-                  <span className="text-[11px] text-slate-500 block mb-6">Tuition fees balance status across directory profiles</span>
+                  <span className="text-[11px] text-slate-550 block mb-6">{t('Tuition fees balance status across directory profiles')}</span>
                 </div>
 
                 {/* Premium Custom SVG Donut Diagram */}
@@ -1083,24 +1081,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </svg>
                   <div className="absolute text-center">
                     <span className="text-lg font-extrabold text-white block">
-                      <AnimatedCounter value={2140} prefix="$" />
+                      <AnimatedCounter value={2140} prefix="₹" />
                     </span>
-                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Total</span>
+                    <span className="text-[10px] text-slate-550 font-bold uppercase block">{t('Total')}</span>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-3 gap-2 mt-4 text-[10px] text-slate-400 font-semibold text-center border-t border-slate-850 pt-4">
                   <div>
                     <span className="inline-block w-2 h-2 rounded-full bg-indigo-500 mr-1.5" />
-                    Paid (65%)
+                    {t('Paid (65%)')}
                   </div>
                   <div>
                     <span className="inline-block w-2 h-2 rounded-full bg-cyan-500 mr-1.5" />
-                    Pending (20%)
+                    {t('Pending (20%)')}
                   </div>
                   <div>
                     <span className="inline-block w-2 h-2 rounded-full bg-slate-600 mr-1.5" />
-                    Overdue (15%)
+                    {t('Overdue (15%)')}
                   </div>
                 </div>
               </div>
@@ -1111,17 +1109,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
                 <div className="flex items-center gap-2">
                   <Bell className="h-4.5 w-4.5 text-amber-400 animate-bounce" />
-                  <h3 className="text-sm font-bold text-white uppercase tracking-wider">New Enrollment Messages</h3>
+                  <h3 className="text-sm font-bold text-white uppercase tracking-wider">{t('New Enrollment Messages')}</h3>
                 </div>
                 <div className="overflow-x-auto bg-slate-950 border border-slate-850 rounded-2xl overflow-hidden shadow-inner">
                   <table className="w-full text-left text-xs border-collapse">
                     <thead className="bg-slate-950 border-b border-slate-850 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
                       <tr>
-                        <th className="p-4">Student Profile</th>
-                        <th className="p-4">Applied Course / Subject</th>
-                        <th className="p-4">Student Phone</th>
-                        <th className="p-4">Parent Phone</th>
-                        <th className="p-4 text-right">Actions</th>
+                        <th className="p-4">{t('Student Profile')}</th>
+                        <th className="p-4">{t('Applied Course / Subject')}</th>
+                        <th className="p-4">{t('Student Phone')}</th>
+                        <th className="p-4">{t('Parent Phone')}</th>
+                        <th className="p-4 text-right">{t('Actions')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-850 bg-slate-950">
@@ -1143,20 +1141,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                   >
                                     {student.name}
                                   </span>
-                                  <span className="text-[9px] text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded font-bold uppercase whitespace-nowrap">Awaiting Review</span>
+                                  <span className="text-[9px] text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded font-bold uppercase whitespace-nowrap">{t('Awaiting Review')}</span>
                                 </div>
-                                <span className="text-[10px] text-slate-550 block text-slate-500">{student.grade} • {student.email}</span>
+                                <span className="text-[10px] text-slate-550 block text-slate-500">{t(student.grade)} • {student.email}</span>
                               </div>
                             </div>
                           </td>
                           <td className="p-4 text-slate-350 font-medium">
-                            {student.subject || 'N/A'}
+                            {t(student.subject) || t('N/A')}
                           </td>
                           <td className="p-4 text-slate-400 font-mono text-[11px]">
                             {student.phone}
                           </td>
                           <td className="p-4 text-indigo-300 font-mono font-semibold text-[11px]">
-                            {student.parentPhone || 'N/A'}
+                            {student.parentPhone || t('N/A')}
                           </td>
                           <td className="p-4 text-right">
                             <div className="flex items-center justify-end gap-2">
@@ -1164,7 +1162,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                 onClick={async () => {
                                   try {
                                     const res = await api.approveStudent(student.id, 'accept');
-                                    setAdminNotification(res.msg || `Accepted ${student.name}`);
+                                    setAdminNotification(res.msg || t('Accepted {name}').replace('{name}', student.name));
                                     setTimeout(() => setAdminNotification(null), 4000);
                                     
                                     // Refresh data
@@ -1175,19 +1173,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                     setStudents(updatedStudents);
                                     setActivityLogs(updatedLogs);
                                   } catch (err: any) {
-                                    alert(err.message || 'Approval failed.');
+                                    alert(err.message || t('Approval failed.'));
                                   }
                                 }}
                                 className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all cursor-pointer hover:scale-105 active:scale-95 shadow-md shadow-emerald-600/10"
                               >
-                                Accept
+                                {t('Accept')}
                               </button>
                               <button
                                 onClick={async () => {
-                                  if (confirm(`Are you sure you want to decline and delete ${student.name}'s registry?`)) {
+                                  if (confirm(t("Are you sure you want to decline and delete {name}'s registry?").replace('{name}', student.name))) {
                                     try {
                                       const res = await api.approveStudent(student.id, 'decline');
-                                      setAdminNotification(res.msg || `Declined ${student.name}`);
+                                      setAdminNotification(res.msg || t('Declined {name}').replace('{name}', student.name));
                                       setTimeout(() => setAdminNotification(null), 4000);
                                       
                                       // Refresh data
@@ -1198,13 +1196,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                       setStudents(updatedStudents);
                                       setActivityLogs(updatedLogs);
                                     } catch (err: any) {
-                                      alert(err.message || 'Decline failed.');
+                                      alert(err.message || t('Decline failed.'));
                                     }
                                   }
                                 }}
                                 className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold transition-all cursor-pointer hover:scale-105 active:scale-95 shadow-md shadow-rose-600/10"
                               >
-                                Decline
+                                {t('Decline')}
                               </button>
                             </div>
                           </td>
@@ -1220,18 +1218,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
               <div className="mb-4">
                 <h3 className="text-sm font-bold text-white">{t('System Security Activity Audits')}</h3>
-                <span className="text-[11px] text-slate-550 block font-semibold text-slate-400">Live database enrollment and transaction transcripts</span>
+                <span className="text-[11px] text-slate-550 block font-semibold text-slate-400">{t('Live database enrollment and transaction transcripts')}</span>
               </div>
 
               <div className="overflow-x-auto max-h-80 overflow-y-auto pr-1">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead className="bg-slate-950 border-b border-slate-850 text-slate-400 font-bold uppercase tracking-wider text-[9px]">
                     <tr>
-                      <th className="p-3">Student Name</th>
-                      <th className="p-3">Action Type</th>
-                      <th className="p-3">Detail</th>
-                      <th className="p-3">Date & Time</th>
-                      <th className="p-3 text-right">Status</th>
+                      <th className="p-3">{t('Student Name')}</th>
+                      <th className="p-3">{t('Action Type')}</th>
+                      <th className="p-3">{t('Detail')}</th>
+                      <th className="p-3">{t('Date & Time')}</th>
+                      <th className="p-3 text-right">{t('Status')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-850">
@@ -1247,12 +1245,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             log.type === 'Payment Failed' ? 'bg-red-500/15 text-red-400 border border-red-500/30' :
                             'bg-slate-800 text-slate-400'
                           }`}>
-                            {log.type}
+                            {t(log.type)}
                           </span>
                         </td>
-                        <td className="p-3 text-slate-400 max-w-[200px] truncate" title={log.detail}>
-                          {log.detail}
-                          {log.amount && <span className="block mt-0.5 text-[10px] text-indigo-400 font-semibold">Ledger balance: -${log.amount}</span>}
+                        <td className="p-3 text-slate-400 max-w-[200px] truncate" title={t(log.detail)}>
+                          {t(log.detail)}
+                          {log.amount && <span className="block mt-0.5 text-[10px] text-indigo-400 font-semibold">{t('Ledger balance:')} -₹{log.amount}</span>}
                         </td>
                         <td className="p-3 text-slate-550 font-mono text-[10px] text-slate-500">
                           {log.dateTime}
@@ -1263,7 +1261,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             log.status === 'Failed' ? 'bg-rose-500/10 text-rose-400 font-semibold' :
                             'bg-slate-800 text-slate-405'
                           }`}>
-                            {log.status}
+                            {t(log.status)}
                           </span>
                         </td>
                       </tr>
@@ -1285,8 +1283,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             {/* Filters and Add Student Button */}
             <div className="p-6 border-b border-slate-850 flex flex-col md:flex-row items-center justify-between gap-4">
               <div>
-                <h3 className="text-base font-bold text-white">Student Academic Enrollment Directory</h3>
-                <p className="text-xs text-slate-550 text-slate-500">Directly add new academic entries, edit status, or click student name to view detailed files.</p>
+                <h3 className="text-base font-bold text-white">{t('Student Academic Enrollment Directory')}</h3>
+                <p className="text-xs text-slate-550 text-slate-500">{t('Directly add new academic entries, edit status, or click student name to view detailed files.')}</p>
               </div>
 
               <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
@@ -1294,7 +1292,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-550 text-slate-550" />
                   <input
                     type="text"
-                    placeholder="Search name, course standard, phone..."
+                    placeholder={t('Search name, course standard, phone...')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full bg-slate-950 border border-slate-800 text-xs pl-9 pr-4 py-2 rounded-xl focus:border-indigo-500 outline-none text-white"
@@ -1312,7 +1310,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           : 'text-slate-500 hover:text-slate-300'
                       }`}
                     >
-                      {filter}
+                      {t(filter)}
                     </button>
                   ))}
                 </div>
@@ -1321,7 +1319,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   onClick={openAddStudentModal}
                   className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer shadow-md hover:scale-[1.02] transition-all"
                 >
-                  <PlusCircle className="h-4.5 w-4.5" /> Add Student
+                  <PlusCircle className="h-4.5 w-4.5" /> {t('Add Student')}
                 </button>
               </div>
             </div>
@@ -1331,12 +1329,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <table className="w-full text-left text-xs border-collapse">
                 <thead className="bg-slate-950 border-b border-slate-850 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
                   <tr>
-                    <th className="p-4">Student Profile</th>
-                    <th className="p-4">Assigned Course / Subject</th>
-                    <th className="p-4">Contact Phone</th>
-                    <th className="p-4">Linked Parent Phone</th>
-                    <th className="p-4">Status</th>
-                    <th className="p-4 text-right">Actions</th>
+                    <th className="p-4">{t('Student Profile')}</th>
+                    <th className="p-4">{t('Assigned Course / Subject')}</th>
+                    <th className="p-4">{t('Contact Phone')}</th>
+                    <th className="p-4">{t('Linked Parent Phone')}</th>
+                    <th className="p-4">{t('Status')}</th>
+                    <th className="p-4 text-right">{t('Actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-850">
@@ -1364,20 +1362,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               >
                                 {student.name}
                               </span>
-                              <span className="text-[10px] text-slate-500 block">{student.grade} • {student.email}</span>
+                              <span className="text-[10px] text-slate-500 block">{t(student.grade)} • {student.email}</span>
                             </div>
                           </div>
                         </td>
-                        <td className="p-4 text-slate-300 font-medium">{student.subject}</td>
+                        <td className="p-4 text-slate-300 font-medium">{t(student.subject)}</td>
                         <td className="p-4 text-slate-400 font-mono text-[11px]">{student.phone}</td>
-                        <td className="p-4 text-slate-500 font-mono text-[11px]">{student.parentPhone || 'Unlinked'}</td>
+                        <td className="p-4 text-slate-500 font-mono text-[11px]">{student.parentPhone || t('Unlinked')}</td>
                         <td className="p-4">
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                             student.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' :
                             student.status === 'Pending' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' :
                             'bg-slate-950 text-slate-500 border border-slate-800'
                           }`}>
-                            {student.status}
+                            {t(student.status)}
                           </span>
                         </td>
                         <td className="p-4 text-right">
@@ -1385,14 +1383,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             <button
                               onClick={() => openEditStudentModal(student)}
                               className="p-1 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition cursor-pointer"
-                              title="Edit Student"
+                              title={t("Edit Student")}
                             >
                               <Edit2 className="h-4 w-4" />
                             </button>
                             <button
                               onClick={() => handleDeleteStudent(student.id, student.name)}
                               className="p-1 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-rose-450 transition cursor-pointer hover:text-rose-400"
-                              title="Delete Student"
+                              title={t("Delete Student")}
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>
@@ -1403,7 +1401,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   ) : (
                     <tr>
                       <td colSpan={6} className="text-center p-8 text-slate-550 font-medium text-slate-500">
-                        No student records match search query parameters.
+                        {t('No student records match search query parameters.')}
                       </td>
                     </tr>
                   )}
@@ -1412,7 +1410,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
           </motion.div>
         )}
-
         {/* VIEW 3 - TUTOR DIRECTORY & CRUD */}
         {!selectedStudentDetail && !selectedTutorDetail && activeTab === 'tutors' && (
           <motion.div 
@@ -1423,15 +1420,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             {/* Headers and Add Tutor Button */}
             <div className="p-6 border-b border-slate-850 flex flex-col md:flex-row items-center justify-between gap-4">
               <div>
-                <h3 className="text-base font-bold text-white">Certified Academic Faculty Directory</h3>
-                <p className="text-xs text-slate-550 text-slate-500">Manage certified educators, courses assignations, or click tutor name to view detailed files.</p>
+                <h3 className="text-base font-bold text-white">{t('Certified Academic Faculty Directory')}</h3>
+                <p className="text-xs text-slate-550 text-slate-500">{t('Manage certified educators, courses assignations, or click tutor name to view detailed files.')}</p>
               </div>
 
               <button
                 onClick={openAddTutorModal}
                 className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer shadow-md hover:scale-[1.02] transition-all"
               >
-                <PlusCircle className="h-4.5 w-4.5" /> Add Faculty Tutor
+                <PlusCircle className="h-4.5 w-4.5" /> {t('Add Faculty Tutor')}
               </button>
             </div>
 
@@ -1440,13 +1437,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <table className="w-full text-left text-xs border-collapse">
                 <thead className="bg-slate-950 border-b border-slate-850 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
                   <tr>
-                    <th className="p-4">Faculty Member</th>
-                    <th className="p-4">Primary Subject</th>
-                    <th className="p-4">Assigned Courses</th>
-                    <th className="p-4 text-center">Attendance Rate</th>
-                    <th className="p-4 text-center">Salary Status</th>
-                    <th className="p-4 text-center">Duty Status</th>
-                    <th className="p-4 text-right">Actions</th>
+                    <th className="p-4">{t('Faculty Member')}</th>
+                    <th className="p-4">{t('Primary Subject')}</th>
+                    <th className="p-4">{t('Assigned Courses')}</th>
+                    <th className="p-4 text-center">{t('Attendance Rate')}</th>
+                    <th className="p-4 text-center">{t('Salary Status')}</th>
+                    <th className="p-4 text-center">{t('Duty Status')}</th>
+                    <th className="p-4 text-right">{t('Actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-850">
@@ -1478,12 +1475,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             </div>
                           </div>
                         </td>
-                        <td className="p-4 text-slate-300 font-medium">{teacher.subject}</td>
+                        <td className="p-4 text-slate-300 font-medium">{t(teacher.subject)}</td>
                         <td className="p-4">
                           <div className="flex flex-wrap gap-1 max-w-[200px]">
                             {teacher.courses && teacher.courses.map((course, idx) => (
                               <span key={idx} className="bg-slate-950 border border-slate-800 px-2 py-0.5 rounded text-[9px] font-semibold text-slate-400">
-                                {course}
+                                {t(course)}
                               </span>
                             ))}
                           </div>
@@ -1495,7 +1492,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           <span className={`px-2.5 py-0.5 rounded text-[10px] font-bold ${
                             teacher.salaryStatus === 'Credited' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-450'
                           }`}>
-                            {teacher.salaryStatus || 'Pending'}
+                            {t(teacher.salaryStatus || 'Pending')}
                           </span>
                         </td>
                         <td className="p-4 text-center">
@@ -1503,7 +1500,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             teacher.status === 'Active' ? 'bg-teal-500/10 text-teal-400 border border-teal-500/30' :
                             'bg-slate-950 border border-slate-800 text-slate-500'
                           }`}>
-                            {teacher.status}
+                            {t(teacher.status)}
                           </span>
                         </td>
                         <td className="p-4 text-right">
@@ -1511,14 +1508,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             <button
                               onClick={() => openEditTutorModal(teacher)}
                               className="p-1 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition cursor-pointer"
-                              title="Edit Tutor"
+                              title={t("Edit Tutor")}
                             >
                               <Edit2 className="h-4 w-4" />
                             </button>
                             <button
                               onClick={() => handleDeleteTutor(teacher.id, teacher.name)}
-                              className="p-1 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-rose-450 transition cursor-pointer hover:text-rose-400"
-                              title="Delete Tutor"
+                              className="p-1 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-rose-455 transition cursor-pointer hover:text-rose-400"
+                              title={t("Delete Tutor")}
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>
@@ -1528,8 +1525,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={7} className="text-center p-8 text-slate-500 font-medium">
-                        No tutors currently registered in database.
+                      <td colSpan={7} className="text-center p-8 text-slate-550 font-medium">
+                        {t('No tutors currently registered in database.')}
                       </td>
                     </tr>
                   )}
@@ -1547,8 +1544,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             className="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center shadow-xl"
           >
             <Users className="h-12 w-12 text-slate-500 mx-auto mb-4 opacity-50" />
-            <h3 className="text-xl font-bold text-white mb-2">Parent Directory</h3>
-            <p className="text-slate-400">Manage parent accounts linked to enrolled students here. (Module under construction)</p>
+            <h3 className="text-xl font-bold text-white mb-2">{t('Parent Directory')}</h3>
+            <p className="text-slate-400">{t('Manage parent accounts linked to enrolled students here. (Module under construction)')}</p>
           </motion.div>
         )}
 
@@ -1560,8 +1557,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             className="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center shadow-xl"
           >
             <Users className="h-12 w-12 text-slate-500 mx-auto mb-4 opacity-50" />
-            <h3 className="text-xl font-bold text-white mb-2">User Management</h3>
-            <p className="text-slate-400">Manage all registered users (Admin, Faculty, Parent, Student) across the platform. (Module under construction)</p>
+            <h3 className="text-xl font-bold text-white mb-2">{t('User Management')}</h3>
+            <p className="text-slate-400">{t('Manage all registered users (Admin, Faculty, Parent, Student) across the platform. (Module under construction)')}</p>
           </motion.div>
         )}
 
@@ -1573,8 +1570,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             className="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center shadow-xl"
           >
             <BookOpen className="h-12 w-12 text-slate-500 mx-auto mb-4 opacity-50" />
-            <h3 className="text-xl font-bold text-white mb-2">Course Management</h3>
-            <p className="text-slate-400">Create, edit, and organize academic courses and syllabi. (Module under construction)</p>
+            <h3 className="text-xl font-bold text-white mb-2">{t('Course Management')}</h3>
+            <p className="text-slate-400">{t('Create, edit, and organize academic courses and syllabi. (Module under construction)')}</p>
           </motion.div>
         )}
 
@@ -1585,9 +1582,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             animate={{ opacity: 1 }}
             className="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center shadow-xl"
           >
-            <DollarSign className="h-12 w-12 text-slate-500 mx-auto mb-4 opacity-50" />
-            <h3 className="text-xl font-bold text-white mb-2">Fees & Billing</h3>
-            <p className="text-slate-400">Track tuition payments, overdue invoices, and financial reports. (Module under construction)</p>
+            <IndianRupee className="h-12 w-12 text-slate-500 mx-auto mb-4 opacity-50" />
+            <h3 className="text-xl font-bold text-white mb-2">{t('Fees & Billing')}</h3>
+            <p className="text-slate-400">{t('Track tuition payments, overdue invoices, and financial reports. (Module under construction)')}</p>
           </motion.div>
         )}
 
@@ -1599,8 +1596,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             className="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center shadow-xl"
           >
             <Activity className="h-12 w-12 text-slate-500 mx-auto mb-4 opacity-50" />
-            <h3 className="text-xl font-bold text-white mb-2">Analytics & Reports</h3>
-            <p className="text-slate-400">Generate academic and financial performance reports for the current term. (Module under construction)</p>
+            <h3 className="text-xl font-bold text-white mb-2">{t('Analytics & Reports')}</h3>
+            <p className="text-slate-400">{t('Generate academic and financial performance reports for the current term. (Module under construction)')}</p>
           </motion.div>
         )}
 
@@ -1611,8 +1608,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             animate={{ opacity: 1 }}
             className="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center shadow-xl"
           >
-            <h3 className="text-xl font-bold text-white mb-2">Platform Settings</h3>
-            <p className="text-slate-400">Configure global platform options, security policies, and integrations. (Module under construction)</p>
+            <h3 className="text-xl font-bold text-white mb-2">{t('Platform Settings')}</h3>
+            <p className="text-slate-400">{t('Configure global platform options, security policies, and integrations. (Module under construction)')}</p>
           </motion.div>
         )}
 
@@ -1638,10 +1635,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <div className="flex justify-between items-center mb-5">
                 <div>
                   <h3 className="text-base font-bold text-white">
-                    {editingStudent ? 'Edit Student Profile' : 'Enroll New Student'}
+                    {editingStudent ? t('Edit Student Profile') : t('Enroll New Student')}
                   </h3>
-                  <span className="text-xs text-slate-500">
-                    {editingStudent ? 'Update registration database properties' : 'Register a new active student'}
+                  <span className="text-xs text-slate-550">
+                    {editingStudent ? t('Update registration database properties') : t('Register a new active student')}
                   </span>
                 </div>
                 <button 
@@ -1655,118 +1652,118 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <form onSubmit={handleStudentSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">First Name *</label>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">{t('First Name *')}</label>
                     <input
                       type="text"
                       required
                       value={studentFormFirstName}
                       onChange={(e) => setStudentFormFirstName(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 text-white"
-                      placeholder="Jane"
+                      placeholder={t('Jane')}
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Last Name *</label>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">{t('Last Name *')}</label>
                     <input
                       type="text"
                       required
                       value={studentFormLastName}
                       onChange={(e) => setStudentFormLastName(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 text-white"
-                      placeholder="Doe"
+                      placeholder={t('Doe')}
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Email Address *</label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">{t('Email Address *')}</label>
                   <input
                     type="email"
                     required
                     value={studentFormEmail}
                     onChange={(e) => setStudentFormEmail(e.target.value)}
                     className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 text-white"
-                    placeholder="jane.doe@email.com"
+                    placeholder={t('jane.doe@email.com')}
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Student Phone *</label>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">{t('Student Phone *')}</label>
                     <input
                       type="tel"
                       required
                       value={studentFormPhone}
                       onChange={(e) => setStudentFormPhone(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 text-white font-mono"
-                      placeholder="10 digit number"
+                      placeholder={t('10 digit number')}
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Parent Phone</label>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">{t('Parent Phone')}</label>
                     <input
                       type="tel"
                       value={studentFormParentPhone}
                       onChange={(e) => setStudentFormParentPhone(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 text-white font-mono"
-                      placeholder="10 digit number"
+                      placeholder={t('10 digit number')}
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Grade Standard *</label>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">{t('Grade Standard *')}</label>
                     <select
                       value={studentFormGrade}
                       onChange={(e) => setStudentFormGrade(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 text-slate-350 bg-slate-950"
                     >
-                      <option>9th Grade</option>
-                      <option>10th Grade</option>
-                      <option>11th Grade</option>
-                      <option>12th Grade</option>
+                      <option value="9th Grade">{t('9th Grade')}</option>
+                      <option value="10th Grade">{t('10th Grade')}</option>
+                      <option value="11th Grade">{t('11th Grade')}</option>
+                      <option value="12th Grade">{t('12th Grade')}</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Course Subject *</label>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">{t('Course Subject *')}</label>
                     <select
                       value={studentFormSubject}
                       onChange={(e) => setStudentFormSubject(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 text-slate-350 bg-slate-950"
                     >
-                      <option>Advanced Physics</option>
-                      <option>Calculus BC</option>
-                      <option>Chemistry Honors</option>
-                      <option>AP Literature</option>
-                      <option>Organic Chemistry</option>
+                      <option value="Advanced Physics">{t('Advanced Physics')}</option>
+                      <option value="Calculus BC">{t('Calculus BC')}</option>
+                      <option value="Chemistry Honors">{t('Chemistry Honors')}</option>
+                      <option value="AP Literature">{t('AP Literature')}</option>
+                      <option value="Organic Chemistry">{t('Organic Chemistry')}</option>
                     </select>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Enrollment Status *</label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">{t('Enrollment Status *')}</label>
                   <select
                     value={studentFormStatus}
                     onChange={(e) => setStudentFormStatus(e.target.value as any)}
                     className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 text-slate-350 bg-slate-950"
                   >
-                    <option value="Active">Active</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Inactive">Inactive</option>
+                    <option value="Active">{t('Active')}</option>
+                    <option value="Pending">{t('Pending')}</option>
+                    <option value="Inactive">{t('Inactive')}</option>
                   </select>
                 </div>
 
                 {!editingStudent && (
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Password *</label>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">{t('Password *')}</label>
                     <input
                       type="password"
                       required
                       value={studentFormPassword}
                       onChange={(e) => setStudentFormPassword(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 text-white"
-                      placeholder="student123"
+                      placeholder={t('student123')}
                     />
                   </div>
                 )}
@@ -1775,7 +1772,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   type="submit"
                   className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs rounded-xl transition cursor-pointer flex justify-center items-center gap-1.5 mt-2"
                 >
-                  {editingStudent ? 'Save Student Changes' : 'Enroll Student'} <ArrowRight className="h-4 w-4" />
+                  {editingStudent ? t('Save Student Changes') : t('Enroll Student')} <ArrowRight className="h-4 w-4" />
                 </button>
               </form>
             </motion.div>
@@ -1803,10 +1800,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <div className="flex justify-between items-center mb-5">
                 <div>
                   <h3 className="text-base font-bold text-white">
-                    {editingTutor ? 'Edit Tutor Profile' : 'Register New Tutor'}
+                    {editingTutor ? t('Edit Tutor Profile') : t('Register New Tutor')}
                   </h3>
                   <span className="text-xs text-slate-500">
-                    {editingTutor ? 'Update academic faculty database records' : 'Introduce a new certified educator'}
+                    {editingTutor ? t('Update academic faculty database records') : t('Introduce a new certified educator')}
                   </span>
                 </div>
                 <button 
@@ -1820,80 +1817,80 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <form onSubmit={handleTutorSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">First Name *</label>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">{t('First Name *')}</label>
                     <input
                       type="text"
                       required
                       value={tutorFormFirstName}
                       onChange={(e) => setTutorFormFirstName(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 text-white"
-                      placeholder="Albert"
+                      placeholder={t('Albert')}
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Last Name *</label>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">{t('Last Name *')}</label>
                     <input
                       type="text"
                       required
                       value={tutorFormLastName}
                       onChange={(e) => setTutorFormLastName(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 text-white"
-                      placeholder="Einstein"
+                      placeholder={t('Einstein')}
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Email Address *</label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">{t('Email Address *')}</label>
                   <input
                     type="email"
                     required
                     value={tutorFormEmail}
                     onChange={(e) => setTutorFormEmail(e.target.value)}
                     className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 text-white"
-                    placeholder="albert.einstein@physics.edu"
+                    placeholder={t('albert.einstein@physics.edu')}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Tutor Phone *</label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">{t('Tutor Phone *')}</label>
                   <input
                     type="tel"
                     required
                     value={tutorFormPhone}
                     onChange={(e) => setTutorFormPhone(e.target.value)}
                     className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 text-white font-mono"
-                    placeholder="10 digit number"
+                    placeholder={t('10 digit number')}
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Subject Specialty *</label>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">{t('Subject Specialty *')}</label>
                     <input
                       type="text"
                       required
                       value={tutorFormSubject}
                       onChange={(e) => setTutorFormSubject(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 text-white"
-                      placeholder="Relativity & Cosmology"
+                      placeholder={t('Relativity & Cosmology')}
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Experience *</label>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">{t('Experience *')}</label>
                     <input
                       type="text"
                       required
                       value={tutorFormExperience}
                       onChange={(e) => setTutorFormExperience(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 text-white"
-                      placeholder="e.g. 12 years"
+                      placeholder={t('e.g. 12 years')}
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1.5">Assigned Courses</label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1.5">{t('Assigned Courses')}</label>
                   <div className="grid grid-cols-2 gap-2 bg-slate-950 border border-slate-800 p-3 rounded-xl">
                     {AVAILABLE_COURSES.map((course) => {
                       const isChecked = tutorFormCourses.includes(course);
@@ -1911,7 +1908,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             }}
                             className="accent-indigo-500 rounded border-slate-800"
                           />
-                          {course}
+                          {t(course)}
                         </label>
                       );
                     })}
@@ -1919,51 +1916,51 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Duty Status *</label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">{t('Duty Status *')}</label>
                   <select
                     value={tutorFormStatus}
                     onChange={(e) => setTutorFormStatus(e.target.value as any)}
                     className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 text-slate-350 bg-slate-950"
                   >
-                    <option value="Active">Active</option>
-                    <option value="On Leave">On Leave</option>
+                    <option value="Active">{t('Active')}</option>
+                    <option value="On Leave">{t('On Leave')}</option>
                   </select>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Attendance Rate</label>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">{t('Attendance Rate')}</label>
                     <input
                       type="text"
                       value={tutorFormAttendance}
                       onChange={(e) => setTutorFormAttendance(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 text-white font-mono"
-                      placeholder="e.g. 96%"
+                      placeholder={t('e.g. 96%')}
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Salary Status *</label>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">{t('Salary Status *')}</label>
                     <select
                       value={tutorFormSalaryStatus}
                       onChange={(e) => setTutorFormSalaryStatus(e.target.value as any)}
                       className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 text-slate-350 bg-slate-950"
                     >
-                      <option value="Credited">Credited</option>
-                      <option value="Pending">Pending</option>
+                      <option value="Credited">{t('Credited')}</option>
+                      <option value="Pending">{t('Pending')}</option>
                     </select>
                   </div>
                 </div>
 
                 {!editingTutor && (
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Password *</label>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">{t('Password *')}</label>
                     <input
                       type="password"
                       required
                       value={tutorFormPassword}
                       onChange={(e) => setTutorFormPassword(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-800 text-xs p-2.5 rounded-xl outline-none focus:border-indigo-500 text-white"
-                      placeholder="tutor123"
+                      placeholder={t('tutor123')}
                     />
                   </div>
                 )}
@@ -1972,7 +1969,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   type="submit"
                   className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs rounded-xl transition cursor-pointer flex justify-center items-center gap-1.5 mt-2"
                 >
-                  {editingTutor ? 'Save Tutor Changes' : 'Register Tutor'} <ArrowRight className="h-4 w-4" />
+                  {editingTutor ? t('Save Tutor Changes') : t('Register Tutor')} <ArrowRight className="h-4 w-4" />
                 </button>
               </form>
             </motion.div>

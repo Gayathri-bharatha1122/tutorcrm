@@ -21,7 +21,7 @@ export const initialActivityLogs: ActivityLog[] = [
   { id: 'ACT001', studentName: 'Marcus Thorne', initials: 'MT', type: 'New Enrollment', detail: 'Successfully enrolled by Administrator into AP Literature Course under Sarah Jenkins', dateTime: 'Today, 10:45 AM', status: 'Completed' },
   { id: 'ACT002', studentName: 'Zoe Vance', initials: 'ZV', type: 'Fee Payment', detail: 'Automatic recurring payment received for Spring Tutors Session Fee package', dateTime: 'Today, 09:12 AM', amount: 320, status: 'Completed' },
   { id: 'ACT003', studentName: 'Liam Sterling', initials: 'LS', type: 'Session Scheduled', detail: 'Private Calculus tutoring session booked with Sarah Jenkins for June 4', dateTime: 'Yesterday, 04:30 PM', status: 'Pending' },
-  { id: 'ACT004', studentName: 'Marcus Thorne', initials: 'MT', type: 'Payment Failed', detail: 'Late Fee of $120 overdue billing card decline - transaction error standard', dateTime: '2 Days ago', amount: 120, status: 'Failed' },
+  { id: 'ACT004', studentName: 'Marcus Thorne', initials: 'MT', type: 'Payment Failed', detail: 'Late Fee of ₹120 overdue billing UPI transaction decline - network timeout standard', dateTime: '2 Days ago', amount: 120, status: 'Failed' },
   { id: 'ACT005', studentName: 'Penelope Chen', initials: 'PC', type: 'New Enrollment', detail: 'Account created and awaiting verification checklist status approval', dateTime: '3 Days ago', status: 'Active' }
 ];
 

@@ -7,7 +7,7 @@ import {
   Shield, 
   User, 
   Book, 
-  DollarSign, 
+  IndianRupee, 
   FileText, 
   Settings, 
   Calendar, 
@@ -89,7 +89,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       { name: t('Tutor Management'), path: '/admin/tutors', icon: <Shield className="h-4.5 w-4.5" /> },
       { name: t('Parent Management'), path: '/admin/parents', icon: <User className="h-4.5 w-4.5" /> },
       { name: t('Courses'), path: '/admin/courses', icon: <Book className="h-4.5 w-4.5" /> },
-      { name: t('Fees'), path: '/admin/fees', icon: <DollarSign className="h-4.5 w-4.5" /> },
+      { name: t('Fees'), path: '/admin/fees', icon: <IndianRupee className="h-4.5 w-4.5" /> },
       { name: t('Reports'), path: '/admin/reports', icon: <FileText className="h-4.5 w-4.5" /> },
       { name: t('Settings'), path: '/admin/settings', icon: <Settings className="h-4.5 w-4.5" /> }
     ],
@@ -106,7 +106,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       { name: t('Child Progress'), path: '/parent/progress', icon: <TrendingUp className="h-4.5 w-4.5" /> },
       { name: t('Attendance'), path: '/parent/attendance', icon: <Calendar className="h-4.5 w-4.5" /> },
       { name: t('Courses & Tutors'), path: '/parent/courses', icon: <GraduationCap className="h-4.5 w-4.5" /> },
-      { name: t('Fees'), path: '/parent/fees', icon: <DollarSign className="h-4.5 w-4.5" /> },
+      { name: t('Fees'), path: '/parent/fees', icon: <IndianRupee className="h-4.5 w-4.5" /> },
       { name: t('Notifications'), path: '/parent/notifications', icon: <Bell className="h-4.5 w-4.5" /> },
       { name: t('Profile'), path: '/parent/profile', icon: <User className="h-4.5 w-4.5" /> }
     ],
@@ -150,7 +150,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <span className="text-xs font-bold text-white block truncate leading-tight">{userName}</span>
             <div className={`px-2 py-0.5 rounded-md text-[9px] font-bold text-white w-max mt-1 flex items-center gap-1.5 bg-gradient-to-r ${currentRoleConfig.themeColor.split(' ').slice(0,2).join(' ')}`}>
               {currentRoleConfig.icon}
-              {currentRoleConfig.badge}
+              {t(currentRoleConfig.badge)}
             </div>
           </div>
         </div>

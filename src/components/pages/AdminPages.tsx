@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { DashboardPage } from '../DashboardPage';
-import { Users, GraduationCap, User, Book, DollarSign, FileText, Settings, Shield, BookOpen, Clock, AlertCircle, CheckCircle, PlusCircle } from 'lucide-react';
+import { Users, GraduationCap, User, Book, IndianRupee, FileText, Settings, Shield, BookOpen, Clock, AlertCircle, CheckCircle, PlusCircle } from 'lucide-react';
 import { motion } from 'motion/react';
 import { api } from '../../services/api';
 import { ParentsPage } from './ParentManagementPage';
+import { useLanguage } from '../../LanguageContext';
 
 interface AdminPageProps {
   pageKey: string;
@@ -13,6 +14,7 @@ interface AdminPageProps {
 
 // ─── Courses Page ────────────────────────────────────────────────────────────
 const CoursesPage: React.FC = () => {
+  const { t } = useLanguage();
   const courses = [
     { id: 'C001', name: 'Advanced Physics', tutor: 'Prof. Alistair Miller', students: 12, schedule: 'Mon/Wed/Fri 09:00 AM', level: 'Grade 11-12', status: 'Active', color: 'teal' },
     { id: 'C002', name: 'Calculus BC', tutor: 'Prof. Sarah Jenkins', students: 8, schedule: 'Tue/Thu 11:00 AM', level: 'Grade 12', status: 'Active', color: 'indigo' },
@@ -49,7 +51,7 @@ const CoursesPage: React.FC = () => {
         ].map((s, i) => (
           <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
             className="bg-slate-900 border border-slate-800 rounded-2xl p-4 text-center">
-            <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">{s.label}</span>
+            <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">{t(s.label)}</span>
             <span className={`text-2xl font-extrabold block ${s.color}`}>{s.value}</span>
           </motion.div>
         ))}
@@ -59,23 +61,23 @@ const CoursesPage: React.FC = () => {
       <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
         <div className="p-5 border-b border-slate-800 flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-bold text-white">Course Catalogue</h3>
-            <p className="text-[11px] text-slate-500 mt-0.5">All academic courses and their assigned tutors</p>
+            <h3 className="text-sm font-bold text-white">{t("Course Catalogue")}</h3>
+            <p className="text-[11px] text-slate-500 mt-0.5">{t("All academic courses and their assigned tutors")}</p>
           </div>
           <button className="flex items-center gap-1.5 px-3.5 py-2 bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold rounded-xl transition cursor-pointer">
-            <PlusCircle className="h-3.5 w-3.5" /> Add Course
+            <PlusCircle className="h-3.5 w-3.5" /> {t("Add Course")}
           </button>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-950 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
               <tr>
-                <th className="p-4">Course</th>
-                <th className="p-4">Tutor</th>
-                <th className="p-4">Students</th>
-                <th className="p-4">Schedule</th>
-                <th className="p-4">Level</th>
-                <th className="p-4 text-right">Status</th>
+                <th className="p-4">{t("Course")}</th>
+                <th className="p-4">{t("Tutor")}</th>
+                <th className="p-4">{t("Students")}</th>
+                <th className="p-4">{t("Schedule")}</th>
+                <th className="p-4">{t("Level")}</th>
+                <th className="p-4 text-right">{t("Status")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800">
@@ -88,7 +90,7 @@ const CoursesPage: React.FC = () => {
                         <BookOpen className="h-4 w-4" />
                       </div>
                       <div>
-                        <span className="font-bold text-white block">{course.name}</span>
+                        <span className="font-bold text-white block">{t(course.name)}</span>
                         <span className="text-[10px] text-slate-500">ID: {course.id}</span>
                       </div>
                     </div>
@@ -108,13 +110,13 @@ const CoursesPage: React.FC = () => {
                   <td className="p-4">
                     <div className="flex items-center gap-1.5">
                       <Clock className="h-3.5 w-3.5 text-slate-500" />
-                      <span className="text-slate-400">{course.schedule}</span>
+                      <span className="text-slate-400">{t(course.schedule)}</span>
                     </div>
                   </td>
-                  <td className="p-4 text-slate-400">{course.level}</td>
+                  <td className="p-4 text-slate-400">{t(course.level)}</td>
                   <td className="p-4 text-right">
                     <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${statusColor[course.status]}`}>
-                      {course.status}
+                      {t(course.status)}
                     </span>
                   </td>
                 </motion.tr>
@@ -129,6 +131,7 @@ const CoursesPage: React.FC = () => {
 
 // ─── Fees Page ───────────────────────────────────────────────────────────────
 const FeesPage: React.FC = () => {
+  const { t } = useLanguage();
   const [bills, setBills] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -164,14 +167,14 @@ const FeesPage: React.FC = () => {
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: 'Total Collected', value: `$${totalPaid.toLocaleString()}`, color: 'text-emerald-400' },
-          { label: 'Outstanding', value: `$${totalPending.toLocaleString()}`, color: 'text-rose-400' },
+          { label: 'Total Collected', value: `₹${totalPaid.toLocaleString()}`, color: 'text-emerald-400' },
+          { label: 'Outstanding', value: `₹${totalPending.toLocaleString()}`, color: 'text-rose-400' },
           { label: 'Total Invoices', value: bills.length, color: 'text-indigo-400' },
           { label: 'Overdue', value: overdueCount, color: 'text-amber-400' },
         ].map((s, i) => (
           <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
             className="bg-slate-900 border border-slate-800 rounded-2xl p-4 text-center">
-            <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">{s.label}</span>
+            <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">{t(s.label)}</span>
             <span className={`text-xl font-extrabold block ${s.color}`}>{s.value}</span>
           </motion.div>
         ))}
@@ -182,7 +185,7 @@ const FeesPage: React.FC = () => {
         <div className="flex items-center gap-3 bg-rose-500/5 border border-rose-500/20 rounded-2xl p-4">
           <AlertCircle className="h-5 w-5 text-rose-400 shrink-0 animate-pulse" />
           <p className="text-xs font-semibold text-rose-300">
-            <span className="font-bold">{overdueCount} overdue invoice{overdueCount > 1 ? 's' : ''}</span> require immediate attention. Total outstanding: <span className="font-bold">${totalPending}</span>
+            <span className="font-bold">{t("{count} overdue invoice(s) require immediate attention. Total outstanding: ").replace("{count}", overdueCount.toString())}</span> <span className="font-bold">₹{totalPending}</span>
           </p>
         </div>
       )}
@@ -190,21 +193,21 @@ const FeesPage: React.FC = () => {
       {/* Bills Table */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
         <div className="p-5 border-b border-slate-800">
-          <h3 className="text-sm font-bold text-white">Payment Ledger</h3>
-          <p className="text-[11px] text-slate-500 mt-0.5">All student tuition invoices and payment records</p>
+          <h3 className="text-sm font-bold text-white">{t("Payment Ledger")}</h3>
+          <p className="text-[11px] text-slate-500 mt-0.5">{t("All student tuition invoices and payment records")}</p>
         </div>
         {loading ? (
-          <div className="p-12 text-center text-slate-500 text-sm">Loading payment records...</div>
+          <div className="p-12 text-center text-slate-500 text-sm">{t("Loading payment records...")}</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-950 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
                 <tr>
-                  <th className="p-4">Invoice</th>
-                  <th className="p-4">Student</th>
-                  <th className="p-4 text-right">Amount</th>
-                  <th className="p-4">Status</th>
-                  <th className="p-4 text-right">Paid Date</th>
+                  <th className="p-4">{t("Invoice")}</th>
+                  <th className="p-4">{t("Student")}</th>
+                  <th className="p-4 text-right">{t("Amount")}</th>
+                  <th className="p-4">{t("Status")}</th>
+                  <th className="p-4 text-right">{t("Paid Date")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800">
@@ -212,7 +215,7 @@ const FeesPage: React.FC = () => {
                   <motion.tr key={bill.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
                     className="hover:bg-slate-950/40 transition">
                     <td className="p-4">
-                      <span className="font-semibold text-white block">{bill.itemName}</span>
+                      <span className="font-semibold text-white block">{t(bill.itemName)}</span>
                       <span className="text-[10px] text-slate-500">Ref: {bill.id}</span>
                     </td>
                     <td className="p-4">
@@ -223,10 +226,10 @@ const FeesPage: React.FC = () => {
                         <span className="text-slate-300">{bill.student || '—'}</span>
                       </div>
                     </td>
-                    <td className="p-4 text-right font-extrabold text-white font-mono">${bill.amount}</td>
+                    <td className="p-4 text-right font-extrabold text-white font-mono">₹{bill.amount}</td>
                     <td className="p-4">
                       <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${statusStyle[bill.status] || statusStyle['Pending']}`}>
-                        {bill.status}
+                        {t(bill.status)}
                       </span>
                     </td>
                     <td className="p-4 text-right">
@@ -236,7 +239,7 @@ const FeesPage: React.FC = () => {
                           <span className="font-semibold">{bill.paidDate}</span>
                         </div>
                       ) : (
-                        <span className="text-slate-600 italic text-[10px]">Not paid</span>
+                        <span className="text-slate-600 italic text-[10px]">{t("Not paid")}</span>
                       )}
                     </td>
                   </motion.tr>
@@ -252,6 +255,8 @@ const FeesPage: React.FC = () => {
 
 // ─── Main AdminPage Router ────────────────────────────────────────────────────
 export const AdminPage: React.FC<AdminPageProps> = ({ pageKey, onBack, adminDashboardElement }) => {
+  const { t } = useLanguage();
+  
   const pageConfig: Record<string, { title: string; subtitle: string; content: React.ReactNode; accent?: string }> = {
     'students': {
       title: 'Student Management',
@@ -290,8 +295,8 @@ export const AdminPage: React.FC<AdminPageProps> = ({ pageKey, onBack, adminDash
       content: (
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-12 text-center">
           <FileText className="h-12 w-12 text-cyan-400 mx-auto mb-4 opacity-60" />
-          <h3 className="text-lg font-bold text-white mb-2">System Reports</h3>
-          <p className="text-slate-400 text-sm">Generate and export academic, financial and operational reports.</p>
+          <h3 className="text-lg font-bold text-white mb-2">{t("System Reports")}</h3>
+          <p className="text-slate-400 text-sm">{t("Generate and export academic, financial and operational reports.")}</p>
         </div>
       ),
     },
@@ -302,8 +307,8 @@ export const AdminPage: React.FC<AdminPageProps> = ({ pageKey, onBack, adminDash
       content: (
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-12 text-center">
           <Settings className="h-12 w-12 text-slate-400 mx-auto mb-4 opacity-60" />
-          <h3 className="text-lg font-bold text-white mb-2">System Configuration</h3>
-          <p className="text-slate-400 text-sm">Adjust portal-wide settings, access control, and integrations.</p>
+          <h3 className="text-lg font-bold text-white mb-2">{t("System Configuration")}</h3>
+          <p className="text-slate-400 text-sm">{t("Adjust portal-wide settings, access control, and integrations.")}</p>
         </div>
       ),
     },

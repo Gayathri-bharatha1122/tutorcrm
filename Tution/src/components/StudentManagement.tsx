@@ -13,7 +13,6 @@ import {
   Eye, 
   ArrowUpDown, 
   X,
-  CreditCard,
   Mail,
   UserPlus,
   ArrowRight,
@@ -492,7 +491,7 @@ export default function StudentManagement({
               </div>
               <div className="flex-1 text-left">
                 <p className="text-sm font-bold text-red-950">Payment Failure</p>
-                <p className="text-xs text-red-700 leading-normal font-medium mt-0.5">Card declined for student: Elena Rodriguez (ID: ST-90234)</p>
+                <p className="text-xs text-red-700 leading-normal font-medium mt-0.5">UPI transaction declined for student: Elena Rodriguez (ID: ST-90234)</p>
               </div>
               <button 
                 onClick={() => handleFixNowAlert('ST-90234')}

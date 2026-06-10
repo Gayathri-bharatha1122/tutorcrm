@@ -164,7 +164,11 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
   const handleSubmitAttendance = () => {
     const slot = filteredSlots.find(s => s.id === selectedSlotId);
     if (!slot) return;
-    setAssignedSuccessMsg(`Attendance roll for "${slot.title}" on ${selectedDate} submitted successfully. Parent notifications dispatched.`);
+    setAssignedSuccessMsg(
+      t('Attendance roll for "{title}" on {date} submitted successfully. Parent notifications dispatched.')
+        .replace('{title}', t(slot.title))
+        .replace('{date}', selectedDate)
+    );
     setTimeout(() => setAssignedSuccessMsg(null), 5000);
   };
   
@@ -191,7 +195,11 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
     setIsGradingCompiled(true);
     setTimeout(() => {
       setIsGradingCompiled(false);
-      setAssignedSuccessMsg(`Successfully logged assignment score of ${gradeScore}% for "${student.name}". Progress metrics updated.`);
+      setAssignedSuccessMsg(
+        t('Successfully logged assignment score of {score}% for "{name}". Progress metrics updated.')
+          .replace('{score}', gradeScore.toString())
+          .replace('{name}', student.name)
+      );
       setTimeout(() => setAssignedSuccessMsg(null), 4000);
     }, 1500);
   };
@@ -199,7 +207,12 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
   const handleScheduleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setShowScheduleModal(false);
-    setAssignedSuccessMsg(`Scheduled lectures on "${lectureTitle}" hosted on ${lectureDate} at ${lectureTime} successfully.`);
+    setAssignedSuccessMsg(
+      t('Scheduled lectures on "{title}" hosted on {date} at {time} successfully.')
+        .replace('{title}', lectureTitle)
+        .replace('{date}', lectureDate)
+        .replace('{time}', lectureTime)
+    );
     setTimeout(() => setAssignedSuccessMsg(null), 4000);
   };
 
@@ -264,7 +277,12 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
         { id: `q-${Date.now()}`, title: quizTitle, subject: quizSubject, questionsCount: quizQuestions.length, questions: quizQuestions },
         ...prev
       ]);
-      setAssignedSuccessMsg(`Successfully published "${quizTitle}" for ${quizSubject} with ${quizQuestions.length} questions.`);
+      setAssignedSuccessMsg(
+        t('Successfully published "{title}" for {subject} with {count} questions.')
+          .replace('{title}', quizTitle)
+          .replace('{subject}', t(quizSubject))
+          .replace('{count}', quizQuestions.length.toString())
+      );
       
       // Reset quiz inputs
       setQuizTitle('');
@@ -289,7 +307,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
               <Users className="h-5 w-5 text-white" />
             </div>
             <div>
-              <span className="font-sans font-bold text-base text-white tracking-tight">EduManage Tutor</span>
+              <span className="font-sans font-bold text-base text-white tracking-tight">{t('EduManage Tutor')}</span>
               <span className="text-[10px] block text-slate-500 font-semibold uppercase">{t('Academic Command')}</span>
             </div>
           </div>
@@ -298,7 +316,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
             <div className="flex items-center gap-3">
               <div className="text-right hidden sm:block">
                 <span className="text-xs font-bold text-slate-200 block">{tutorName}</span>
-                <span className="text-[10px] text-teal-400 font-bold uppercase font-mono">Senior Instructor Faculty</span>
+                <span className="text-[10px] text-teal-400 font-bold uppercase font-mono">{t('Senior Instructor Faculty')}</span>
               </div>
               <LanguageSelector />
               <button 
@@ -339,21 +357,21 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
         {/* Highlight Stats summaries and classroom scheduling hooks */}
         <div className="bg-slate-900 border border-slate-800 p-6 rounded-3xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-1">
-            <span className="text-xs font-bold text-teal-400 uppercase tracking-widest block">Senior Instructor Control</span>
+            <span className="text-xs font-bold text-teal-400 uppercase tracking-widest block">{t('Senior Instructor Control')}</span>
             <h2 className="text-2xl font-bold text-white">{t('Daily Command Space')} – {tutorName}</h2>
-            <p className="text-slate-400 text-xs">Manage active pupil attendances, input assignment metrics, and dispatch calendar coordinates.</p>
+            <p className="text-slate-400 text-xs">{t('Manage active pupil attendances, input assignment metrics, and dispatch calendar coordinates.')}</p>
             {tutorProfile && (
               <div className="flex items-center gap-3 mt-2 text-xs">
                 <span className="flex items-center gap-1.5 bg-slate-950 border border-slate-850 px-2.5 py-1 rounded-lg">
-                  <span className="text-[10px] text-slate-500 font-bold uppercase">Tutor Attendance:</span>
+                  <span className="text-[10px] text-slate-500 font-bold uppercase">{t('Tutor Attendance:')}</span>
                   <span className="font-mono font-bold text-teal-400">{tutorProfile.attendance || '96%'}</span>
                 </span>
                 <span className="flex items-center gap-1.5 bg-slate-950 border border-slate-850 px-2.5 py-1 rounded-lg">
-                  <span className="text-[10px] text-slate-500 font-bold uppercase">Salary Status:</span>
+                  <span className="text-[10px] text-slate-500 font-bold uppercase">{t('Salary Status:')}</span>
                   <span className={`font-mono font-bold px-1.5 py-0.5 rounded text-[10px] ${
                     tutorProfile.salaryStatus === 'Credited' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-450'
                   }`}>
-                    {tutorProfile.salaryStatus || 'Pending'}
+                    {t(tutorProfile.salaryStatus || 'Pending')}
                   </span>
                 </span>
               </div>
@@ -372,16 +390,15 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
 
         {/* Interactive Attendance checklist and Assigment grading tools splitting */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          
-          {/* Daily classroom checklist - Left */}
+                  {/* Daily classroom checklist - Left */}
           <div className="lg:col-span-3 bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between">
             <div className="space-y-4">
               <div className="border-b border-slate-850 pb-4 flex items-center justify-between">
                 <div>
                   <h3 className="text-sm font-bold text-white">{t('Mark Classroom Attendance Roll')}</h3>
-                  <span className="text-[10px] text-slate-500">Record classroom absences instantly for automatic parent sync</span>
+                  <span className="text-[10px] text-slate-500">{t('Record classroom absences instantly for automatic parent sync')}</span>
                 </div>
-                <span className="text-[10px] font-bold text-teal-400 bg-teal-500/10 px-2.5 py-1 rounded">Daily Standard Journal</span>
+                <span className="text-[10px] font-bold text-teal-400 bg-teal-500/10 px-2.5 py-1 rounded">{t('Daily Standard Journal')}</span>
               </div>
 
               {/* Date and Time Slot selectors with premium styling */}
@@ -402,10 +419,10 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
                     {t('Lecture Slot')}
                   </label>
                   {allSameSubject ? (
-                      <div className="py-2 text-slate-200 font-medium">{filteredSlots[0].subject?.toUpperCase() ?? 'Course'} Attendance</div>
+                      <div className="py-2 text-slate-200 font-medium">{t('{subject} Attendance').replace('{subject}', t(filteredSlots[0].subject ?? 'Course'))}</div>
                     ) : (
                       filteredSlots.length === 1 ? (
-                        <div className="py-2 text-slate-200 font-medium">{filteredSlots[0].title} ({filteredSlots[0].schedule.replace(' at ', ' @ ')})</div>
+                        <div className="py-2 text-slate-200 font-medium">{t(filteredSlots[0].title)} ({t(filteredSlots[0].schedule).replace(' at ', ' @ ')})</div>
                       ) : (
                         <select
                           value={selectedSlotId}
@@ -414,7 +431,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
                         >
                           {filteredSlots.map(slot => (
                             <option key={slot.id} value={slot.id}>
-                              {slot.title} ({slot.schedule.replace(' at ', ' @ ')})
+                              {t(slot.title)} ({t(slot.schedule).replace(' at ', ' @ ')})
                             </option>
                           ))}
                         </select>
@@ -438,7 +455,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
                       </div>
                       <div>
                         <span className="text-xs font-bold text-white block">{student.name}</span>
-                        <span className="text-[10px] text-slate-500 block">{student.grade} • Registered in Advanced physics</span>
+                        <span className="text-[10px] text-slate-500 block">{t(student.grade)} • {t('Registered in Advanced physics')}</span>
                       </div>
                     </div>
 
@@ -454,7 +471,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
                               : 'text-slate-500 hover:text-slate-300'
                           }`}
                         >
-                          {status}
+                          {t(status)}
                         </button>
                       ))}
                     </div>
@@ -473,9 +490,9 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
                 </button>
               </div>
               <div className="flex items-center justify-between text-[11px] text-slate-500">
-                <span>Automatic notification dispatched to parents upon attendance submissions.</span>
+                <span>{t('Automatic notification dispatched to parents upon attendance submissions.')}</span>
                 <span className="text-teal-400 hover:underline cursor-pointer font-bold flex items-center gap-0.5">
-                  Review Historical Attendance Ledger <ChevronRight className="h-3.5 w-3.5" />
+                  {t('Review Historical Attendance Ledger')} <ChevronRight className="h-3.5 w-3.5" />
                 </span>
               </div>
             </div>
@@ -485,41 +502,41 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
           <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-6">
             <div className="mb-4">
               <h3 className="text-xs font-bold text-white uppercase tracking-widest text-teal-400 mb-1">{t('Evaluate Assignment Draft')}</h3>
-              <h4 className="text-sm font-bold text-white">Record Curricular Grades and Feedback</h4>
+              <h4 className="text-sm font-bold text-white">{t('Record Curricular Grades and Feedback')}</h4>
             </div>
 
             <form onSubmit={handleGradeAssignmentSubmit} className="space-y-4">
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Select Student Profile *</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">{t('Select Student Profile *')}</label>
                 <select
                   value={selectedStudentId}
                   onChange={(e) => setSelectedStudentId(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-850 text-xs p-2.5 rounded-xl outline-none focus:border-teal-500 text-slate-300"
+                  className="w-full bg-slate-955 border border-slate-855 text-xs p-2.5 rounded-xl outline-none focus:border-teal-500 text-slate-350"
                 >
                   {students.slice(0, 4).map((s) => (
                     <option key={s.id} value={s.id}>
-                      {s.name} ({s.grade})
+                      {s.name} ({t(s.grade)})
                     </option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Assignment Description *</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">{t('Assignment Description *')}</label>
                 <input
                   type="text"
                   required
                   value={assignmentName}
                   onChange={(e) => setAssignmentName(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-850 text-xs p-2.5 rounded-xl outline-none focus:border-teal-500 text-slate-200"
-                  placeholder="Rotational Force kinematic Essays"
+                  placeholder={t("Rotational Force kinematic Essays")}
                 />
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase">Assessment Score *</label>
-                  <span className="text-xs font-bold text-teal-400 font-mono">{gradeScore}% (Grade A)</span>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase">{t('Assessment Score *')}</label>
+                  <span className="text-xs font-bold text-teal-400 font-mono">{gradeScore}% ({t('Grade A')})</span>
                 </div>
                 <input
                   type="range"
@@ -532,20 +549,20 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Feedback Notation / Teacher Comments</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">{t('Feedback Notation / Teacher Comments')}</label>
                 <textarea
                   value={gradeFeedback}
                   onChange={(e) => setGradeFeedback(e.target.value)}
                   rows={2}
-                  className="w-full bg-slate-950 border border-slate-850 text-slate-200 text-xs p-3 rounded-xl focus:border-teal-500 outline-none transition resize-none"
-                  placeholder="Record pedagogical instructions..."
+                  className="w-full bg-slate-955 border border-slate-855 text-slate-200 text-xs p-3 rounded-xl focus:border-teal-500 outline-none transition resize-none"
+                  placeholder={t("Record pedagogical instructions...")}
                 />
               </div>
 
               {isGradingCompiled ? (
                 <div className="p-3 bg-teal-950/20 border border-teal-500/20 text-teal-400 text-xs font-semibold rounded-xl flex items-center justify-center gap-2">
                   <div className="w-4 h-4 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
-                  <span>Logging score metrics to campus registry...</span>
+                  <span>{t('Logging score metrics to campus registry...')}</span>
                 </div>
               ) : (
                 <button
@@ -564,19 +581,19 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
         <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
           <div className="border-b border-slate-850 pb-4 mb-6">
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <Users className="h-5 w-5 text-teal-400 animate-pulse" /> Student Attendance Overview
+              <Users className="h-5 w-5 text-teal-400 animate-pulse" /> {t('Student Attendance Overview')}
             </h3>
-            <span className="text-[11px] text-slate-550">Overview of student details, enrolled course tracks, and cumulative attendance rates</span>
+            <span className="text-[11px] text-slate-550">{t('Overview of student details, enrolled course tracks, and cumulative attendance rates')}</span>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-left border-collapse">
               <thead>
                 <tr className="border-b border-slate-850 text-slate-500">
-                  <th className="pb-3 font-bold uppercase text-[9px] tracking-wider">Student Name</th>
-                  <th className="pb-3 font-bold uppercase text-[9px] tracking-wider">Grade Level</th>
-                  <th className="pb-3 font-bold uppercase text-[9px] tracking-wider">Course Track</th>
-                  <th className="pb-3 font-bold uppercase text-[9px] tracking-wider text-right">Attendance Rate</th>
+                  <th className="pb-3 font-bold uppercase text-[9px] tracking-wider">{t('Student Name')}</th>
+                  <th className="pb-3 font-bold uppercase text-[9px] tracking-wider">{t('Grade Level')}</th>
+                  <th className="pb-3 font-bold uppercase text-[9px] tracking-wider">{t('Course Track')}</th>
+                  <th className="pb-3 font-bold uppercase text-[9px] tracking-wider text-right">{t('Attendance Rate')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -588,8 +605,8 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
                       </div>
                       <span className="font-bold text-white">{student.name}</span>
                     </td>
-                    <td className="py-3.5 text-slate-300">{student.grade}</td>
-                    <td className="py-3.5 text-slate-400 max-w-xs truncate" title={student.subject}>{student.subject}</td>
+                    <td className="py-3.5 text-slate-300">{t(student.grade)}</td>
+                    <td className="py-3.5 text-slate-400 max-w-xs truncate" title={t(student.subject)}>{t(student.subject)}</td>
                     <td className="py-3.5 text-right font-mono font-bold">
                       <span className={`px-2 py-0.5 rounded text-[10px] ${
                         student.attendanceRate >= 85 ? 'bg-emerald-500/15 text-emerald-400' :
@@ -603,7 +620,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
                 ))}
                 {students.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="py-4 text-center text-slate-550 italic">No assigned students found.</td>
+                    <td colSpan={4} className="py-4 text-center text-slate-550 italic">{t('No assigned students found.')}</td>
                   </tr>
                 )}
               </tbody>
@@ -616,99 +633,99 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
           <div className="border-b border-slate-850 pb-4 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="space-y-1">
               <span className="text-[10px] font-bold text-teal-400 uppercase tracking-widest block bg-teal-500/10 w-max px-2.5 py-0.5 rounded-md">
-                Quiz Workshop
+                {t('Quiz Workshop')}
               </span>
               <h3 className="text-lg font-bold text-white flex items-center gap-1.5">
                 <BookOpen className="h-5 w-5 text-teal-400" /> {t('Prepare Subject Quiz')}
               </h3>
-              <p className="text-slate-400 text-xs">Create multi-choice questionnaires to dispatch directly to active student portals.</p>
+              <p className="text-slate-400 text-xs">{t('Create multi-choice questionnaires to dispatch directly to active student portals.')}</p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Question Composer Form */}
             <div className="space-y-4 bg-slate-950/60 p-5 rounded-2xl border border-slate-850/60">
-              <h4 className="text-xs font-bold text-teal-400 uppercase tracking-widest">Composer Settings</h4>
+              <h4 className="text-xs font-bold text-teal-400 uppercase tracking-widest">{t('Composer Settings')}</h4>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Subject Category *</label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">{t('Subject Category *')}</label>
                   <select
                     value={quizSubject}
                     onChange={(e) => setQuizSubject(e.target.value)}
                     className="w-full bg-slate-950 border border-slate-850 text-xs p-2.5 rounded-xl outline-none focus:border-teal-500 text-slate-350"
                   >
-                    <option>Physics Mechanics</option>
-                    <option>Quantum Dynamics</option>
-                    <option>Calculus BC</option>
-                    <option>Electromagnetism</option>
+                    <option value="Physics Mechanics">{t('Physics Mechanics')}</option>
+                    <option value="Quantum Dynamics">{t('Quantum Dynamics')}</option>
+                    <option value="Calculus BC">{t('Calculus BC')}</option>
+                    <option value="Electromagnetism">{t('Electromagnetism')}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Quiz Title *</label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">{t('Quiz Title *')}</label>
                   <input
                     type="text"
                     required
                     value={quizTitle}
                     onChange={(e) => setQuizTitle(e.target.value)}
-                    placeholder="e.g. Rotational Kinematics Quiz"
-                    className="w-full bg-slate-950 border border-slate-850 text-xs p-2.5 rounded-xl outline-none focus:border-teal-500 text-slate-200"
+                    placeholder={t("e.g. Rotational Kinematics Quiz")}
+                    className="w-full bg-slate-955 border border-slate-855 text-xs p-2.5 rounded-xl outline-none focus:border-teal-500 text-slate-200"
                   />
                 </div>
               </div>
 
               <div className="border-t border-slate-850/60 pt-4 space-y-4">
-                <h5 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Add a Question</h5>
+                <h5 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{t('Add a Question')}</h5>
                 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Question Text *</label>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('Question Text *')}</label>
                   <input
                     type="text"
                     value={newQuestionText}
                     onChange={(e) => setNewQuestionText(e.target.value)}
-                    placeholder="Enter question description..."
-                    className="w-full bg-slate-950 border border-slate-850 text-xs p-2.5 rounded-xl outline-none focus:border-teal-500 text-slate-200"
+                    placeholder={t("Enter question description...")}
+                    className="w-full bg-slate-955 border border-slate-855 text-xs p-2.5 rounded-xl outline-none focus:border-teal-500 text-slate-200"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-550 uppercase mb-1">Option A *</label>
+                    <label className="block text-[10px] font-bold text-slate-550 uppercase mb-1">{t('Option A *')}</label>
                     <input
                       type="text"
                       value={optionA}
                       onChange={(e) => setOptionA(e.target.value)}
-                      placeholder="Choice A"
+                      placeholder={t("Choice A")}
                       className="w-full bg-slate-950 border border-slate-850 text-xs p-2 rounded-xl outline-none focus:border-teal-500 text-slate-300"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-550 uppercase mb-1">Option B *</label>
+                    <label className="block text-[10px] font-bold text-slate-550 uppercase mb-1">{t('Option B *')}</label>
                     <input
                       type="text"
                       value={optionB}
                       onChange={(e) => setOptionB(e.target.value)}
-                      placeholder="Choice B"
+                      placeholder={t("Choice B")}
                       className="w-full bg-slate-950 border border-slate-850 text-xs p-2 rounded-xl outline-none focus:border-teal-500 text-slate-300"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-550 uppercase mb-1">Option C *</label>
+                    <label className="block text-[10px] font-bold text-slate-550 uppercase mb-1">{t('Option C *')}</label>
                     <input
                       type="text"
                       value={optionC}
                       onChange={(e) => setOptionC(e.target.value)}
-                      placeholder="Choice C"
+                      placeholder={t("Choice C")}
                       className="w-full bg-slate-950 border border-slate-850 text-xs p-2 rounded-xl outline-none focus:border-teal-500 text-slate-300"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-550 uppercase mb-1">Option D *</label>
+                    <label className="block text-[10px] font-bold text-slate-550 uppercase mb-1">{t('Option D *')}</label>
                     <input
                       type="text"
                       value={optionD}
                       onChange={(e) => setOptionD(e.target.value)}
-                      placeholder="Choice D"
+                      placeholder={t("Choice D")}
                       className="w-full bg-slate-950 border border-slate-850 text-xs p-2 rounded-xl outline-none focus:border-teal-500 text-slate-300"
                     />
                   </div>
@@ -716,7 +733,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
 
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-2">
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase">Correct Option:</label>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase">{t('Correct Option:')}</label>
                     <select
                       value={correctOption}
                       onChange={(e) => setCorrectOption(e.target.value)}
@@ -732,9 +749,9 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
                   <button
                     type="button"
                     onClick={handleAddQuestion}
-                    className="px-3.5 py-2 bg-slate-900 hover:bg-slate-850 border border-slate-800 text-teal-400 hover:text-teal-300 text-xs font-bold rounded-xl transition cursor-pointer flex items-center gap-1"
+                    className="px-3.5 py-2 bg-slate-900 hover:bg-slate-855 border border-slate-800 text-teal-400 hover:text-teal-300 text-xs font-bold rounded-xl transition cursor-pointer flex items-center gap-1"
                   >
-                    <Plus className="h-4 w-4" /> Add Question
+                    <Plus className="h-4 w-4" /> {t('Add Question')}
                   </button>
                 </div>
               </div>
@@ -744,9 +761,9 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
             <div className="space-y-4 flex flex-col justify-between">
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-850 pb-2">
-                  <h4 className="text-xs font-bold text-teal-400 uppercase tracking-widest">Live Quiz Preview</h4>
+                  <h4 className="text-xs font-bold text-teal-400 uppercase tracking-widest">{t('Live Quiz Preview')}</h4>
                   <span className="text-[9px] font-bold bg-teal-500/10 text-teal-400 px-2 py-0.5 rounded">
-                    {quizQuestions.length} {quizQuestions.length === 1 ? 'Question' : 'Questions'} Staged
+                    {t(quizQuestions.length === 1 ? '{count} Question Staged' : '{count} Questions Staged').replace('{count}', quizQuestions.length.toString())}
                   </span>
                 </div>
 
@@ -754,7 +771,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
                   <div className="p-4 bg-slate-950 border border-slate-850 rounded-2xl space-y-3 max-h-60 overflow-y-auto">
                     <div className="flex justify-between items-start gap-2">
                       <div>
-                        <span className="text-[9px] font-bold text-teal-500 uppercase tracking-wider block">{quizSubject}</span>
+                        <span className="text-[9px] font-bold text-teal-500 uppercase tracking-wider block">{t(quizSubject)}</span>
                         <h5 className="text-sm font-bold text-white">{quizTitle}</h5>
                       </div>
                     </div>
@@ -782,14 +799,14 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
                       ))}
                       {quizQuestions.length === 0 && (
                         <div className="text-center py-6 text-xs text-slate-550 italic">
-                          No questions added yet. Compile questions using the composer on the left.
+                          {t('No questions added yet. Compile questions using the composer on the left.')}
                         </div>
                       )}
                     </div>
                   </div>
                 ) : (
                   <div className="p-6 bg-slate-950/40 border border-slate-850/40 rounded-2xl text-center text-xs text-slate-500 italic">
-                    Enter a Quiz Title and Subject to activate the live preview board.
+                    {t('Enter a Quiz Title and Subject to activate the live preview board.')}
                   </div>
                 )}
               </div>
@@ -805,21 +822,21 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
                       : 'bg-slate-800 text-slate-500 cursor-not-allowed'
                   }`}
                 >
-                  <Check className="h-4 w-4" /> Publish & Dispatch Quiz
+                  <Check className="h-4 w-4" /> {t('Publish & Dispatch Quiz')}
                 </button>
 
                 {/* Published Quizzes log */}
                 <div>
-                  <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block mb-2">Active Published Quizzes</span>
+                  <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block mb-2">{t('Active Published Quizzes')}</span>
                   <div className="space-y-2">
                     {publishedQuizzes.map((quiz, i) => (
                       <div key={i} className="p-3 bg-slate-950 border border-slate-850/60 rounded-xl flex items-center justify-between text-xs">
                         <div>
                           <span className="font-semibold text-slate-200 block">{quiz.title}</span>
-                          <span className="text-[10px] text-slate-500">{quiz.subject}</span>
+                          <span className="text-[10px] text-slate-550">{t(quiz.subject)}</span>
                         </div>
                         <span className="text-[10px] font-mono font-bold text-teal-400 bg-teal-500/5 border border-teal-500/10 px-2 py-0.5 rounded">
-                          {quiz.questionsCount} Qs
+                          {t('{count} Qs').replace('{count}', quiz.questionsCount)}
                         </span>
                       </div>
                     ))}
@@ -834,7 +851,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
         <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
           <div className="mb-4">
             <h3 className="text-sm font-bold text-white">{t('Lecture Timetable')}</h3>
-            <span className="text-[11px] text-slate-550 block">Assigned academic slots for active physics curricula</span>
+            <span className="text-[11px] text-slate-550 block">{t('Assigned academic slots for active physics curricula')}</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -902,9 +919,9 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
               <div className="flex justify-between items-center mb-5">
                 <div>
                   <h4 className="text-sm font-bold text-white flex items-center gap-1.5">
-                    <Calendar className="h-4.5 w-4.5 text-teal-400 animate-pulse" /> Schedule Lecture Slot
+                    <Calendar className="h-4.5 w-4.5 text-teal-400 animate-pulse" /> {t('Schedule Lecture Slot')}
                   </h4>
-                  <span className="text-[11px] text-slate-550">Insert academic calendar slots</span>
+                  <span className="text-[11px] text-slate-550">{t('Insert academic calendar slots')}</span>
                 </div>
                 <button 
                   onClick={() => setShowScheduleModal(false)}
@@ -916,7 +933,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
 
               <form onSubmit={handleScheduleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Lecture Topic / Title *</label>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('Lecture Topic / Title *')}</label>
                   <input
                     type="text"
                     required
@@ -927,7 +944,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Lecture Held Date *</label>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('Lecture Held Date *')}</label>
                   <input
                     type="text"
                     required
@@ -939,7 +956,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Start Time *</label>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('Start Time *')}</label>
                     <input
                       type="text"
                       required
@@ -949,7 +966,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Seminar Hall *</label>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('Seminar Hall *')}</label>
                     <input
                       type="text"
                       required
@@ -964,7 +981,7 @@ export const TutorDashboard: React.FC<TutorDashboardProps> = ({
                   type="submit"
                   className="w-full py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-semibold text-xs rounded-xl transition cursor-pointer flex justify-center items-center gap-1.5"
                 >
-                  Confirm Scheduling <ArrowRight className="h-4 w-4" />
+                  {t('Confirm Scheduling')} <ArrowRight className="h-4 w-4" />
                 </button>
               </form>
             </motion.div>
