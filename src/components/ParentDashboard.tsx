@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  User, 
-  DollarSign, 
-  Calendar, 
-  Activity, 
-  AlertCircle, 
-  CheckCircle, 
-  X, 
-  CreditCard, 
-  Bell, 
+import {
+  User,
+  DollarSign,
+  Calendar,
+  Activity,
+  AlertCircle,
+  CheckCircle,
+  X,
+  CreditCard,
+  Bell,
   ArrowRight,
   GraduationCap,
   Sparkles,
@@ -87,25 +87,12 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
     }
   };
 
-  // Scroll to section when navigated via sidebar
-  React.useEffect(() => {
-    if (currentPath?.includes('/courses')) {
-      setTimeout(() => {
-        const el = document.getElementById('courses');
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-    } else if (currentPath?.includes('/attendance')) {
-      setTimeout(() => {
-        const el = document.getElementById('attendance');
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-    } else if (currentPath?.includes('/fees')) {
-      setTimeout(() => {
-        const el = document.getElementById('billing');
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-    }
-  }, [currentPath]);
+  const isDashboard = !currentPath || currentPath.endsWith('/dashboard');
+  const showOverview = isDashboard || currentPath?.includes('/progress');
+  const showAttendance = isDashboard || currentPath?.includes('/attendance');
+  const showBilling = isDashboard || currentPath?.includes('/fees') || currentPath?.includes('/notifications');
+  const showCourses = isDashboard || currentPath?.includes('/courses');
+  const showFeedback = isDashboard || currentPath?.includes('/profile');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -131,14 +118,14 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentSuccessMessage, setPaymentSuccessMessage] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'announcements' | 'messages'>('announcements');
-  
+
   useEffect(() => {
     if (currentPath) {
       if (currentPath.includes('/messages') || currentPath.includes('/teachers')) setActiveTab('messages');
       else setActiveTab('announcements');
     }
   }, [currentPath]);
-  
+
   // Card details mock states
   const [cardNumber, setCardNumber] = useState('•••• •••• •••• 4921');
   const [cardHolder, setCardHolder] = useState('HELENA THORNE');
@@ -163,7 +150,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
 
       setIsProcessingPayment(false);
       setSelectedBill(null);
-      
+
       setPaymentSuccessMessage(`Payment for "${selectedBill.itemName}" processed successfully. Invoiced balance cleared.`);
       setTimeout(() => setPaymentSuccessMessage(null), 4000);
     } catch (err: any) {
@@ -201,7 +188,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans">
-      
+
       {/* Upper Navigation bars */}
       <nav className="border-b border-slate-900 bg-slate-950/80 backdrop-blur sticky top-0 z-40">
         <div className="w-full px-4 sm:px-8 lg:px-12 h-16 flex items-center justify-between">
@@ -222,7 +209,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                 <span className="text-[10px] text-amber-400 font-bold uppercase font-mono">Linked Child • {linkedStudentName}</span>
               </div>
               <LanguageSelector />
-              <button 
+              <button
                 onClick={onHome}
                 className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs text-slate-200 font-semibold rounded-lg transition cursor-pointer"
               >
@@ -240,7 +227,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
         {/* Payments Status Notification alerts */}
         <AnimatePresence>
           {paymentSuccessMessage && (
-            <motion.div 
+            <motion.div
               initial={{ height: 0, opacity: 0, y: -10 }}
               animate={{ height: 'auto', opacity: 1, y: 0 }}
               exit={{ height: 0, opacity: 0, y: -10 }}
@@ -258,6 +245,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
         </AnimatePresence>
 
         {/* Highlight Child Metrics Header with tracking gauges */}
+        {showOverview && (
         <div id="overview" className="bg-slate-900 border border-slate-800 rounded-3xl p-6 scroll-mt-20">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-slate-850 pb-6 mb-6 gap-4">
             <div className="space-y-1">
@@ -290,9 +278,9 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
 
           {/* Progress Indicators and circular tracker panels */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            
+
             {/* Metric 1 */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 }}
@@ -312,7 +300,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
             </motion.div>
 
             {/* Metric 2 */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
@@ -332,7 +320,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
             </motion.div>
 
             {/* Metric 3 */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 }}
@@ -353,8 +341,10 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
 
           </div>
         </div>
+        )}
 
         {/* Attendance Calendar Card */}
+        {showAttendance && (
         <div id="attendance" className="bg-slate-900 border border-slate-800 rounded-3xl p-6 scroll-mt-20">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
             <div className="space-y-1">
@@ -375,7 +365,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
 
           <div className="p-6 bg-slate-950 border border-slate-850 rounded-2xl">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-              
+
               {/* Calendar Left */}
               <div className="w-full max-w-xs mx-auto md:mx-0">
                 <div className="text-center font-bold text-xs text-slate-350 mb-3">May 2026</div>
@@ -388,7 +378,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                     if (day.status === 'empty') {
                       return <div key={`empty-${idx}`} className="w-8 h-8" />;
                     }
-                    
+
                     let cellStyle = "";
                     if (day.status === 'present') {
                       cellStyle = "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-full";
@@ -414,7 +404,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
               {/* Attendance Statistics Right */}
               <div className="space-y-4">
                 <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-850 pb-2">May Attendance Stats</h4>
-                
+
                 <div className="grid grid-cols-3 gap-3">
                   <div className="bg-slate-900/55 p-3 rounded-xl border border-slate-850 text-center">
                     <span className="text-[9px] font-bold text-slate-500 uppercase block">Conducted</span>
@@ -423,7 +413,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                     </span>
                     <span className="text-[8px] text-slate-400 block font-semibold">Sessions</span>
                   </div>
-                  
+
                   <div className="bg-emerald-950/20 p-3 rounded-xl border border-emerald-500/10 text-center">
                     <span className="text-[9px] font-bold text-emerald-550 uppercase block">Attended</span>
                     <span className="text-sm font-extrabold text-emerald-400 block mt-1">
@@ -447,12 +437,12 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                     <svg className="w-14 h-14 transform -rotate-90">
                       <circle cx="28" cy="28" r="22" fill="transparent" stroke="#1e293b" strokeWidth="3.5" />
                       <motion.circle cx="28" cy="28" r="22" fill="transparent" strokeWidth="3.5"
-                              className="stroke-emerald-400 transition-all duration-1000"
-                              initial={{ strokeDashoffset: 138 }}
-                              animate={{ strokeDashoffset: 138 - (138 * 90.5) / 100 }}
-                              transition={{ duration: 1.2, ease: "easeOut" }}
-                              strokeDasharray="138"
-                              strokeLinecap="round" />
+                        className="stroke-emerald-400 transition-all duration-1000"
+                        initial={{ strokeDashoffset: 138 }}
+                        animate={{ strokeDashoffset: 138 - (138 * 90.5) / 100 }}
+                        transition={{ duration: 1.2, ease: "easeOut" }}
+                        strokeDasharray="138"
+                        strokeLinecap="round" />
                     </svg>
                     <span className="absolute font-mono text-[9px] font-extrabold text-slate-350">
                       <AnimatedCounter value={90.5} decimals={1} suffix="%" />
@@ -468,10 +458,12 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
             </div>
           </div>
         </div>
+        )}
 
         {/* Split layouts: billing list left, announcements logs right */}
+        {showBilling && (
         <div id="billing" className="grid grid-cols-1 lg:grid-cols-5 gap-6 scroll-mt-20">
-          
+
           {/* Itemized ledger outstanding tuition bills list */}
           <div className="lg:col-span-3 bg-slate-900 border border-slate-800 rounded-3xl p-6">
             <div className="mb-6 flex items-center justify-between">
@@ -493,7 +485,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                 </thead>
                 <tbody className="divide-y divide-slate-850 text-xs">
                   {bills.map((bill, bIdx) => (
-                    <motion.tr 
+                    <motion.tr
                       key={bill.id}
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -505,11 +497,10 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                         <span className="text-[10px] text-slate-500 block">Billing Code: {bill.id} • Date compiled: {bill.status === 'Paid' ? bill.paidDate : 'Overdue Period'}</span>
                       </td>
                       <td className="p-4">
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold block w-max ${
-                          bill.status === 'Paid' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' :
-                          bill.status === 'Overdue' ? 'bg-red-500/10 text-red-500 border border-red-500/20 animate-pulse' :
-                          'bg-amber-500/10 text-amber-500 border border-amber-500/20'
-                        }`}>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold block w-max ${bill.status === 'Paid' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' :
+                            bill.status === 'Overdue' ? 'bg-red-500/10 text-red-500 border border-red-500/20 animate-pulse' :
+                              'bg-amber-500/10 text-amber-500 border border-amber-500/20'
+                          }`}>
                           {bill.status}
                         </span>
                       </td>
@@ -539,13 +530,13 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
             <div className="space-y-4">
               <div>
                 <div className="flex gap-2 mb-2">
-                  <button 
+                  <button
                     onClick={() => setActiveTab('announcements')}
                     className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${activeTab === 'announcements' ? 'bg-amber-600 text-white' : 'text-slate-500 hover:text-slate-300'}`}
                   >
                     Campus Announcements
                   </button>
-                  <button 
+                  <button
                     onClick={() => setActiveTab('messages')}
                     className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${activeTab === 'messages' ? 'bg-amber-600 text-white' : 'text-slate-500 hover:text-slate-300'}`}
                   >
@@ -558,7 +549,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
               <div className="space-y-4 max-h-[300px] overflow-y-auto pr-1">
                 {activeTab === 'announcements' ? (
                   announcements.map((ann, aIdx) => (
-                    <motion.div 
+                    <motion.div
                       key={ann.id}
                       initial={{ opacity: 0, x: 15 }}
                       animate={{ opacity: 1, x: 0 }}
@@ -574,7 +565,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                     </motion.div>
                   ))
                 ) : (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, scale: 0.98 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="p-4 bg-slate-950 border border-slate-850 rounded-2xl flex flex-col gap-2"
@@ -599,11 +590,13 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
           </div>
 
         </div>
+        )}
 
         {/* Messages anchor */}
         <div id="messages" className="hidden scroll-mt-20" />
 
         {/* Enrolled Courses & Tutors Section */}
+        {showCourses && (
         <div id="courses" className="bg-slate-900 border border-slate-800 rounded-3xl p-6 scroll-mt-20">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
             <div className="space-y-1">
@@ -638,9 +631,9 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                 const color = colorMap[course.iconType] || 'indigo';
                 const colorClasses: Record<string, { bg: string; border: string; text: string; progBg: string }> = {
                   indigo: { bg: 'bg-indigo-500/10', border: 'border-indigo-500/20', text: 'text-indigo-400', progBg: 'bg-indigo-500' },
-                  teal:   { bg: 'bg-teal-500/10',   border: 'border-teal-500/20',   text: 'text-teal-400',   progBg: 'bg-teal-500'   },
-                  amber:  { bg: 'bg-amber-500/10',  border: 'border-amber-500/20',  text: 'text-amber-400',  progBg: 'bg-amber-500'  },
-                  rose:   { bg: 'bg-rose-500/10',   border: 'border-rose-500/20',   text: 'text-rose-400',   progBg: 'bg-rose-500'   }
+                  teal: { bg: 'bg-teal-500/10', border: 'border-teal-500/20', text: 'text-teal-400', progBg: 'bg-teal-500' },
+                  amber: { bg: 'bg-amber-500/10', border: 'border-amber-500/20', text: 'text-amber-400', progBg: 'bg-amber-500' },
+                  rose: { bg: 'bg-rose-500/10', border: 'border-rose-500/20', text: 'text-rose-400', progBg: 'bg-rose-500' }
                 };
                 const cc = colorClasses[color];
 
@@ -654,83 +647,34 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                     className="bg-slate-950 border border-slate-850 rounded-2xl p-5 flex flex-col gap-4 transition-all hover:border-slate-700 hover:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.4)]"
                   >
                     {/* Course header */}
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-center gap-3">
                       <div className={`w-11 h-11 rounded-xl ${cc.bg} ${cc.border} border ${cc.text} flex items-center justify-center shrink-0`}>
                         {iconMap[course.iconType] || <BookOpen className="h-5 w-5" />}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <span className="text-xs font-bold text-white block truncate">{course.name}</span>
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                          <MapPin className="h-3 w-3 text-slate-500 shrink-0" />
-                          <span className="text-[10px] text-slate-500 font-semibold truncate">{course.room || 'TBA'}</span>
-                        </div>
+                        <span className="text-sm font-bold text-white block truncate">{course.name}</span>
                       </div>
                     </div>
 
-                    {/* Progress bar */}
-                    <div>
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="text-[9px] font-bold text-slate-500 uppercase">Course Progress</span>
-                        <span className={`text-[10px] font-extrabold font-mono ${cc.text}`}>{course.progress}%</span>
-                      </div>
-                      <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${course.progress}%` }}
-                          transition={{ duration: 1, ease: 'easeOut', delay: idx * 0.07 + 0.2 }}
-                          className={`h-full ${cc.progBg} rounded-full`}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Schedule */}
-                    <div className="flex items-center gap-2 bg-slate-900/60 rounded-xl px-3 py-2 border border-slate-800/60">
-                      <Clock className="h-3.5 w-3.5 text-slate-500 shrink-0" />
-                      <span className="text-[10px] text-slate-400 font-semibold">{course.schedule}</span>
-                    </div>
-
-                    {/* Tutor + Availability */}
-                    <div className="border-t border-slate-800 pt-3 flex items-center justify-between gap-2">
+                    {/* Tutor + Contact */}
+                    <div className="border-t border-slate-800 pt-3 flex items-center justify-between gap-2 mt-2">
                       <div className="flex items-center gap-2 min-w-0">
-                        <div className="w-7 h-7 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0">
-                          <User className="h-3.5 w-3.5 text-slate-400" />
+                        <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0">
+                          <User className="h-4 w-4 text-slate-400" />
                         </div>
                         <div className="min-w-0">
-                          <span className="text-[11px] font-bold text-white block truncate">{course.tutorName}</span>
-                          <div className="flex items-center gap-1 mt-0.5">
-                            {isAvailable ? (
-                              <>
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-                                <span className="text-[9px] text-emerald-400 font-bold uppercase">Available</span>
-                              </>
-                            ) : course.tutorAvailability === 'On Leave' ? (
-                              <>
-                                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
-                                <span className="text-[9px] text-amber-400 font-bold uppercase">On Leave</span>
-                              </>
-                            ) : (
-                              <>
-                                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0" />
-                                <span className="text-[9px] text-indigo-400 font-bold uppercase">Contact Available</span>
-                              </>
-                            )}
-                          </div>
+                          <span className="text-xs font-bold text-white block truncate">{course.tutorName}</span>
+                          <span className="text-[10px] text-slate-500 font-semibold truncate">Tutor</span>
                         </div>
                       </div>
 
                       {/* Contact button */}
                       <button
                         onClick={() => setContactingTutor(contactingTutor === course.id ? null : course.id)}
-                        className={`shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
-                          isAvailable
-                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 hover:scale-105'
-                            : course.tutorAvailability === 'On Leave'
-                              ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20 hover:bg-amber-500/20 hover:scale-105'
-                              : 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/20 hover:scale-105'
-                        }`}
+                        className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/20 hover:scale-105`}
                         title={`Contact ${course.tutorName}`}
                       >
-                        <Mail className="h-3 w-3" />
+                        <Mail className="h-3.5 w-3.5" />
                         Contact
                       </button>
                     </div>
@@ -775,8 +719,10 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
             )}
           </div>
         </div>
+        )}
 
         {/* Feedback & Rating Section */}
+        {showFeedback && (
         <div id="feedback" className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
           <div className="border-b border-slate-850 pb-4 mb-6">
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
@@ -789,7 +735,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
             {/* Submit Feedback Form */}
             <div className="bg-slate-950 border border-slate-850 p-5 rounded-2xl">
               <h4 className="text-xs font-bold text-white uppercase tracking-widest border-b border-slate-850 pb-2 mb-4">Submit Feedback & Rating</h4>
-              
+
               {feedbackSuccess && <div className="p-3 mb-3 text-xs bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl">{feedbackSuccess}</div>}
               {feedbackError && <div className="p-3 mb-3 text-xs bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-xl">{feedbackError}</div>}
 
@@ -826,7 +772,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                     ))}
                   </div>
                 </div>
-                
+
                 <div>
                   <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Comment</label>
                   <textarea
@@ -851,7 +797,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
             {/* Submissions History */}
             <div className="bg-slate-950 border border-slate-850 p-5 rounded-2xl">
               <h4 className="text-xs font-bold text-white uppercase tracking-widest border-b border-slate-850 pb-2 mb-4">Previous Feedback & Ratings</h4>
-              
+
               <div className="overflow-x-auto">
                 <table className="w-full text-xs text-left border-collapse">
                   <thead>
@@ -878,9 +824,8 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                         </td>
                         <td className="py-2.5 text-slate-300 max-w-xs truncate" title={sub.feedback}>{sub.feedback}</td>
                         <td className="py-2.5">
-                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
-                            sub.status === 'Reviewed' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-400'
-                          }`}>
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${sub.status === 'Reviewed' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-400'
+                            }`}>
                             {sub.status}
                           </span>
                         </td>
@@ -897,6 +842,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
             </div>
           </div>
         </div>
+        )}
 
       </main>
 
@@ -905,7 +851,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
         {selectedBill && (
           <>
             {/* Backdrop */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.5 }}
               exit={{ opacity: 0 }}
@@ -914,7 +860,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
             />
 
             {/* Checkout modal panel */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
@@ -927,7 +873,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({
                   </h4>
                   <span className="text-[11px] text-slate-550">{t('Authorize instant bank ledger wire transfers')}</span>
                 </div>
-                <button 
+                <button
                   onClick={() => setSelectedBill(null)}
                   className="p-1 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white"
                 >

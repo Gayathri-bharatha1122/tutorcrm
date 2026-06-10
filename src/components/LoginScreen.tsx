@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { api } from '../services/api';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  Lock, 
-  Mail, 
-  Eye, 
-  EyeOff, 
-  GraduationCap, 
-  Shield, 
-  Users, 
-  User, 
+import {
+  Lock,
+  Mail,
+  Eye,
+  EyeOff,
+  GraduationCap,
+  Shield,
+  Users,
+  User,
   ArrowRight,
   Info,
   Sparkles,
@@ -28,7 +28,7 @@ interface LoginScreenProps {
 export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavigate, initialRole = 'student' }) => {
   const { t } = useLanguage();
   const [selectedRole, setSelectedRole] = useState<Role>(initialRole);
-  
+
   // Dynamic customization variables based on chosen role
   const roleConfig = {
     admin: {
@@ -69,16 +69,16 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavi
     }
   };
 
-  const [email, setEmail] = useState(roleConfig[initialRole].demoUser);
-  const [password, setPassword] = useState(roleConfig[initialRole].demoPass);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorStatus, setErrorStatus] = useState<string | null>(null);
   const [typedMessage, setTypedMessage] = useState<string | null>(null);
 
   // Automatically update the prefilled credentials when changing roles
   React.useEffect(() => {
-    setEmail(roleConfig[selectedRole].demoUser);
-    setPassword(roleConfig[selectedRole].demoPass);
+    setEmail('');
+    setPassword('');
     setErrorStatus(null);
   }, [selectedRole]);
 
@@ -110,13 +110,13 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavi
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-slate-950 flex flex-col items-center justify-center px-4 relative overflow-hidden font-sans">
-      
+
       {/* Decorative Glow elements */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-slate-900/40 opacity-70 blur-[100px] pointer-events-none" />
 
       {/* Brand logo back to landing link */}
-      <div 
-        onClick={() => onNavigate('landing')} 
+      <div
+        onClick={() => onNavigate('landing')}
         className="flex items-center gap-2.5 mb-10 cursor-pointer hover:scale-105 transition-all relative z-10"
       >
         <div className="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center">
@@ -125,7 +125,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavi
         <span className="font-sans font-bold text-lg text-white tracking-tight">EduManage CRM</span>
       </div>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -153,11 +153,10 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavi
               onClick={() => {
                 setSelectedRole(role);
               }}
-              className={`py-2 text-[11px] font-semibold rounded-lg transition-all capitalize cursor-pointer ${
-                selectedRole === role 
-                  ? 'bg-slate-900 text-white shadow-md border-b-2 border-indigo-500' 
+              className={`py-2 text-[11px] font-semibold rounded-lg transition-all capitalize cursor-pointer ${selectedRole === role
+                  ? 'bg-slate-900 text-white shadow-md border-b-2 border-indigo-500'
                   : 'text-slate-500 hover:text-slate-300'
-              }`}
+                }`}
             >
               {role}
             </button>
@@ -221,7 +220,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavi
           {/* Feedback logs */}
           <AnimatePresence mode="wait">
             {errorStatus && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
@@ -233,7 +232,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavi
             )}
 
             {typedMessage && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
@@ -268,7 +267,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onNavi
         {/* Dynamic Stepper switch backer */}
         <div className="mt-6 pt-5 border-t border-slate-800 text-center text-xs text-slate-500 font-medium">
           <span>{t('New to our campus?')} </span>
-          <button 
+          <button
             type="button"
             onClick={() => onNavigate('register')}
             className="text-indigo-400 hover:underline hover:text-indigo-300 transition-colors font-bold cursor-pointer"
