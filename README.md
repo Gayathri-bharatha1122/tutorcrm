@@ -1,21 +1,73 @@
-<div align="center">
-
 # 🌌 Tutor CRM Portal
 
 ### 🎓 Smart Tuition Management Platform
 
-![GitHub stars](https://img.shields.io/badge/Project-Tutor_CRM-0D1B2A?style=for-the-badge\&logo=github\&logoColor=white)
-![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge\&logo=react\&logoColor=black)
-![Node](https://img.shields.io/badge/Node.js-0D1B2A?style=for-the-badge\&logo=node.js\&logoColor=green)
-![Tailwind](https://img.shields.io/badge/TailwindCSS-1B263B?style=for-the-badge\&logo=tailwind-css\&logoColor=38BDF8)
+---
+
+## 📂 Project Directory Structure
+
+The project has been separated into two dedicated directories:
+
+* **[Frontend](file:///c:/Users/ADM/Downloads/project-zenithyuga/Frontend)**: The React + Vite client dashboard application.
+* **[Backend](file:///c:/Users/ADM/Downloads/project-zenithyuga/Backend)**: The Node + Express backend server.
 
 ---
 
-### ✨ Manage Students • Tutors • Courses • Payments • Attendance
+## 🚀 How to Run the Project
 
-🚀 A centralized CRM platform for tuition centers with secure role-based dashboards.
+### Option A: Workspace Concurrent Runner (Recommended)
+You can launch both Frontend and Backend concurrently from the root folder:
 
-</div>
+1. **Install dependencies** across the workspace, frontend, and backend folders:
+   ```bash
+   npm run install:all
+   ```
+2. **Start the development servers**:
+   ```bash
+   npm run dev
+   ```
+
+* Frontend is accessible at: **`http://localhost:3000`**
+* Backend is running on port: **`5000`**
+
+### Option B: Run Directories Separately
+
+#### Frontend
+1. Navigate to the `Frontend` directory:
+   ```bash
+   cd Frontend
+   ```
+2. Install dependencies & run:
+   ```bash
+   npm install
+   ```
+   ```bash
+   npm run dev
+   ```
+
+#### Backend
+1. Navigate to the `Backend` directory:
+   ```bash
+   cd Backend
+   ```
+2. Install dependencies & run:
+   ```bash
+   npm install
+   ```
+   ```bash
+   npm run dev
+   ```
+
+---
+
+## ⚙️ Backend Environment Variables (`Backend/.env`)
+Create/modify the `.env` file under the `Backend` folder:
+```env
+PORT=5000
+DATABASE_URL=mongodb://localhost:27017/tutorcrm
+JWT_SECRET=super_secret_tutor_crm_jwt_token_key_123!
+GEMINI_API_KEY=your_gemini_api_key_here
+```
 
 ---
 
