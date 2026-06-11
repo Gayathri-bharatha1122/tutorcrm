@@ -12,6 +12,7 @@ import studentRoutes from './routes/student';
 import parentRoutes from './routes/parent';
 import messagesRoutes from './routes/messages';
 import aiRoutes from './routes/ai';
+import paymentRoutes from './routes/payment';
 
 dotenv.config();
 
@@ -38,6 +39,7 @@ app.use('/api/student', studentRoutes);
 app.use('/api/parent', parentRoutes);
 app.use('/api/messages', messagesRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api', paymentRoutes);
 
 // Base route status check
 app.get('/status', (req, res) => {
