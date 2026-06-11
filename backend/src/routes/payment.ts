@@ -4,17 +4,22 @@ import crypto from 'crypto';
 
 const router = Router();
 
-// Configure Razorpay instance
-const keyId = process.env.RAZORPAY_KEY_ID || '';
-const keySecret = process.env.RAZORPAY_KEY_SECRET || '';
-
-const razorpay = new Razorpay({
-  key_id: keyId,
-  key_secret: keySecret,
+// Keys are read lazily so the module loads even when .env is not set
+const getKeys = () => ({
+  keyId: process.env.RAZORPAY_KEY_ID || '',
+  keySecret: process.env.RAZORPAY_KEY_SECRET || ''
 });
+
+// Lazily create the Razorpay instance only when keys are available
+const getRazorpay = () => {
+  const { keyId, keySecret } = getKeys();
+  if (!keyId || !keySecret) return null;
+  return new Razorpay({ key_id: keyId, key_secret: keySecret });
+};
 
 // GET /razorpay-key
 router.get('/razorpay-key', (req: Request, res: Response) => {
+  const { keyId } = getKeys();
   if (!keyId) {
     return res.status(404).json({ error: 'Razorpay Key ID not configured.' });
   }
@@ -24,6 +29,7 @@ router.get('/razorpay-key', (req: Request, res: Response) => {
 // POST /create-order
 router.post('/create-order', async (req: Request, res: Response) => {
   const { amount, currency, receipt } = req.body;
+  const { keyId, keySecret } = getKeys();
 
   // 1. Missing fields check
   if (amount === undefined || !currency || !receipt) {
@@ -42,6 +48,7 @@ router.post('/create-order', async (req: Request, res: Response) => {
   }
 
   try {
+    const razorpay = getRazorpay()!;
     const options = {
       amount: amountVal,
       currency: currency,
@@ -70,6 +77,7 @@ router.post('/create-order', async (req: Request, res: Response) => {
 // POST /verify-payment
 router.post('/verify-payment', (req: Request, res: Response) => {
   const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
+  const { keySecret } = getKeys();
 
   // 1. Missing fields check: return 400
   if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {

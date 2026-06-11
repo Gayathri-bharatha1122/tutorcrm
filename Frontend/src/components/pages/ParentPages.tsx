@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { DashboardPage } from '../DashboardPage';
 import { motion } from 'motion/react';
 import { TrendingUp, Calendar, IndianRupee, Bell, User, CheckCircle, AlertCircle } from 'lucide-react';
 import { useLanguage } from '../../LanguageContext';
+import RazorpayCheckout from '../RazorpayCheckout';
 
 interface ParentPageProps {
   pageKey: string;
@@ -25,6 +26,7 @@ const StatCard: React.FC<{ label: string; value: string; sub?: string; color: st
 
 export const ParentPage: React.FC<ParentPageProps> = ({ pageKey, parentName, studentName, onBack }) => {
   const { t } = useLanguage();
+  const [paymentMsg, setPaymentMsg] = useState<{ ok: boolean; text: string } | null>(null);
   
   const pageContent: Record<string, React.ReactNode> = {
     'progress': (
@@ -124,9 +126,22 @@ export const ParentPage: React.FC<ParentPageProps> = ({ pageKey, parentName, stu
               </div>
             </div>
           ))}
-          <button className="mt-5 w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold rounded-xl transition cursor-pointer">
-            {t("Pay Outstanding Balance (₹320)")}
-          </button>
+          <div className="mt-5">
+            <RazorpayCheckout
+              amountInRupees={320}
+              label={t('Pay Outstanding Balance (₹320)')}
+              receipt="fees-q3-2024"
+              prefill={{ name: parentName }}
+              onResult={(ok, msg) => setPaymentMsg({ ok, text: msg })}
+            />
+            {paymentMsg && (
+              <p className={`text-[11px] text-center font-medium mt-2 ${
+                paymentMsg.ok ? 'text-emerald-400' : 'text-rose-400'
+              }`}>
+                {paymentMsg.text}
+              </p>
+            )}
+          </div>
         </div>
       </div>
     ),

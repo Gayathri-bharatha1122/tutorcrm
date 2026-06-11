@@ -264,5 +264,32 @@ export const api = {
   // Tutor Profile Endpoint
   getTutorProfile: () => {
     return request('/tutor/profile');
+  },
+
+  // ── Razorpay Payment Integration ──────────────────────────────────────────
+
+  /** Fetch the Razorpay public key_id from the backend (never hardcode it in frontend) */
+  getRazorpayKey: (): Promise<{ key_id: string }> => {
+    return request('/razorpay-key');
+  },
+
+  /** Create a Razorpay order on the backend and receive the order_id */
+  createOrder: (amount: number, currency = 'INR', receipt: string): Promise<{ order_id: string; amount: number; currency: string }> => {
+    return request('/create-order', {
+      method: 'POST',
+      body: JSON.stringify({ amount, currency, receipt })
+    });
+  },
+
+  /** Verify payment signature on the backend — never verify client-side */
+  verifyPayment: (payload: {
+    razorpay_payment_id: string;
+    razorpay_order_id: string;
+    razorpay_signature: string;
+  }): Promise<{ success: boolean; message?: string; error?: string }> => {
+    return request('/verify-payment', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
   }
 };
