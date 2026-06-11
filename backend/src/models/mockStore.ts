@@ -171,15 +171,27 @@ const createMockModel = (collectionName: string) => {
 
     async create(data: any) {
       const list = getItems();
-      const newObj = {
-        _id: `mock-${collectionName.toLowerCase()}-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        ...data
-      };
-
-      list.push(newObj);
-      return attachSave(newObj);
+      if (Array.isArray(data)) {
+        const createdItems = data.map((item, idx) => {
+          return {
+            _id: `mock-${collectionName.toLowerCase()}-${Date.now()}-${idx}-${Math.floor(Math.random() * 1000)}`,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            ...item
+          };
+        });
+        list.push(...createdItems);
+        return createdItems.map(attachSave);
+      } else {
+        const newObj = {
+          _id: `mock-${collectionName.toLowerCase()}-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          ...data
+        };
+        list.push(newObj);
+        return attachSave(newObj);
+      }
     },
 
     async findOneAndUpdate(filter: any, update: any, options: any = {}) {
