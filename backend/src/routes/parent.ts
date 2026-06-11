@@ -81,7 +81,18 @@ router.get('/bills', async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ error: 'No child profiles linked.' });
     }
 
-    const bills = await Bill.find({ studentId: studentProfile.userId });
+    let bills = await Bill.find({ studentId: studentProfile.userId });
+    
+    // Auto-create default bills for the student if none exist
+    if (bills.length === 0) {
+      bills = await Bill.create([
+        { studentId: studentProfile.userId, itemName: 'Q1 Tuition Fee', paidDate: 'Jan 05', amount: 820, status: 'Paid' },
+        { studentId: studentProfile.userId, itemName: 'Q2 Tuition Fee', paidDate: 'Apr 03', amount: 820, status: 'Paid' },
+        { studentId: studentProfile.userId, itemName: 'Library & Lab Fees', paidDate: 'Feb 15', amount: 180, status: 'Paid' },
+        { studentId: studentProfile.userId, itemName: 'Q3 Tuition Fee', paidDate: '-', amount: 320, status: 'Overdue' }
+      ]);
+    }
+
     return res.json(bills);
   } catch (error) {
     console.error('Error loading parent invoices:', error);

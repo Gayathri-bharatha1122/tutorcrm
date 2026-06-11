@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DashboardPage } from '../DashboardPage';
 import { motion } from 'motion/react';
 import { TrendingUp, Calendar, IndianRupee, Bell, User, CheckCircle, AlertCircle } from 'lucide-react';
 import { useLanguage } from '../../LanguageContext';
 import RazorpayCheckout from '../RazorpayCheckout';
+import { api } from '../../services/api';
+import { Bill } from '../../types';
 
 interface ParentPageProps {
   pageKey: string;
@@ -27,6 +29,27 @@ const StatCard: React.FC<{ label: string; value: string; sub?: string; color: st
 export const ParentPage: React.FC<ParentPageProps> = ({ pageKey, parentName, studentName, onBack }) => {
   const { t } = useLanguage();
   const [paymentMsg, setPaymentMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [bills, setBills] = useState<Bill[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (pageKey === 'fees') {
+      setLoading(true);
+      api.getParentBills()
+        .then(data => setBills(data || []))
+        .catch(err => console.error("Error loading bills:", err))
+        .finally(() => setLoading(false));
+    }
+  }, [pageKey]);
+
+  // Compute Outstanding Dues & Total Paid dynamically
+  const outstandingDues = bills
+    .filter((b) => b.status === 'Pending' || b.status === 'Overdue')
+    .reduce((sum, b) => sum + b.amount, 0);
+
+  const totalPaid = bills
+    .filter((b) => b.status === 'Paid')
+    .reduce((sum, b) => sum + b.amount, 0);
   
   const pageContent: Record<string, React.ReactNode> = {
     'progress': (
@@ -99,41 +122,62 @@ export const ParentPage: React.FC<ParentPageProps> = ({ pageKey, parentName, stu
     'fees': (
       <div className="space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <StatCard label="Outstanding Dues" value="₹320" sub="Due by Jun 30" color="text-rose-400" />
-          <StatCard label="Total Paid" value="₹1,820" sub="This academic year" color="text-emerald-400" />
+          <StatCard label="Outstanding Dues" value={`₹${outstandingDues}`} sub="Due by Jun 30" color="text-rose-400" />
+          <StatCard label="Total Paid" value={`₹${totalPaid}`} sub="This academic year" color="text-emerald-400" />
           <StatCard label="Next Due" value="Jul 1" sub="Quarterly tuition" color="text-amber-400" />
         </div>
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
           <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
             <IndianRupee className="h-4 w-4 text-amber-400" /> {t("Fee Ledger")}
           </h3>
-          {[
-            { item: 'Q1 Tuition Fee', amount: 820, status: 'Paid', date: 'Jan 5' },
-            { item: 'Q2 Tuition Fee', amount: 820, status: 'Paid', date: 'Apr 3' },
-            { item: 'Library & Lab Fees', amount: 180, status: 'Paid', date: 'Feb 15' },
-            { item: 'Q3 Tuition Fee', amount: 320, status: 'Overdue', date: 'Jun 30' },
-          ].map((f, i) => (
-            <div key={i} className="flex items-center justify-between py-3 border-b border-slate-800 last:border-0">
-              <div>
-                <span className="text-xs font-bold text-white block">{t(f.item)}</span>
-                <span className="text-[10px] text-slate-500">{t("Due")}: {t(f.date)}</span>
+          {loading ? (
+            <div className="text-center py-6 text-xs text-slate-500 font-semibold">{t('Loading billing records...')}</div>
+          ) : bills.length === 0 ? (
+            <div className="text-center py-6 text-xs text-slate-500 font-semibold">{t('No bills found.')}</div>
+          ) : (
+            bills.map((f, i) => (
+              <div key={i} className="flex items-center justify-between py-3 border-b border-slate-800 last:border-0">
+                <div>
+                  <span className="text-xs font-bold text-white block">{t(f.itemName)}</span>
+                  <span className="text-[10px] text-slate-500">{t("Due")}: {f.status === 'Paid' ? t(f.paidDate) : t('Jun 30')}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-extrabold text-white font-mono">₹{f.amount}</span>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                    f.status === 'Paid' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400 animate-pulse'
+                  }`}>{t(f.status)}</span>
+                </div>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="text-sm font-extrabold text-white font-mono">₹{f.amount}</span>
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                  f.status === 'Paid' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400 animate-pulse'
-                }`}>{t(f.status)}</span>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
           <div className="mt-5">
-            <RazorpayCheckout
-              amountInRupees={320}
-              label={t('Pay Outstanding Balance (₹320)')}
-              receipt="fees-q3-2024"
-              prefill={{ name: parentName }}
-              onResult={(ok, msg) => setPaymentMsg({ ok, text: msg })}
-            />
+            {outstandingDues > 0 ? (
+              <RazorpayCheckout
+                amountInRupees={outstandingDues}
+                label={t('Pay Outstanding Balance (₹{amount})').replace('{amount}', outstandingDues.toString())}
+                receipt={`fees-dues-${Date.now()}`}
+                prefill={{ name: parentName }}
+                onResult={async (ok, msg) => {
+                  setPaymentMsg({ ok, text: msg });
+                  if (ok) {
+                    try {
+                      const unpaidBills = bills.filter(b => b.status === 'Pending' || b.status === 'Overdue');
+                      for (const ub of unpaidBills) {
+                        await api.payBill(ub.id || (ub as any)._id);
+                      }
+                      const freshBills = await api.getParentBills();
+                      setBills(freshBills);
+                    } catch (err) {
+                      console.error("Failed to settle paid bills on backend:", err);
+                    }
+                  }
+                }}
+              />
+            ) : (
+              <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold text-center rounded-xl">
+                {t('All dues are fully settled. Thank you!')}
+              </div>
+            )}
             {paymentMsg && (
               <p className={`text-[11px] text-center font-medium mt-2 ${
                 paymentMsg.ok ? 'text-emerald-400' : 'text-rose-400'

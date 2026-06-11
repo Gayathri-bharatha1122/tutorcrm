@@ -212,8 +212,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <>
       {/* Desktop fixed sidebar */}
-      <div className="hidden lg:block shrink-0 h-screen sticky top-0">
-        {sidebarContent}
+      <div className="hidden lg:block shrink-0 w-64 md:w-72 h-screen relative">
+        <div className="fixed top-0 left-0 bottom-0 w-64 md:w-72 z-30">
+          {sidebarContent}
+        </div>
       </div>
 
       {/* Mobile Sidebar overlay and drawer */}
