@@ -8,8 +8,8 @@
 
 The project has been separated into two dedicated directories:
 
-* **[Frontend](file:///c:/Users/ADM/Downloads/project-zenithyuga/Frontend)**: The React + Vite client dashboard application.
-* **[Backend](file:///c:/Users/ADM/Downloads/project-zenithyuga/Backend)**: The Node + Express backend server.
+* **frontend**: The React + Vite client dashboard application.
+* **backend**: The Node + Express backend server.
 
 ---
 
@@ -33,9 +33,9 @@ You can launch both Frontend and Backend concurrently from the root folder:
 ### Option B: Run Directories Separately
 
 #### Frontend
-1. Navigate to the `Frontend` directory:
+1. Navigate to the `frontend` directory:
    ```bash
-   cd Frontend
+   cd frontend
    ```
 2. Install dependencies & run:
    ```bash
@@ -46,9 +46,9 @@ You can launch both Frontend and Backend concurrently from the root folder:
    ```
 
 #### Backend
-1. Navigate to the `Backend` directory:
+1. Navigate to the `backend` directory:
    ```bash
-   cd Backend
+   cd backend
    ```
 2. Install dependencies & run:
    ```bash
@@ -60,8 +60,8 @@ You can launch both Frontend and Backend concurrently from the root folder:
 
 ---
 
-## ⚙️ Backend Environment Variables (`Backend/.env`)
-Create/modify the `.env` file under the `Backend` folder:
+## ⚙️ Backend Environment Variables (`backend/.env`)
+Create/modify the `.env` file under the `backend` folder:
 ```env
 PORT=5000
 DATABASE_URL=mongodb://localhost:27017/tutorcrm
