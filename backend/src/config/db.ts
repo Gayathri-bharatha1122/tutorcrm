@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { setUseMockDb } from '../models';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 
 dotenv.config();
 
@@ -13,7 +14,15 @@ export const connectDB = async () => {
     });
     console.log('⚡ Connected to MongoDB successfully.');
   } catch (error) {
-    console.log('❌ Failed to connect to MongoDB. Service may not be running locally.');
-    setUseMockDb(true);
+    console.log('⚠️ Failed to connect to local MongoDB. Starting in-memory MongoDB Server...');
+    try {
+      const mongoServer = await MongoMemoryServer.create();
+      const mongoUri = mongoServer.getUri();
+      await mongoose.connect(mongoUri);
+      console.log('⚡ Connected to In-Memory MongoDB successfully.');
+    } catch (memError) {
+      console.log('❌ Failed to start In-Memory MongoDB. Falling back to Mock Store.');
+      setUseMockDb(true);
+    }
   }
 };
